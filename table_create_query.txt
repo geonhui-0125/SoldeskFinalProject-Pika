@@ -1,0 +1,185 @@
+drop sequence seq_accounts;
+drop sequence seq_reviews;
+drop sequence seq_favorite_products;
+drop sequence seq_payments;
+drop sequence seq_products;
+drop sequence seq_categories;
+drop sequence seq_users;
+
+create sequence seq_users 
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_categories
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_products
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_payments
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_favorite_products
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_reviews 
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+    
+create sequence seq_accounts
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+--drop table━
+drop table account;
+drop table reviews;
+drop table favorite_products;
+drop table payments;
+drop table products;
+drop table categories;
+drop table users;
+
+--create table
+CREATE TABLE users (
+	id varchar2(20) primary key,
+    pw varchar2(20) not null,
+	nickname varchar2(50) NULL,
+    profile_image varchar2(250) NULL,
+	address	varchar2(100) NULL,
+    birth DATE null
+);
+
+CREATE TABLE categories (
+	category_id	NUMBER primary key,
+	category varchar2(50) not null
+);
+
+-- categories 데이터 insert 
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '피규어>아크릴 스탠드');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '피규어>SD 스탠드');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '피규어>일반 피규어');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '피규어>프라모델');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '피규어>인형');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '피규어>기타');
+
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '서적>소설');
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '서적>만화');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '서적>2차 창작');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '서적>음반/블루레이');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '서적>기타');
+
+insert into categories (category_id, category)
+values (seq_categories.nextval, '의류>일반의류');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '의류>코스튬');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '의류>침구류');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '의류>기타');
+
+insert into categories (category_id, category)
+values (seq_categories.nextval, '잡화>포스터');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '잡화>핀뱃지');
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '잡화>문구류');
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '잡화>스티커');
+insert into categories (category_id, category)
+values (seq_categories.nextval, '잡화>카드');
+insert into categories (category_id, category) 
+values (seq_categories.nextval, '잡화>기타');
+
+insert into categories (category_id, category)
+values (seq_categories.nextval, '기타>기타');
+
+CREATE TABLE products (
+	product_id NUMBER primary key,
+	seller_id varchar(20) NOT NULL,
+	category_id	NUMBER NOT NULL,
+	price NUMBER NOT NULL,
+	title varchar2(100) NOT NULL,
+	description	varchar2(1000) NOT NULL,
+    product_image varchar2(250) NOT NULL,
+	view_cnt NUMBER DEFAULT 0,
+	created_at date NOT NULL,
+    product_state NUMBER(1) DEFAULT 0, -- 0 : selling, 1 : selled
+    foreign key (seller_id) 
+    references users (id) ON DELETE CASCADE,
+    foreign key (category_id) 
+    references categories (category_id) ON DELETE CASCADE
+);
+
+create table payments (
+    imp_uid varchar2(50) primary key,
+    merchant_uid varchar2(50) not null,
+    task_id NUMBER not null,
+    amount NUMBER not null
+);
+
+CREATE TABLE favorite_products (
+	fp_id NUMBER primary key,
+	user_id	varchar(20) NOT NULL,
+	product_id NUMBER NOT NULL,
+    foreign key (user_id) 
+    references users (id) ON DELETE CASCADE,
+    foreign key (product_id) 
+    references products (product_id) ON DELETE CASCADE
+);
+
+create table reviews (
+    review_id number primary key,
+    product_id number not null,
+    user_id varchar2(20) not null,
+    score number not null,
+    foreign key (user_id) 
+    references users (id) ON DELETE CASCADE,
+    foreign key (product_id) 
+    references products (product_id) ON DELETE CASCADE
+);
+
+create table accounts(
+    account_id number primary key,
+    seller_id varchar2(20) not null,
+    bank_code number not null,
+    account_number varchar(100),
+    foreign key (seller_id) 
+    references users (id) ON DELETE CASCADE
+);
+
+--select table━
+select * from users;
+select * from categories;
+select * from products;
+select * from payments;
+select * from favorite_products;
+select * from reviews;
+select * from accounts;
+
+commit;
+
+
+
+
