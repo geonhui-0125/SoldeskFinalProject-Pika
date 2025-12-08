@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 상세</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+
+    <style>
+        /* UI 스타일은 기존과 동일 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .total-payment {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #000;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .total-payment .info-value {
+            color: #ff0000;
+        }
+
+        .payment-button-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 0;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .payment-button {
+            width: 90%;
+            max-width: 560px;
+            padding: 15px;
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .payment-button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">결제 상세</div>
+
+    <div class="section">
+        <div class="section-title">상품 정보</div>
+        <div class="info-row">
+            <span class="info-label">상품명</span>
+            <span class="info-value" th:text="${paymentDto.name}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">상품 ID</span>
+            <span class="info-value" th:text="${paymentDto.taskId}"></span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">주문자 정보</div>
+        <div class="info-row">
+            <span class="info-label">이름</span>
+            <span class="info-value">홍길동</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">이메일</span>
+            <span class="info-value">gildong@gmail.com</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">전화번호</span>
+            <span class="info-value">010-1234-5678</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">최종 결제 금액</div>
+        <div class="info-row">
+            <span class="info-label">상품 금액</span>
+            <span class="info-value"
+                  th:text="${#numbers.formatDecimal(paymentDto.amount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+        </div>
+        <div class="total-payment info-row">
+            <span class="info-label">총 결제 금액</span>
+            <span class="info-value"
+                  th:text="${#numbers.formatDecimal(paymentDto.amount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+        </div>
+    </div>
+
+</div>
+
+<div class="payment-button-area">
+    <button class="payment-button" onclick="onClickPayment()" id="paymentButton">
+        <span th:text="${#numbers.formatDecimal(paymentDto.amount, 0, 'COMMA', 0, 'POINT')} + '원 결제하기'"></span>
+    </button>
+</div>
+
+
+<script>
+
+    const impUID = "[[${paymentDto.impUid}]]";
+    const productName = "[[${paymentDto.name}]]";
+    const productPrice = "[[${paymentDto.amount}]]";
+    const productId = "[[${paymentDto.taskId}]]"
+
+    // 3. 결제 요청 처리 함수
+    function onClickPayment() {
+
+        const {IMP} = window;
+
+        IMP.init(impUID);
+
+        const paymentData = {
+            pg: "html5_inicis",                             // PG사
+            pay_method: "card",                             // 결제수단
+            merchant_uid: `1_${new Date().getTime()}`,    // 주문번호(판매자UID +  "_" + 현재날짜 (고유해야 함)
+            name: productName,                              // 주문명
+            amount: 1,                                      // 결제금액
+            buyer_name: "홍길동",                            // 구매자 이름
+            buyer_email: "gildong@gmail.com",               // 구매자 이메일
+            buyer_tel : '010-1234-5678',                    // 그 외 정보....
+            buyer_addr : '서울특별시 강남구 삼성동',
+            buyer_postcode : '123-456',
+            custom_data : {
+                actualAmount: productPrice,
+                taskId: productId
+            }
+        };
+
+        // PortOne 결제 창 호출
+        IMP.request_pay(paymentData, async (response) => {
+
+            if (response.success) {
+                console.log("클라이언트 결제 성공:", response);
+                await validatePaymentOnServer(
+                    response.imp_uid,
+                    response.merchant_uid,
+                    response.custom_data.taskId,
+                    response.custom_data.actualAmount);
+            } else {
+                alert(`결제 실패: ${response.error_msg}`);
+            }
+        });
+    }
+
+    // 4. 우리 백엔드 서버에 결제 검증 요청
+    async function validatePaymentOnServer(impUid, merchantUid, taskId, amount) {
+
+        const $paymentButton = document.getElementsByClassName(".payment-button-area > .payment-button")
+
+        $paymentButton.disabled = true;
+        $paymentButton.textContent = '결제 처리 중입니다...';
+
+        try {
+            const serverResponse = await fetch("/api/payments/validation", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    impUid: impUid,
+                    taskId: taskId,
+                    amount: amount,
+                    merchantUid: merchantUid.split('_')[0], //서버로 보낼 때는 날짜 없애기
+                }),
+            });
+
+            //
+            const data = await serverResponse.json();
+
+            if (!serverResponse.ok) {
+                throw new Error(data.message || `서버 검증 응답 오류: ${serverResponse.status}`);
+            }
+
+            console.log("서버 검증 성공:", data);
+            alert("결제 및 서버 검증이 모두 완료되었습니다.");
+
+            const merchantUid = data.response?.merchantUid || data.merchantUid;
+            window.location.href = `/payment/result?merchantUid=${merchantUid}`;
+
+        } catch (e) {
+            console.error("서버 검증 실패:", e);
+            alert(`서버 검증에 실패했습니다: ${e.message}`);
+            window.location.href = "/payment/fail";
+        } finally {
+            $paymentButton.disabled = false;
+            $paymentButton.textContent = `${new Intl.NumberFormat().format(PRODUCT_PRICE)}원 결제하기`;
+        }
+    }
+</script>
+</body>
+</html>
