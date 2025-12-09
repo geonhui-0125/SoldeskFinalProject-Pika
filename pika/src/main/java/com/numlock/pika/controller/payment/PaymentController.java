@@ -2,11 +2,18 @@ package com.numlock.pika.controller.payment;
 
 import com.numlock.pika.dto.PaymentDto;
 import com.numlock.pika.service.payment.PaymentService;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @Controller
@@ -32,16 +39,7 @@ public class PaymentController {
     public String getPaymentResult(@RequestParam("productId") int id, Model model) {
 
 
-        return  "payment/result";
-    }
-
-    //결제 확정 로직
-    @GetMapping("/payment/confirm")
-    public String confirmPayment(@RequestParam("impUid") String impUid, Model model) {
-
-        paymentService.confirmPayment(impUid);
-
-        return "product/main"; //추후 수정
+        return "payment/result";
     }
 
 }

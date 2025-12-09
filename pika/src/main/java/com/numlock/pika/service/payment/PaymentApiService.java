@@ -1,5 +1,9 @@
 package com.numlock.pika.service.payment;
 
+import com.numlock.pika.domain.Accounts;
+import com.numlock.pika.domain.Payments;
+import com.numlock.pika.repository.AccountRepository;
+import com.numlock.pika.repository.PaymentRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -19,18 +23,24 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class PaymentValidService {
+public class PaymentApiService {
 
     private final IamportClient iamportClient;
 
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
+
     //생성자로 IamportClient 초기화 
     //불변성 보장, null값 방지
     //properties.application 파일의 포트원 키 정보 가져옴
-    public PaymentValidService(@Value("${imp.access}") String apiKey,
-                               @Value("${imp.secret}") String apiSecret) {
+    public PaymentApiService(@Value("${imp.access}") String apiKey,
+                             @Value("${imp.secret}") String apiSecret) {
 
         this.iamportClient = new IamportClient(apiKey, apiSecret);
     }
@@ -38,7 +48,7 @@ public class PaymentValidService {
     /**
      * 결제 정보를 PortOne 서버와 비교하여 검증
      *
-     * @param PaymentVaildDto 클라이언트에서 받은 아임포트 결제 정보
+     * @param PaymentValidDto 클라이언트에서 받은 아임포트 결제 정보
      * @return 검증된 결제 응답
      * @throws IamportResponseException
      * @throws IOException
@@ -93,7 +103,7 @@ public class PaymentValidService {
     }
 
     //주문 결제 환불/취소 시
-    public void cancelPayment(String impUid) throws IamportResponseException, IOException {
+    public IamportResponse<Payment> cancelPayment(String impUid) throws IamportResponseException, IOException {
 
         CancelData cancelData = new CancelData(impUid, true); // amount를 생략하면 전액 취소
 
@@ -101,9 +111,44 @@ public class PaymentValidService {
 
         if (cancelResponse.getResponse() != null) {
             System.out.println("결제 취소 성공 : " + cancelResponse.getResponse());
+
+            return cancelResponse;
         } else {
             throw new RuntimeException("결제 취소 실패 : " + cancelResponse.getMessage());
         }
+    }
+
+    //주문 결제 확정 시
+    public IamportResponse<Payment> confirmPayment(String impUid) throws IamportResponseException, IOException {
+
+        //결제 정보 찾기
+        Payments payments = paymentRepository.findById(impUid)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        //결제한 정보에서 판매자 UID 찾기 (merchantUID 형태 : 판매자UID_202512080404)
+        String mUid = payments.getMerchantUid().split("_")[0];
+
+        //해당 사용자의 은행 계좌 정보 가져옴
+        Accounts accounts = accountRepository.findByUserId(mUid)
+                .orElseThrow(() -> new RuntimeException("해당 사용자의 계좌 정보가 존재하지 않습니다."));
+
+        //결제 취소/환불 요청 데이터에 판매자 계좌 정보로 수정
+        CancelData cancelData = new CancelData(impUid, true); // amount를 생략하면 전액 취소/환불
+        cancelData.setRefund_holder(accounts.getSellerId()); //김혁진
+        cancelData.setRefund_bank(accounts.getBankCode()); //03 기업 은행
+        cancelData.setRefund_account(accounts.getAccountNumber()); //00512746501012
+
+        //결제 쥐소/환불 요청
+        IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
+
+        if (cancelResponse.getResponse() != null) {
+            System.out.println("결제 취소 성공 : " + cancelResponse.getResponse());
+
+            return cancelResponse;
+        } else {
+            throw new RuntimeException("결제 취소 실패 : " + cancelResponse.getMessage());
+        }
+
     }
 
 }
