@@ -1,6 +1,6 @@
 package com.numlock.pika.controller.login;
 
-import com.numlock.pika.dto.Users;
+import com.numlock.pika.domain.Users;
 import com.numlock.pika.service.login.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +56,14 @@ public class LoginController {
     public String loginForm(Model model) {
         model.addAttribute("user", new Users());
         return "user/loginForm";
+    }
+
+    @GetMapping("/user/loginSuccess")
+    public String loginSuccess(Principal principal, Model model) {
+        if (principal != null) {
+            model.addAttribute("loginUserId", principal.getName());
+        }
+        return "user/loginSuccess";
     }
 
     @GetMapping("/user/delete")

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -16,21 +16,24 @@ public class LoginSecurity {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        // return new BCryptPasswordEncoder(); // 암호화 원할 시 복구
+        // 개발용. PasswordEncoder를 사용하지 않음.
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize //특정 URL 모두 허용
-                                -> authorize.requestMatchers("/user/join", "/user/login", "/", "/css/**", "/js/**").permitAll()
-                                .requestMatchers("/mypage/**").hasRole("USER") // '/mypage/**'는 USER 역할만 접근 가능
-                        .anyRequest().authenticated() //나머지는 인증 필요
-                )
+                // .authorizeHttpRequests(authorize //특정 URL 모두 허용
+                //                 -> authorize.requestMatchers("/user/join", "/user/login", "/", "/css/**", "/js/**").permitAll()
+                //                 .requestMatchers("/mypage/**").hasRole("USER") // '/mypage/**'는 USER 역할만 접근 가능
+                //         .anyRequest().authenticated() //나머지는 인증 필요
+                // )
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()) // 모든 경로에 대한 접근 허용 (개발용)
                 .formLogin(form -> form.loginPage("/user/login") //사용자 정의 로그인 페이지
                         .loginProcessingUrl("/user/login-proc") //로그인 처리 페이지
-                        .defaultSuccessUrl("/", true) //로그인 성공시 리다이렉트
+                        .defaultSuccessUrl("/user/loginSuccess", true) //로그인 성공시 리다이렉트
                         //.failureUrl("/user/login")
                         .permitAll()
                 )
