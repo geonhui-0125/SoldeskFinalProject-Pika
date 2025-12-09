@@ -23,16 +23,8 @@ import java.util.Optional;
 @Service
 public class PaymentService {
 
-    private final IamportClient iamportClient;
-
     @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
-    private AccountRepository accountRepository;
 
     //생성자로 IamportClient 초기화
     //불변성 보장, null값 방지
@@ -40,12 +32,9 @@ public class PaymentService {
 
     private final String impCode;
 
-    public PaymentService(@Value("${imp.code}") String impCode,
-                          @Value("${imp.access}") String apiKey,
-                          @Value("${imp.secret}") String apiSecret) {
+    public PaymentService(@Value("${imp.code}") String impCode) {
 
         this.impCode = impCode;
-        iamportClient = new IamportClient(apiKey, apiSecret);
     }
 
     public PaymentDto getPayemntInfo(int productId) {
@@ -69,25 +58,6 @@ public class PaymentService {
         return paymentDto;
     }
 
-    public void confirmPayment(String impUid) {
 
-        Payments payments = paymentRepository.findById(impUid)
-                .orElseThrow(() -> new RuntimeException(""));
-
-        Accounts accounts = accountRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException(""));
-
-        CancelData cancelData = new CancelData(impUid, true); // amount를 생략하면 전액 취소
-        //cancelData.setRefund_holder();
-
-        //IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
-
-//        if (cancelResponse.getResponse() != null) {
-//            System.out.println("결제 취소 성공 : " + cancelResponse.getResponse());
-//        } else {
-//            throw new RuntimeException("결제 취소 실패 : " + cancelResponse.getMessage());
-//        }
-
-    }
 
 }

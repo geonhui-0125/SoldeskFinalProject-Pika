@@ -161,6 +161,7 @@
     const productName = "[[${paymentDto.name}]]";
     const productPrice = "[[${paymentDto.amount}]]";
     const productId = "[[${paymentDto.taskId}]]"
+    const merchantUid = "[[${paymentDto.merchantUid}]]"
 
     // 3. 결제 요청 처리 함수
     function onClickPayment() {
@@ -172,7 +173,7 @@
         const paymentData = {
             pg: "html5_inicis",                             // PG사
             pay_method: "card",                             // 결제수단
-            merchant_uid: `1_${new Date().getTime()}`,    // 주문번호(판매자UID +  "_" + 현재날짜 (고유해야 함)
+            merchant_uid: merchantUid,    // 주문번호(판매자UID +  "_" + 현재날짜 (고유해야 함)
             name: productName,                              // 주문명
             amount: 1,                                      // 결제금액
             buyer_name: "홍길동",                            // 구매자 이름
@@ -205,6 +206,10 @@
     // 4. 우리 백엔드 서버에 결제 검증 요청
     async function validatePaymentOnServer(impUid, merchantUid, taskId, amount) {
 
+        const merchantId = merchantUid;
+
+        console.log('결제 요청 데이터 확인 : ' + impUid, merchantId, taskId, amount);
+
         const $paymentButton = document.getElementsByClassName(".payment-button-area > .payment-button")
 
         $paymentButton.disabled = true;
@@ -218,7 +223,7 @@
                     impUid: impUid,
                     taskId: taskId,
                     amount: amount,
-                    merchantUid: merchantUid.split('_')[0], //서버로 보낼 때는 날짜 없애기
+                    merchantUid: merchantId //서버로 보낼 때는 날짜 없애기
                 }),
             });
 
