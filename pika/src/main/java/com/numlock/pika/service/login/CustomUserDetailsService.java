@@ -1,6 +1,6 @@
 package com.numlock.pika.service.login;
 
-import com.numlock.pika.dto.Users;
+import com.numlock.pika.domain.Users;
 import com.numlock.pika.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // "USER", "GUEST" 등의 role 문자열을 Spring Security가 인식할 수 있는 형태로 변환
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
-        return new User(user.getId(), user.getPassword(), authorities);
+        return new User(user.getId(), user.getPw(), authorities);
     }
 
 }

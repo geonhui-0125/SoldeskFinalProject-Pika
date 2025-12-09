@@ -1,6 +1,6 @@
 package com.numlock.pika.repository;
 
-import com.numlock.pika.dto.Users;
+import com.numlock.pika.domain.Users;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
