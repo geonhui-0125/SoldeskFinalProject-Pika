@@ -33,7 +33,7 @@ public class Users {
     //추가 입력값
     private String address;
     private String phone;
-    //private int birth_date;
+    private int birth;
 
     //로그인 타입 분류
     @Column(nullable = false)
@@ -49,9 +49,10 @@ public class Users {
         this.role = role;
     }
 
-    public Users updateUserRole(String address, String phone){
+    public Users updateUserRole(String address, String phone, int birth){
         this.address = address;
         this.phone = phone;
+        this.birth = birth;
         this.role = "USER";
         return this;
     }

@@ -42,7 +42,7 @@ create sequence seq_accounts
     NOCACHE NOORDER;
 
 --drop table━
-drop table account;
+drop table accounts;
 drop table reviews;
 drop table favorite_products;
 drop table payments;
@@ -54,10 +54,13 @@ drop table users;
 CREATE TABLE users (
 	id varchar2(20) primary key,
     pw varchar2(20) not null,
-	nickname varchar2(50) NULL,
-    profile_image varchar2(250) NULL,
+	nickname varchar2(50) not NULL,
+    profile_image varchar2(250) not NULL,
+    email varchar2(50) not NULL,
 	address	varchar2(100) NULL,
-    birth DATE null
+    phone varchar2(20) null,
+    birth DATE null,
+    role varchar2(20)
 );
 
 CREATE TABLE categories (
