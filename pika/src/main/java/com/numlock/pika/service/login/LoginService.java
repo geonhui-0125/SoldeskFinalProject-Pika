@@ -36,7 +36,7 @@ public class LoginService {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));
 
-        //암호화된 비밀번호 일치 확인 (현재 단계에서는 평문으로 직접 비교) - 보안 경고: 이 방법은 매우 위험합니다.
+        //암호화된 비밀번호 일치 확인 (현재 단계에서는 평문으로 직접 비교)
         // if (!passwordEncoder.matches(password, user.getPs())) {
         //     throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         // }

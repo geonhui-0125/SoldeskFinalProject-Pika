@@ -31,12 +31,12 @@ public class LoginController {
 
     @GetMapping("/user/join")
     public String joinForm(Model model) {
-        model.addAttribute("user", new Users()); // Changed from User to Users
+        model.addAttribute("user", new Users());
         return "user/joinForm";
     }
 
     @PostMapping("/user/joinUser")
-    public String joinUser(Users users, Model model) { // Changed from User to Users
+    public String joinUser(Users users, Model model) {
         log.info("Attempting to join user: {}", users.toString()); // Log the whole object
 
         try {
@@ -58,6 +58,7 @@ public class LoginController {
         return "user/loginForm";
     }
 
+    //로그인 성공 처리
     @GetMapping("/user/loginSuccess")
     public String loginSuccess(Principal principal, Model model) {
         if (principal != null) {

@@ -32,6 +32,7 @@ public class LoginSecurity {
                 // )
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()) // 모든 경로에 대한 접근 허용 (개발용)
                 .formLogin(form -> form.loginPage("/user/login") //사용자 정의 로그인 페이지
+                        .usernameParameter("id") //loginForm의 username을 id로
                         .loginProcessingUrl("/user/login-proc") //로그인 처리 페이지
                         .defaultSuccessUrl("/user/loginSuccess", true) //로그인 성공시 리다이렉트
                         //.failureUrl("/user/login")
