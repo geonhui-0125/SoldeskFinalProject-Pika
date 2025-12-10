@@ -29,7 +29,7 @@ public class Users {
     @Column(nullable = false)
     private String nickname;
     @Column(nullable = false)
-    private String profileImage;
+    private String profileImage; // TODO: 추후 이미지 파일 업로드 구현 시 byte[] 타입으로 변경하고 @Lob 어노테이션 추가 (Oracle BLOB 저장용), profileImageType 필드(String) 추가 필요
     @Column(nullable = false)
     private String email;
 
