@@ -14,26 +14,35 @@ public class LoginService {
 
     private final UserRepository userRepository;
 
-    @Transactional
-    public Users joinUser(Users users) {
-        //ID 중복 확인
-        if(checkUser(users.getId())) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }else if(checkNickname(users.getNickname())) {
-            throw new IllegalStateException("이미 존재하는 닉네임 입니다");
-        }
-        //비밀번호 암호화
-        // users.setPs(passwordEncoder.encode(users.getPs()));
-        return userRepository.save(users);
-    }
-
     //ID 중복 검사
     public boolean checkUser(String id) {
         return userRepository.existsById(id);
     }
 
     //닉네임 중복 검사
-    public boolean checkNickname(String nickname) {return userRepository.existsByNickname(nickname);}
+    public boolean checkNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);}
+
+    //이메일 중복 검사
+    public boolean checkEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Transactional
+    public Users joinUser(Users users) {
+        //필수 요소 중복 확인
+        if(checkUser(users.getId())) {
+            throw new IllegalStateException("이미 존재하는 아이디 입니다.");
+        }else if(checkNickname(users.getNickname())) {
+            throw new IllegalStateException("이미 존재하는 닉네임 입니다");
+        }else if(checkEmail(users.getEmail())) {
+            throw new IllegalStateException("이미 존재하는 이메일 입니다.");
+        }
+        //비밀번호 암호화
+        // users.setPs(passwordEncoder.encode(users.getPs()));
+        return userRepository.save(users);
+    }
+
 
     @Transactional(readOnly = true)
     public Users login(String id, String password) {
