@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class UserService {
     private final FileUploadService fileUploadService;
 
     public Users updateAddlInfo(String userId, UserAddInfoDto dto, MultipartFile profileImage) throws IOException {
-        Users user = userRepository.findById(userId)
+        Users user = userRepository.findById (userId)
                 .orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         //프로필 이미지 업데이트
@@ -45,8 +47,14 @@ public class UserService {
         }
 
         //생년월일 업데이트
-        if(dto.getBirth() != null){
-            user.setBirth(dto.getBirth());
+        if(dto.getBirth() != null && !dto.getBirth().trim().isEmpty()){
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                sdf.setLenient(false);
+                user.setBirth(sdf.parse(dto.getBirth()));
+            } catch (ParseException e){
+                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다.");
+            }
         }
 
         //모든 추가정보 입력시 role 변경

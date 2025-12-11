@@ -15,9 +15,7 @@ public class UserAddInfoDto {
     private String profileImage;
     private String address;
     private String phone;
-    private Date birth;
+    private String birth;
     private String role;
-
-
 
 }

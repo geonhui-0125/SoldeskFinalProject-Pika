@@ -68,4 +68,12 @@ public class Users {
         this.role = role;
     }
 
+    public Users updateUserRole(String address, String phone, Date birth){
+        this.address = address;
+        this.phone = phone;
+        this.birth = birth;
+        this.role = "USER";
+        return this;
+    }
+
 }

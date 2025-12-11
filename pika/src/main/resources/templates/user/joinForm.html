@@ -63,6 +63,8 @@
 <body>
     <div class="container">
         <h1>회원가입</h1>
+        <!--/* 디버깅용: errorMessage 변수가 모델에 담겨오는지 확인 */-->
+        <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
         <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="id">아이디:</label>
