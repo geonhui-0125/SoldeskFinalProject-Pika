@@ -57,9 +57,6 @@
 <body>
     <div class="container">
         <h1>회원가입</h1>
-        <div th:if="${errorMessage}" class="error-message">
-            <p th:text="${errorMessage}"></p>
-        </div>
         <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="id">아이디:</label>
@@ -99,5 +96,14 @@
             <a href="/user/login">이미 계정이 있으신가요? 로그인</a>
         </div>
     </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const errorMessage = /*[[${errorMessage}]]*/ null;
+        if(errorMessage){
+            alert(errorMessage);
+        }
+        /*]]>*/
+    </script>
 </body>
 </html>

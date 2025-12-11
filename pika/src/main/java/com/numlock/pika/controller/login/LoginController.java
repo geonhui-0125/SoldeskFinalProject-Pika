@@ -87,11 +87,10 @@ public class LoginController {
 
     //Spring Security가 로그인/아웃을 자동으로 처리
     @GetMapping("/user/login")
-    public String loginForm(//@RequestParam(required = false)String error,
-                            Model model) {
-//        if(error != null){
-//            model.addAttribute("errorMessage", error);
-//        } 오류메세지 띄우기용 -> 이후에 구현
+    public String loginForm(@RequestParam(required = false)String error, Model model) {
+       if(error != null){
+            model.addAttribute("errorMessage", "아이디 혹은 비밀번호가 올바르지 않습니다.");
+        }
 
         model.addAttribute("user", new Users());
         return "user/loginForm";
