@@ -10,19 +10,21 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class Reviews {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_reviews")
+    @SequenceGenerator(name = "seq_reviews", sequenceName = "seq_reviews", allocationSize = 1)
     @Column(name = "review_id")
-    private int reviewId; // 리뷰 고유 ID
+    private Long reviewId;
 
-    @Column(name = "product_id")
-    private int productId; // 리뷰 상품 고유 ID
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
-    @Column(name = "user_id")
-    private int userId; // 리뷰어 고유 ID
+    @Column(name = "user_id", nullable = false, length = 20)
+    private String userId;
 
-    @Column(name = "score")
-    private int score; // 별점 1 ~ 5
+    @Column(name = "score", nullable = false)
+    private Integer score;
 }
