@@ -4,7 +4,67 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
+<style>
 
+
+    .confirm-button-area {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px 0;
+        background-color: #fff;
+        border-top: 1px solid #eee;
+        text-align: center;
+    }
+
+    .confirm-button {
+        width: 90%;
+        max-width: 560px;
+        padding: 15px;
+        background-color: #ff0000;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+</style>
+<body>
+<div class="confirm-button-area">
+    <button class="confirm-button" onclick="onclickConfirmPayment()" id="confirmButton">
+        <span>구매 확정</span>
+    </button>
+</div>
+<script>
+    const impUid = "[[${impUid}]]"; // 결제 고유 Uid
+
+    async function onclickConfirmPayment() {
+
+        try {
+            const serverResponse = await fetch(`/api/payment/confirm/${impUid}`, {
+                method: "POST"
+            });
+
+            const data = await serverResponse.json();
+
+            if (!serverResponse.ok) {
+                throw new Error(data.message || `서버 검증 응답 오류: ${serverResponse.status}`);
+            }
+
+            console.log("서버 검증 성공:", data);
+            alert("구매 확정 성공!");
+
+            //window.location.href = `/payment/result?impUid=${data.response.impUid}`;
+
+        } catch (e) {
+            console.error("서버 검증 실패:", e);
+            alert('구매 확정 실패!');
+            //window.location.href = "/payment/fail";
+        }
+    }
+</script>
 </body>
 </html>

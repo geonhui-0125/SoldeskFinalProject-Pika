@@ -1,6 +1,7 @@
 package com.numlock.pika.controller.payment;
 
-import com.numlock.pika.dto.PaymentValidDto;
+import com.numlock.pika.domain.Accounts;
+import com.numlock.pika.dto.PaymentResDto;
 import com.numlock.pika.service.payment.PaymentApiService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -16,24 +17,25 @@ import java.io.IOException;
 @RestController
 public class PaymentApiController {
 
+    // 결제 완료 후 서비스 로직
     private final PaymentApiService paymentApiService;
 
-    @PostMapping("/api/payments/validation")
-    public ResponseEntity<?> validateOrder(@RequestBody PaymentValidDto paymentValidDto) {
+    // 결제 검증 controller
+    @PostMapping("/api/payment/validation")
+    public ResponseEntity<?> validateOrder(@RequestBody PaymentResDto paymentResDto) {
 
-        System.out.println("paymentVaildDto = " + paymentValidDto);
+        System.out.println("paymentResDto = " + paymentResDto);
 
         try {
 
             // 서버 기대 금액 확인 ( 데이터 베이스의 상품 금액과 일치해야함)
-            System.out.println("포트원으로부터 전달 받은 결제 금액 : " +  paymentValidDto.getAmount());
+            System.out.println("포트원으로부터 전달 받은 결제 금액 : " +  paymentResDto.getAmount());
 
             //PaymentService를 호출하여 PortOne API와 통신 및 금액 검증 수행
-            IamportResponse<Payment> iamportResponse = paymentApiService.validatePayment(paymentValidDto);
-
-            // 3. 결제 상태에 따른 추가 처리 (DB 저장, 재고 차감 등)
+            IamportResponse<Payment> iamportResponse = paymentApiService.validatePayment(paymentResDto);
             Payment paymentData = iamportResponse.getResponse();
 
+            //Paid : 결제 완료 상태
             System.out.println("결제 검증 성공! Paid 상태 : " + paymentData.getStatus());
 
             return ResponseEntity.ok(iamportResponse);
@@ -50,7 +52,6 @@ public class PaymentApiController {
             // 주로 PaymentService에서 금액 불일치 시 던지는 예외
             System.out.println("금액/유효성 검증 실패 : " + e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-
         }
     }
 
@@ -59,10 +60,9 @@ public class PaymentApiController {
     public ResponseEntity<?> confirmPayment(@PathVariable String impUid) {
 
         try {
+            Accounts accounts = paymentApiService.confirmPayment(impUid);
 
-            IamportResponse<Payment> iamportResponse = paymentApiService.confirmPayment(impUid);
-
-            return ResponseEntity.ok(iamportResponse); //추후 수정
+            return ResponseEntity.ok(accounts);
 
         } catch (IamportResponseException e) {
             System.out.println("PortOne API 통신 오류 : " + e.getMessage());
@@ -86,7 +86,6 @@ public class PaymentApiController {
     public ResponseEntity<?> cancelPayment(@PathVariable String impUid) {
 
         try {
-
             IamportResponse<Payment> iamportResponse = paymentApiService.cancelPayment(impUid);
 
             return ResponseEntity.ok(iamportResponse); //추후 수정
