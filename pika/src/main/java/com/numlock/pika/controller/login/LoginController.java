@@ -1,7 +1,9 @@
 package com.numlock.pika.controller.login;
 
 import com.numlock.pika.domain.Users;
+import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.login.LoginService;
+import com.numlock.pika.service.file.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.io.IOException;
 
 @Slf4j
 @Controller
@@ -19,30 +23,60 @@ import java.security.Principal;
 public class LoginController {
 
     private final LoginService loginService;
+    private final FileUploadService fileUploadService;
+    private final UserRepository userRepository;
 
-    //Principal 객채로 사용자 정보 호출
+    //Principal 객채로 index에 사용자 정보 호출
     @GetMapping("/")
     public String index(Principal principal, Model model) {
         if(principal != null) {
-            model.addAttribute("loginUserId", principal.getName());
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
         }
         return "index";
     }
 
     @GetMapping("/user/join")
     public String joinForm(Model model) {
-        model.addAttribute("user", new Users()); // Changed from User to Users
+        model.addAttribute("user", new Users());
         return "user/joinForm";
     }
 
     @PostMapping("/user/joinUser")
-    public String joinUser(Users users, Model model) { // Changed from User to Users
-        log.info("Attempting to join user: {}", users.toString()); // Log the whole object
+    public String joinUser(Users users, @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile, Model model) {
+        log.info("Attempting to join user: {}", users.toString());
 
         try {
+
+            String profileImagePath = null;
+            // 1. 프로필 이미지 비어있이 않으면 저장
+            if(profileImageFile != null && !profileImageFile.isEmpty()) {
+                profileImagePath = fileUploadService.store(profileImageFile);
+            }
+
+            // 2. 프로필 이미지 업로드가 없거나 저장 실패시 기본이미지 설정
+            if (profileImagePath == null) {
+                profileImagePath = "/profile/default-profile.jpg"; // 기본 이미지 경로
+            }
+            users.setProfileImage(profileImagePath);
+
+            // 3. 사용자 정보 저장
             users.setRole("USER"); // 일반 회원가입 시 USER 역할 부여
             loginService.joinUser(users);
             log.info("User {} joined successfully.", users.getId());
+
+        } catch (IOException e) {
+            log.error("File upload failed for user {}: {}", users.getId(), e.toString());
+            model.addAttribute("errorMessage", "프로필 이미지 업로드에 실패했습니다.");
+            return "user/joinForm";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             log.error("Error joining user {}: {}", users.getId(), e.toString());
@@ -53,11 +87,17 @@ public class LoginController {
 
     //Spring Security가 로그인/아웃을 자동으로 처리
     @GetMapping("/user/login")
-    public String loginForm(Model model) {
+    public String loginForm(//@RequestParam(required = false)String error,
+                            Model model) {
+//        if(error != null){
+//            model.addAttribute("errorMessage", error);
+//        } 오류메세지 띄우기용 -> 이후에 구현
+
         model.addAttribute("user", new Users());
         return "user/loginForm";
     }
 
+    //로그인 성공 처리
     @GetMapping("/user/loginSuccess")
     public String loginSuccess(Principal principal, Model model) {
         if (principal != null) {

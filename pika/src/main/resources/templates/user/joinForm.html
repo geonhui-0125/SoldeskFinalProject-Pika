@@ -60,7 +60,7 @@
         <div th:if="${errorMessage}" class="error-message">
             <p th:text="${errorMessage}"></p>
         </div>
-        <form th:action="@{/user/joinUser}" th:object="${user}" method="post">
+        <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="id">아이디:</label>
                 <input type="text" id="id" th:field="*{id}" required/>
@@ -74,8 +74,8 @@
                 <input type="text" id="nickname" th:field="*{nickname}" required/>
             </div>
             <div class="form-group">
-                <label for="profileImage">프로필 이미지 URL:</label>
-                <input type="text" id="profileImage" th:field="*{profileImage}" required/>
+                <label for="profileImageFile">프로필 이미지:</label>
+                <input type="file" id="profileImageFile" name="profileImageFile"/>
             </div>
             <div class="form-group">
                 <label for="email">이메일:</label>
