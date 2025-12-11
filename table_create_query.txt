@@ -1,15 +1,8 @@
 drop sequence seq_accounts;
 drop sequence seq_reviews;
 drop sequence seq_favorite_products;
-drop sequence seq_payments;
 drop sequence seq_products;
 drop sequence seq_categories;
-drop sequence seq_users;
-
-create sequence seq_users 
-    INCREMENT BY 1 START WITH 1
-    MINVALUE 1 MAXVALUE 9999 NOCYCLE
-    NOCACHE NOORDER;
     
 create sequence seq_categories
     INCREMENT BY 1 START WITH 1
@@ -17,11 +10,6 @@ create sequence seq_categories
     NOCACHE NOORDER;
     
 create sequence seq_products
-    INCREMENT BY 1 START WITH 1
-    MINVALUE 1 MAXVALUE 9999 NOCYCLE
-    NOCACHE NOORDER;
-    
-create sequence seq_payments
     INCREMENT BY 1 START WITH 1
     MINVALUE 1 MAXVALUE 9999 NOCYCLE
     NOCACHE NOORDER;
@@ -57,7 +45,7 @@ CREATE TABLE users (
 	nickname varchar2(50) not NULL,
     profile_image varchar2(250) not NULL,
     email varchar2(50) not NULL,
-	address	varchar2(100) NULL,
+	address	varchar2(200) NULL,
     phone varchar2(20) null,
     birth DATE null,
     role varchar2(20)
@@ -182,6 +170,9 @@ select * from reviews;
 select * from accounts;
 
 commit;
+
+
+
 
 
 

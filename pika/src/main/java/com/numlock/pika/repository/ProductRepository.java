@@ -1,8 +1,20 @@
 package com.numlock.pika.repository;
 
+import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.domain.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Products, Integer> {
 
+    /**
+     * 상품정보와 판매자 정보를 조인
+     * 상품 정보 페이지에서 판매자 정보도 가져올 때 사용
+     * @param int productId
+     * @return Optional<Products>
+     */
+    @Query(value = "SELECT p FROM Products p Join p.seller.id where p.productId = : productId")
+    Optional<Products> findWithUserById(int productId);
 }

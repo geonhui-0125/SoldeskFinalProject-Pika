@@ -17,8 +17,9 @@ public class Accounts {
     @Column(name = "account_id")
     private int accountId; // 계좌 고유 ID
 
-    @Column(name = "seller_id")
-    private String sellerId; // 계좌 소유자(판매자)
+    @OneToOne
+    @JoinColumn(name = "seller_id")
+    private Users seller; // 계좌 소유자(판매자)
 
     @Column(name = "bank_code")
     private String bankCode; // 은행 고유 코드 ex) 국민 - 88
