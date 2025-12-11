@@ -1,9 +1,11 @@
 package com.numlock.pika.controller.login;
 
 import com.numlock.pika.domain.Users;
+import com.numlock.pika.dto.UserAddInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.login.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
+import com.numlock.pika.service.login.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class LoginController {
     private final LoginService loginService;
     private final FileUploadService fileUploadService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     //Principal 객채로 index에 사용자 정보 호출
     @GetMapping("/")
@@ -47,6 +50,7 @@ public class LoginController {
         return "index";
     }
 
+    //회원 가입 처리(Create)
     @GetMapping("/user/join")
     public String joinForm(Model model) {
         model.addAttribute("user", new Users());
@@ -78,7 +82,7 @@ public class LoginController {
             user.setProfileImage(profileImagePath);
 
             // 3. 사용자 정보 저장
-            user.setRole("USER"); // 일반 회원가입 시 USER 역할 부여
+            user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
             loginService.joinUser(user);
             log.info("User {} joined successfully.", user.getId());
 
@@ -93,7 +97,7 @@ public class LoginController {
             model.addAttribute("user", user);
             return "user/joinForm";
         }
-        return "redirect:/";
+        return "redirect:/user/add-info";
     }
 
     //Spring Security가 로그인/아웃을 자동으로 처리
@@ -116,6 +120,32 @@ public class LoginController {
         return "user/loginSuccess";
     }
 
+    //회원 추가정보 입력 처리(Update)
+    @GetMapping("/user/add-info")
+    public String addInfoForm(Model model) {
+        model.addAttribute("userAddInfo", new UserAddInfoDto());
+        return "user/addInfoForm";
+    }
+
+    @PostMapping("/user/add-info")
+    public String addInfo(UserAddInfoDto dto, Principal principal, Model model,
+                          @RequestParam(value="profileImageFile", required = false) MultipartFile profileImageFile) {
+        if(principal == null) {
+            //미로그인 오류 처리
+            return "redirect:/user/login";
+        }
+        try {
+            userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
+        }catch (Exception e){
+            log.error("추가 정보 업데이트 중 오류 발생: {}", e.getMessage());
+            model.addAttribute("errorMessage", "정보 업데이트 중 오류가 발생했습니다."+ e.getMessage());
+            model.addAttribute("userAddInfo", dto);
+            return "user/addInfoForm";
+        }
+        return "redirect:/";
+    }
+
+    //회원 탈퇴 처리(Delete)
     @GetMapping("/user/delete")
     public String deleteForm() {
         return "/user/deleteForm";
