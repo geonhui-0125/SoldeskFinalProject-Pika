@@ -1,0 +1,15 @@
+package com.numlock.pika.dto;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+public class ReviewRequestDto {
+    private Long productId;
+    private String userId;
+    private Integer score;
+}
