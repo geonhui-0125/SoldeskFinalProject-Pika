@@ -22,11 +22,13 @@ public class Products {
     @Column(name = "product_id")
     private int productId; // 상품 고유 ID
 
-    @Column(name = "seller_id", nullable = false)
-    private String sellerId; // 판매자 고유 ID
+    @OneToOne
+    @JoinColumn(name = "seller_id")
+    private Users seller; // 판매자 고유 ID
 
-    @Column(name = "category_id", nullable = false)
-    private int categoryId; // 카테고리 고유 ID
+    @OneToOne
+    @JoinColumn(name = "category_id")
+    private Categories category; // 카테고리 고유 ID
 
     @Column(name = "price", nullable = false)
     private BigDecimal price; // 상품 가격

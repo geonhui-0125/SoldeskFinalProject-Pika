@@ -17,9 +17,11 @@ public class FavoriteProducts {
     @Column(name = "fp_id")
     private int fpId; // 찜 고유 ID
 
-    @Column(name = "user_id")
-    private String userId; // 찜한 유저 ID
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users user; // 찜한 유저 ID
 
-    @Column(name = "product_id")
-    private int productId; // 찜한 상품 ID
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Products product; // 찜한 상품 ID
 }

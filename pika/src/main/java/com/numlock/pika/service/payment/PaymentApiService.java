@@ -9,12 +9,15 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import com.numlock.pika.domain.Products;
-import com.numlock.pika.dto.PaymentValidDto;
+import com.numlock.pika.dto.PaymentResDto;
 import com.numlock.pika.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -47,7 +50,6 @@ public class PaymentApiService {
 
     /**
      * 결제 정보를 PortOne 서버와 비교하여 검증
-     *
      * @param PaymentValidDto 클라이언트에서 받은 아임포트 결제 정보
      * @return 검증된 결제 응답
      * @throws IamportResponseException
@@ -55,18 +57,17 @@ public class PaymentApiService {
      */
 
     //BigDecimal : 매우 정밀하고 정확한 십진수 연산을 수행하기 위해 제공되는 클래스
-    public IamportResponse<Payment> validatePayment(PaymentValidDto paymentVaildDto)
+    public IamportResponse<Payment> validatePayment(PaymentResDto paymentResDto)
             throws IamportResponseException, IOException {
 
-        // 결제 검증 데이터 impUid, amount 정의
-        String impUid =  paymentVaildDto.getImpUid();
-        BigDecimal amount = paymentVaildDto.getAmount();
-
+        // 결제 검증 데이터 impUid, amount 초기화
+        String impUid =  paymentResDto.getImpUid();
+        BigDecimal amount = paymentResDto.getAmount();
         
         // 상품 데이터 데이터베이스 조회
         // taskId(상품 Id) 로 조회 findById 
         // Optional<> orElseThrow로 상품이 존재하지 않으면 에러 생성
-        Optional<Products> productOptional = productRepository.findById(paymentVaildDto.getTaskId());
+        Optional<Products> productOptional = productRepository.findById(paymentResDto.getTaskId());
         Products product = productOptional.orElseThrow(
                 () -> new IllegalArgumentException("해당 상품은 존재하지 않습니다."));
 
@@ -82,7 +83,7 @@ public class PaymentApiService {
 
             // PortOne에서 받은 실제 결제 금액(actualAmount)이 서버가 기대하는 금액(amount)과 일치하는지 확인
             if (!amount.equals(actualAmount)) {
-                System.out.println("결제 금액 일치 확인");
+                System.out.println("결제 금액 불일치 확인");
                 System.out.println("impUid : " + impUid);
                 System.out.println("amount : " + amount);
                 System.out.println("actualAmount : " + actualAmount);
@@ -90,16 +91,30 @@ public class PaymentApiService {
                 // 금액 불일치 시, 즉시 결제 취소(환불) 로직 호출
                 cancelPayment(impUid);
 
-                throw new RuntimeException("결제 금액 불일치");
+                throw new RuntimeException("결제 금액이 서버와 불일치 합니다.");
             }
+            // 만약 금액이 일치하면 데이터 베이스에 결제 정보 저장
+            savePaymentInfo(paymentResDto);
+
         } else {
-            // 결제 데이터가 존재하지 않음 (오류) , 즉시 결제 취소(환불) 로직 호출
+            // 결제 데이터가 존재하지 않음 (오류) 결제가 안된 경우일 확률이 높아서 안돌아갈 가능성이 높음
             cancelPayment(impUid);
 
             throw new RuntimeException("유효하지 않은 결제 정보입니다.");
         }
 
         return iamportResponse;
+    }
+
+    public void savePaymentInfo(PaymentResDto paymentResDto) {
+        Payments payment = Payments.builder()
+                .impUid(paymentResDto.getImpUid())
+                .merchantUid(paymentResDto.getMerchantUid())
+                .taskId(paymentResDto.getTaskId())
+                .amount(paymentResDto.getAmount())
+                .build();
+
+        paymentRepository.save(payment);
     }
 
     //주문 결제 환불/취소 시
@@ -119,7 +134,7 @@ public class PaymentApiService {
     }
 
     //주문 결제 확정 시
-    public IamportResponse<Payment> confirmPayment(String impUid) throws IamportResponseException, IOException {
+    public Accounts confirmPayment(String impUid) throws IamportResponseException, IOException {
 
         //결제 정보 찾기
         Payments payments = paymentRepository.findById(impUid)
@@ -133,21 +148,11 @@ public class PaymentApiService {
                 .orElseThrow(() -> new RuntimeException("해당 사용자의 계좌 정보가 존재하지 않습니다."));
 
         //결제 취소/환불 요청 데이터에 판매자 계좌 정보로 수정
-        CancelData cancelData = new CancelData(impUid, true); // amount를 생략하면 전액 취소/환불
-        cancelData.setRefund_holder(accounts.getSellerId()); //김혁진
-        cancelData.setRefund_bank(accounts.getBankCode()); //03 기업 은행
-        cancelData.setRefund_account(accounts.getAccountNumber()); //00512746501012
+        System.out.println("예금주명 : " + accounts.getSeller());
+        System.out.println("은행 코드 : " + accounts.getBankCode());
+        System.out.println("계좌 번호 : " + accounts.getAccountNumber());
 
-        //결제 쥐소/환불 요청
-        IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
-
-        if (cancelResponse.getResponse() != null) {
-            System.out.println("결제 취소 성공 : " + cancelResponse.getResponse());
-
-            return cancelResponse;
-        } else {
-            throw new RuntimeException("결제 취소 실패 : " + cancelResponse.getMessage());
-        }
+        return accounts;
 
     }
 

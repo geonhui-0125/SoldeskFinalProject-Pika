@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Accounts, Integer> {
 
     // @Query 활용 + JPQL 활용
-    @Query(value = "SELECT a FROM Accounts a WHERE a.sellerId = : sellerId")
+    @Query(value = "SELECT a FROM Accounts a WHERE a.seller.id = : sellerId")
     Optional<Accounts> findByUserId(String sellerId);
 
 }
