@@ -13,35 +13,46 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class Products {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_seq_gen")
+    @SequenceGenerator(name = "products_seq_gen", sequenceName = "seq_products", allocationSize = 1)
     @Column(name = "product_id")
     private int productId; // 상품 고유 ID
 
-    @Column(name = "seller_id")
+    @Column(name = "seller_id", nullable = false)
     private String sellerId; // 판매자 고유 ID
 
-    @Column(name = "category_id")
-    private String categoryId; // 카테고리 고유 ID
+    @Column(name = "category_id", nullable = false)
+    private int categoryId; // 카테고리 고유 ID
 
-    @Column(name = "price")
+    @Column(name = "price", nullable = false)
     private BigDecimal price; // 상품 가격
 
-    @Column(name = "title")
+    @Column(name = "title", nullable = false)
     private String title; // 상품 제목
 
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description; // 상품 설명
 
-    @Column(name = "product_image")
+    @Column(name = "product_image", nullable = false)
     private String productImage; // 상품 섬네일
 
     @Column(name = "view_cnt")
     private int viewCnt; // 조회수
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt; // 생성일
 
+    @Column(name = "product_state")
+    private int productState; // 0 : selling, 1 : selled
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 }
