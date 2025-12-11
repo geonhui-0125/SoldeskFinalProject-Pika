@@ -28,8 +28,8 @@ public class ProductDto {
     public static ProductDto fromEntity(Products product) {
         return ProductDto.builder()
                 .productId(product.getProductId())
-                .sellerId(product.getSellerId())
-                .categoryId(product.getCategoryId())
+                .sellerId(product.getSeller().getId())
+                .categoryId(product.getCategory().getCategoryId())
                 .price(product.getPrice())
                 .title(product.getTitle())
                 .description(product.getDescription())
@@ -40,19 +40,4 @@ public class ProductDto {
                 .build();
     }
 
-    // DTO -> Entity
-    public Products toEntity() {
-        return Products.builder()
-                .productId(productId)
-                .sellerId(sellerId)
-                .categoryId(categoryId)
-                .price(price)
-                .title(title)
-                .description(description)
-                .productImage(productImage)
-                .viewCnt(viewCnt)
-                .createdAt(createdAt)
-                .productState(productState)
-                .build();
-    }
 }

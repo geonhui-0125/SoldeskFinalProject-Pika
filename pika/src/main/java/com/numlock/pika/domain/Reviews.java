@@ -19,11 +19,13 @@ public class Reviews {
     @Column(name = "review_id")
     private Long reviewId;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Products product; // 리뷰 상품 고유 ID
 
-    @Column(name = "user_id", nullable = false, length = 20)
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users user; // 리뷰어 고유 ID
 
     @Column(name = "score", nullable = false)
     private Integer score;

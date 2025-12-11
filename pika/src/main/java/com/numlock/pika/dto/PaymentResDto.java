@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Setter
 @Component
 @ToString
-public class PaymentValidDto {
+public class PaymentResDto {
 
     //결제 검증 파라미터 정의
     private String impUid; //포트원
