@@ -5,11 +5,14 @@ import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.login.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,11 +54,17 @@ public class LoginController {
     }
 
     @PostMapping("/user/joinUser")
-    public String joinUser(Users users, @RequestParam(value = "profileImageFile", required = false) MultipartFile profileImageFile, Model model) {
-        log.info("Attempting to join user: {}", users.toString());
+    public String joinUser(@Valid @ModelAttribute("user") Users user, BindingResult bindingResult,
+                           @RequestParam(value = "profileImageFile", required = false)
+                           MultipartFile profileImageFile, Model model) {
+        log.info("Attempting to join user: {}", user.toString());
+
+        if(bindingResult.hasErrors()) { //유효성 검사 실패 처리 로직
+            log.warn("Validation errors for user join: {}", bindingResult.getAllErrors());
+            return "user/joinForm";
+        }
 
         try {
-
             String profileImagePath = null;
             // 1. 프로필 이미지 비어있이 않으면 저장
             if(profileImageFile != null && !profileImageFile.isEmpty()) {
@@ -66,20 +75,22 @@ public class LoginController {
             if (profileImagePath == null) {
                 profileImagePath = "/profile/default-profile.jpg"; // 기본 이미지 경로
             }
-            users.setProfileImage(profileImagePath);
+            user.setProfileImage(profileImagePath);
 
             // 3. 사용자 정보 저장
-            users.setRole("USER"); // 일반 회원가입 시 USER 역할 부여
-            loginService.joinUser(users);
-            log.info("User {} joined successfully.", users.getId());
+            user.setRole("USER"); // 일반 회원가입 시 USER 역할 부여
+            loginService.joinUser(user);
+            log.info("User {} joined successfully.", user.getId());
 
         } catch (IOException e) {
-            log.error("File upload failed for user {}: {}", users.getId(), e.toString());
+            log.error("File upload failed for user {}: {}", user.getId(), e.toString());
             model.addAttribute("errorMessage", "프로필 이미지 업로드에 실패했습니다.");
+            model.addAttribute("user", user);
             return "user/joinForm";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
-            log.error("Error joining user {}: {}", users.getId(), e.toString());
+            log.error("Error joining user {}: {}", user.getId(), e.toString());
+            model.addAttribute("user", user);
             return "user/joinForm";
         }
         return "redirect:/";

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends CrudRepository<Users,String> {
 
+    boolean existsByNickname(String nickname);
 }
