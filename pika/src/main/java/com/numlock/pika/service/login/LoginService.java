@@ -19,6 +19,8 @@ public class LoginService {
         //ID 중복 확인
         if(checkUser(users.getId())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }else if(checkNickname(users.getNickname())) {
+            throw new IllegalStateException("이미 존재하는 닉네임 입니다");
         }
         //비밀번호 암호화
         // users.setPs(passwordEncoder.encode(users.getPs()));
@@ -30,6 +32,8 @@ public class LoginService {
         return userRepository.existsById(id);
     }
 
+    //닉네임 중복 검사
+    public boolean checkNickname(String nickname) {return userRepository.existsByNickname(nickname);}
 
     @Transactional(readOnly = true)
     public Users login(String id, String password) {
@@ -43,7 +47,6 @@ public class LoginService {
         if (!password.equals(user.getPw())) { // 평문 비밀번호 직접 비교
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
-
         return user;
     }
 
@@ -56,7 +59,6 @@ public class LoginService {
         if(!rawPassword.equals(user.getPw())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
-
         userRepository.delete(user);
     }
 
