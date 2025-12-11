@@ -41,12 +41,15 @@ public class ReviewController {
     public String createReview(@ModelAttribute("review") ReviewRequestDto reviewRequestDto,
                                Principal principal, // 로그인한 사용자 정보를 가져오기 위해
                                Model model) {
-        if (principal != null) {
-            reviewRequestDto.setUserId(principal.getName()); // 로그인한 사용자 ID 설정
-        } else {
-            model.addAttribute("errorMessage", "로그인이 필요합니다.");
-            return "review/form"; // 오류 메시지와 함께 양식으로 돌아갑니다.
-        }
+        // --- 임시 수정: 로그인 로직을 우회하고 user1을 사용합니다 ---
+        reviewRequestDto.setUserId("user1");
+        // if (principal != null) {
+        //     reviewRequestDto.setUserId(principal.getName());
+        // } else {
+        //     model.addAttribute("errorMessage", "로그인이 필요합니다.");
+        //     return "review/form";
+        // }
+        // --- 임시 수정 끝 ---
 
         try {
             reviewService.createReview(reviewRequestDto);

@@ -25,6 +25,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .productId(reviewRequestDto.getProductId())
                 .userId(reviewRequestDto.getUserId())
                 .score(reviewRequestDto.getScore())
+                .content(reviewRequestDto.getContent()) // content 필드 추가
                 .build();
         Reviews savedReview = reviewRepository.save(review);
         return mapToReviewResponseDto(savedReview);
@@ -51,6 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .productId(review.getProductId())
                 .userId(review.getUserId())
                 .score(review.getScore())
+                .content(review.getContent()) // content 필드 추가
                 .build();
     }
 }

@@ -13,4 +13,5 @@ public class ReviewResponseDto {
     private Long productId;
     private String userId;
     private Integer score;
+    private String content;
 }
