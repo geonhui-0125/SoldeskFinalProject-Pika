@@ -10,12 +10,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 public class Reviews {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_reviews")
+    @SequenceGenerator(name = "seq_reviews", sequenceName = "seq_reviews", allocationSize = 1)
     @Column(name = "review_id")
-    private int reviewId; // 리뷰 고유 ID
+    private Long reviewId;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -25,6 +27,9 @@ public class Reviews {
     @JoinColumn(name = "user_id")
     private Users user; // 리뷰어 고유 ID
 
-    @Column(name = "score")
-    private int score; // 별점 1 ~ 5
+    @Column(name = "score", nullable = false)
+    private Integer score;
+
+    @Column(name = "content", length = 500) // 새로운 content 필드 추가
+    private String content;
 }

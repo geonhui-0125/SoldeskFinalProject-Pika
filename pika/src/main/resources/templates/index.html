@@ -20,7 +20,7 @@
     <div sec:authorize="isAuthenticated()" th:if="${user}"> <!-- user 객체가 모델에 있을 때만 이 블록을 보여줍니다 -->
         <h2 th:text="|${user.nickname}님, 로그인되었습니다.|"></h2>
         <div th:if="${user.profileImage}">
-            <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: contain;">
+            <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: cover;">
         </div>
         <ul>
             <li><a href="/user/logout">로그아웃</a></li>
