@@ -25,12 +25,12 @@ public class Reviews {
     private Long reviewId;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Products product; // 리뷰 상품 고유 ID
+    @JoinColumn(name = "seller_id")
+    private Users seller; // 리뷰 대상 판매자 ID
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users user; // 리뷰어 고유 ID
+    @JoinColumn(name = "reviewer_id")
+    private Users reviewer; // 리뷰 작성자 ID
 
     @Column(name = "score", nullable = false)
     private Integer score;

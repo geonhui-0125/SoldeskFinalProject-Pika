@@ -33,7 +33,7 @@ public class LoginController {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    //Principal 객채로 index에 사용자 정보 호출
+    //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
     public String index(Principal principal, Model model) {
         if(principal != null) {
@@ -48,7 +48,7 @@ public class LoginController {
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
         }
-        return "index";
+        return "main";
     }
 
     //회원 가입 처리(Create)
@@ -109,19 +109,18 @@ public class LoginController {
        if(error != null){
             model.addAttribute("errorMessage", "아이디 혹은 비밀번호가 올바르지 않습니다.");
         }
-
         model.addAttribute("user", new Users());
         return "user/loginForm";
     }
 
     //로그인 성공 처리
-    @GetMapping("/user/loginSuccess")
+   /* @GetMapping("/main")
     public String loginSuccess(Principal principal, Model model) {
         if (principal != null) {
             model.addAttribute("loginUserId", principal.getName());
         }
-        return "user/loginSuccess";
-    }
+        return "main";
+    }*/
 
     //회원 추가정보 입력 처리(Update)
     @GetMapping("/user/add-info")
