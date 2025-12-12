@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 목록</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .review-item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .review-item strong { color: #333; }
+        .score { color: gold; }
+    </style>
+</head>
+<body>
+    <h1>제품 [[${productId}]]에 대한 리뷰 목록</h1>
+
+    <div th:if="${reviews.isEmpty()}">
+        <p>아직 작성된 리뷰가 없습니다.</p>
+    </div>
+
+    <div th:each="review : ${reviews}" class="review-item">
+        <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
+        <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
+        <p><strong>별점:</strong> <span class="score" th:text="${review.score}">5</span></p>
+        <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
+    </div>
+
+    <hr/>
+    <a th:href="@{/reviews/new/{productId}(productId=${productId})}">새 리뷰 작성</a>
+    <br/>
+    <a href="/">홈으로 돌아가기</a>
+</body>
+</html>
