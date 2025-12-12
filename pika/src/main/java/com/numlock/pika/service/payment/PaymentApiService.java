@@ -39,6 +39,9 @@ public class PaymentApiService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private SmsService smsService;
+
     //생성자로 IamportClient 초기화 
     //불변성 보장, null값 방지
     //properties.application 파일의 포트원 키 정보 가져옴
@@ -140,8 +143,12 @@ public class PaymentApiService {
         Payments payments = paymentRepository.findById(impUid)
                 .orElseThrow(() -> new RuntimeException(""));
 
+        System.out.println("payments 확인 : " + payments);
+
         //결제한 정보에서 판매자 UID 찾기 (merchantUID 형태 : 판매자UID_202512080404)
         String mUid = payments.getMerchantUid().split("_")[0];
+
+        System.out.println("판매자 id 확인 : " + mUid);
 
         //해당 사용자의 은행 계좌 정보 가져옴
         Accounts accounts = accountRepository.findByUserId(mUid)
@@ -151,6 +158,9 @@ public class PaymentApiService {
         System.out.println("예금주명 : " + accounts.getSeller());
         System.out.println("은행 코드 : " + accounts.getBankCode());
         System.out.println("계좌 번호 : " + accounts.getAccountNumber());
+
+        // 구매 확정을 누르면 판매자에게 메시지를 전송
+        smsService.sendMessage();
 
         return accounts;
 
