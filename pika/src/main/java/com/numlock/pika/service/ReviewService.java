@@ -9,5 +9,8 @@ public interface ReviewService {
     ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto);
     ReviewResponseDto getReviewById(Long reviewId);
     List<ReviewResponseDto> getReviewsByProductId(int productId);
-    // Potentially add methods for update and delete later
+
+    ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto reviewRequestDto, String currentUserId);
+    void deleteReview(Long reviewId, String currentUserId);
+
 }
