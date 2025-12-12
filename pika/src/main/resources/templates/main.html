@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
     <title>피카 마켓 클론 - TH 적용</title>
-
     <style>
         * {
             box-sizing: border-box;
@@ -25,194 +25,6 @@
 
         ul {
             list-style: none;
-        }
-
-        /*******************************
-         HEADER
-        ********************************/
-        #main-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        /* 상단 메뉴라인 */
-        #header-top {
-            height: 60px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-
-        #header-main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 0 20px;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        #logo-link {
-            font-size: 1.8em;
-            font-weight: 900;
-            color: #ff4500;
-            white-space: nowrap;
-        }
-
-        /* 검색창 */
-        #search-bar {
-            display: flex;
-            align-items: center;
-            background-color: #f0f0f0;
-            border-radius: 25px;
-            padding: 10px 16px;
-            width: 420px;
-        }
-
-        #search-bar input {
-            border: none;
-            background: none;
-            outline: none;
-            flex-grow: 1;
-            font-size: 1em;
-        }
-
-        #search-bar img {
-            width: 20px;
-            height: 20px;
-        }
-
-        /* 상단 오른쪽 메뉴 */
-        #main-nav-menu {
-            display: flex;
-            gap: 20px;
-            font-size: 1em;
-        }
-
-        #category-wrapper {
-            position: relative;
-        }
-
-        /* 카테고리바 */
-        #category-bar {
-            height: 40px;
-            display: flex;
-            align-items: center;
-            max-width: 1200px;
-            margin: 10px auto;
-            width: 100%;
-            padding: 0 20px;
-        }
-
-        #hamburger-icon {
-            position: relative;
-            cursor: pointer;
-            padding: 20px 0;
-        }
-
-        #hamburger-icon img {
-            width: 30px;
-        }
-
-        #category-dropdown {
-            position: absolute;
-            top: 40px;
-            left: 0;
-            width: 220px;
-            background: white;
-            border: 1px solid #ddd;
-            box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
-            margin-top: 26px;
-            padding-top: 10px;
-            padding-bottom: 0;
-            display: none;
-        }
-
-        #category-dropdown > p {
-            font-weight: bold;
-            border-bottom: 1px solid #eee;
-            color: #ff4500;
-            padding-left: 12px;
-            padding-bottom: 10px;
-        }
-
-        #category-dropdown a {
-            display: block;
-            padding: 8px 15px;
-        }
-
-        #category-dropdown a:hover {
-            background-color: #f5f5f5;
-        }
-        .submenu {
-            position: absolute;
-            top: 0;
-            left: 217px;
-            width: 200px;
-            background: white;
-            border: 1px solid #ddd;
-            box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
-            display: none;
-        }
-
-        .submenu-title {
-            font-weight: bold;
-            padding: 9px 15px;
-            color: #ff4500;
-            border-bottom: 1px solid #eee;
-        }
-
-        .submenu a {
-            display: block;
-            padding: 8px 15px;
-        }
-
-
-        .submenu a:hover {
-            background-color: #f5f5f5;
-        }
-
-
-        /*******************************
-         우측 떠 있는 메뉴
-        ********************************/
-        #header-bottom-menu {
-            position: fixed;
-            top: 150px;
-            right: 0;
-            background: white;
-            padding: 10px 15px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 4px 0 0 4px;
-        }
-
-        #favorite-link {
-            text-align: center;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        #favorite-link img {
-            width: 18px;
-            height: 18px;
-            margin-top: 5px;
-        }
-
-        #top-link {
-            font-weight: bold;
-            border-top: 1px solid #eee;
-            padding-top: 5px;
-            text-align: center;
         }
 
         /*******************************
@@ -281,114 +93,9 @@
             color: #999;
         }
     </style>
-    <script>
-        $(document).ready(function () {
-
-            /** ▼ 메인 카테고리 hover 시 드롭다운 표시 */
-            $("#category-wrapper").hover(
-                function () {
-                    $("#category-dropdown")
-                        .stop(true, true)
-                        .slideDown(120);
-                },
-                function () {
-                    $("#category-dropdown")
-                        .stop(true, true)
-                        .slideUp(120);
-                }
-            );
-
-            $(".category-item").hover(
-                function () {
-                    $(this).find(".submenu").stop(true, true).show();
-                },
-                function () {
-                    $(this).find(".submenu").stop(true, true).hide();
-                }
-            );
-
-        });
-
-    </script>
 </head>
 <body>
-
-<header id="main-header">
-
-    <!-- 상단 헤더 -->
-    <div id="header-top">
-        <div id="header-main-content">
-
-            <a id="logo-link" th:href="@{/}">pika 피카</a>
-
-            <div id="search-bar">
-                <input placeholder="상품을 검색해보세요">
-                <img th:src="@{/icon/search.svg}">
-            </div>
-
-            <ul id="main-nav-menu">
-                <li><a th:href="@{/sell}">판매하기</a></li>
-                <li><a th:href="@{/mystore}">내 상점</a></li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- 카테고리 라인 -->
-    <div id="category-bar">
-        <div id="category-wrapper">
-            <div id="hamburger-icon">
-                <img th:src="@{/icon/hamburger-icon.png}">
-            </div>
-            <div id="category-dropdown">
-                <p>전체 카테고리</p>
-                <!-- 피규어 -->
-                <div class="category-item">
-                    <a>피규어</a>
-                    <div class="submenu">
-                        <p class="submenu-title">피규어</p>
-                        <a>넨도로이드</a>
-                        <a>피규어 프라모델</a>
-                        <a>애니 굿즈</a>
-                    </div>
-                </div>
-
-                <!-- 전자제품 -->
-                <div class="category-item">
-                    <a>전자제품</a>
-                    <div class="submenu">
-                        <p class="submenu-title">전자제품</p>
-                        <a>노트북</a>
-                        <a>키보드</a>
-                        <a>헤드셋</a>
-                    </div>
-                </div>
-
-                <!-- 의류 -->
-                <div class="category-item">
-                    <a>의류</a>
-                    <div class="submenu">
-                        <p class="submenu-title">의류</p>
-                        <a>상의</a>
-                        <a>하의</a>
-                        <a>신발</a>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- 오른쪽 고정 메뉴 -->
-    <div id="header-bottom-menu">
-        <div id="favorite-link">
-            <p>찜한 상품</p>
-            <img th:src="@{/icon/heart.svg}">
-        </div>
-        <div id="top-link">TOP</div>
-    </div>
-
-</header>
-
+<header th:replace="~{header :: mainHeader}"></header>
 <section id="product-section">
     <div id="product-wrap">
 
@@ -525,6 +232,6 @@
 
     </div>
 </section>
-
+<script th:src="@{/js/header.js}"></script>
 </body>
 </html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="mainHeader" id="main-header">
+    <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
+        <div>
+            <!--<div th:if="${user.profileImage}">
+                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: contain;">
+            </div>-->
+            <a href="/user/logout">로그아웃</a>
+        </div>
+    </div>
+    <div sec:authorize="!isAuthenticated()" class="header-auth">
+        <div>
+            <a href="/user/login" id="login">로그인</a>
+            <a href="/user/join" id="join">회원가입</a>
+        </div>
+    </div>
+
+    <div id="header-top">
+        <div id="header-main-content">
+
+            <a id="logo-link" th:href="@{/}">pika 피카</a>
+
+            <div id="search-bar">
+                <input placeholder="상품을 검색해보세요">
+                <img th:src="@{/icon/search.svg}">
+            </div>
+
+            <ul id="main-nav-menu">
+                <li><a th:href="@{/sell}">판매하기</a></li>
+                <li><a th:href="@{/mystore}">마이페이지</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 카테고리 라인 -->
+    <div id="category-bar">
+        <div id="category-wrapper">
+            <div id="hamburger-icon">
+                <img th:src="@{/icon/hamburger-icon.png}">
+            </div>
+            <div id="category-dropdown">
+                <p>전체 카테고리</p>
+                <!-- 피규어 -->
+                <div class="category-item">
+                    <a>피규어</a>
+                    <div class="submenu">
+                        <p class="submenu-title">피규어</p>
+                        <a>넨도로이드</a>
+                        <a>피규어 프라모델</a>
+                        <a>애니 굿즈</a>
+                    </div>
+                </div>
+
+                <!-- 전자제품 -->
+                <div class="category-item">
+                    <a>전자제품</a>
+                    <div class="submenu">
+                        <p class="submenu-title">전자제품</p>
+                        <a>노트북</a>
+                        <a>키보드</a>
+                        <a>헤드셋</a>
+                    </div>
+                </div>
+
+                <!-- 의류 -->
+                <div class="category-item">
+                    <a>의류</a>
+                    <div class="submenu">
+                        <p class="submenu-title">의류</p>
+                        <a>상의</a>
+                        <a>하의</a>
+                        <a>신발</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 오른쪽 고정 메뉴 -->
+    <div id="header-bottom-menu">
+        <div id="favorite-link">
+            <p>찜한 상품</p>
+            <img th:src="@{/icon/heart.svg}">
+        </div>
+        <div id="top-link">TOP</div>
+    </div>
+
+</header>
+</body>
+</html>
