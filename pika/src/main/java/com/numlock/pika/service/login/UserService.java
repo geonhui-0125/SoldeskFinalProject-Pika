@@ -25,7 +25,7 @@ public class UserService {
 
         //프로필 이미지 업데이트
         if(profileImage != null && !profileImage.isEmpty()){
-            String profileImagePath = fileUploadService.store(profileImage);
+            String profileImagePath = fileUploadService.storeImg(profileImage);
             user.setProfileImage(profileImagePath);
         }else if(dto.getProfileImage() != null && dto.getProfileImage().equals("default")){
             //"default" 가 DTO에서 넘어오면 기본이미지로 설정(ex. 사용자가 기존 이미지 삭제)
