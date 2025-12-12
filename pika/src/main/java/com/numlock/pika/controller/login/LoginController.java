@@ -113,15 +113,6 @@ public class LoginController {
         return "user/loginForm";
     }
 
-    //로그인 성공 처리
-   /* @GetMapping("/main")
-    public String loginSuccess(Principal principal, Model model) {
-        if (principal != null) {
-            model.addAttribute("loginUserId", principal.getName());
-        }
-        return "main";
-    }*/
-
     //회원 추가정보 입력 처리(Update)
     @GetMapping("/user/add-info")
     public String addInfoForm(Principal principal, Model model) {

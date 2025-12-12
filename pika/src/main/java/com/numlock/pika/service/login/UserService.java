@@ -40,7 +40,7 @@ public class UserService {
         //전화번호 업데이트
         if(dto.getPhone()!= null && !dto.getPhone().trim().isEmpty()){
             //전화번호 유효성 검사
-            if(!dto.getPhone().matches("^\\d{3}\\d{4}\\d{4}$")){
+            if(!dto.getPhone().matches("^010-\\d{4}-\\d{4}$")){
                 throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다.");
             }
             user.setPhone(dto.getPhone());

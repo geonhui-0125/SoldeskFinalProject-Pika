@@ -85,7 +85,14 @@
             </div>
             <div class="form-group">
                 <label for="phone">전화번호:</label>
-                <input type="text" id="phone" th:field="*{phone}" placeholder="01012345678"/>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="phone1" maxlength="3" style="width: 28%; text-align: center;">
+                    <span style="margin: 0 10px;">-</span>
+                    <input type="text" id="phone2" maxlength="4" style="width: 33%; text-align: center;">
+                    <span style="margin: 0 10px;">-</span>
+                    <input type="text" id="phone3" maxlength="4" style="width: 33%; text-align: center;">
+                </div>
+                <input type="hidden" id="phone" th:field="*{phone}" />
                 <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="field-error"></span>
             </div>
             <div class="form-group">
@@ -93,7 +100,7 @@
                 <input type="text" id="birth" th:field="*{birth}" placeholder="YYYYMMDD"/>
                 <span th:if="${#fields.hasErrors('birth')}" th:errors="*{birth}" class="field-error"></span>
             </div>
-            <button type="submit">정보 업데이트</button>
+            <button type="submit" onclick="alert('정보를 수정했습니다.')">정보 업데이트</button>
         </form>
         <form th:action="@{/}" method="get" style="margin-top: 10px;">
             <button type="submit" class="skip-button">건너뛰기</button>
@@ -116,6 +123,42 @@
                 document.getElementById('profileImageAction').value = 'default';
                 // 메인 폼을 전송
                 document.getElementById('addInfoForm').submit();
+            });
+        }
+        // --- 전화번호 관련 스크립트 ---
+        const phone1 = document.getElementById('phone1');
+        const phone2 = document.getElementById('phone2');
+        const phone3 = document.getElementById('phone3');
+        const addInfoForm = document.getElementById('addInfoForm');
+
+        if (phone1 && phone2 && phone3) {
+            // 숫자만 입력되도록 필터링 및 자동 포커스 이동
+            const filterNumericInput = function() {
+                if (this.value.length === parseInt(this.maxLength)) {
+                    if (this === phone1) {
+                        phone2.focus();
+                    } else if (this === phone2) {
+                        phone3.focus();
+                    }
+                }
+            };
+
+            phone1.addEventListener('input', filterNumericInput);
+            phone2.addEventListener('input', filterNumericInput);
+            phone3.addEventListener('input', filterNumericInput);
+        }
+
+        if (addInfoForm) {
+            // 폼 제출 시 전화번호 조합
+            addInfoForm.addEventListener('submit', function(event) {
+                // 각 필드가 하나라도 채워져 있으면 조합
+                if (phone1.value && phone2.value && phone3.value) {
+                    const combinedPhone = `${phone1.value}-${phone2.value}-${phone3.value}`;
+                    document.getElementById('phone').value = combinedPhone;
+                } else {
+                    // 하나라도 비어있으면 빈 문자열로 설정
+                    document.getElementById('phone').value = '';
+                }
             });
         }
         /*]]>*/
