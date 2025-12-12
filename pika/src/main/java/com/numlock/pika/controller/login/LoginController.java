@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -74,7 +75,7 @@ public class LoginController {
             String profileImagePath = null;
             // 1. 프로필 이미지 비어있이 않으면 저장
             if(profileImageFile != null && !profileImageFile.isEmpty()) {
-                profileImagePath = fileUploadService.store(profileImageFile);
+                profileImagePath = fileUploadService.storeImg(profileImageFile);
             }
             // 2. 프로필 이미지 업로드가 없거나 저장 실패시 기본이미지 설정
             if (profileImagePath == null) {
@@ -124,7 +125,12 @@ public class LoginController {
 
     //회원 추가정보 입력 처리(Update)
     @GetMapping("/user/add-info")
-    public String addInfoForm(Model model) {
+    public String addInfoForm(Principal principal, Model model) {
+       if(principal != null){
+           userRepository.findById(principal.getName()).ifPresent(user -> {
+               model.addAttribute("user", user);
+           });
+       }
         model.addAttribute("userAddInfo", new UserAddInfoDto());
         return "user/addInfoForm";
     }
