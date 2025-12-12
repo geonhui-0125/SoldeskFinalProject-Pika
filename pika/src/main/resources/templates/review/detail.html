@@ -26,7 +26,7 @@
 
     <div th:if="${review}" class="review-detail">
         <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
-        <p><strong>제품 ID:</strong> <span th:text="${review.productId}">100</span></p>
+        <p><strong>판매자 ID:</strong> <span th:text="${review.sellerId}">seller1</span></p>
         <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
         <p><strong>별점:</strong> <span class="score" th:text="${review.score}">5</span></p>
         <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
@@ -50,7 +50,7 @@
     </div>
 
     <hr/>
-    <a th:href="@{/reviews/product/{productId}(productId=${review.productId})}">리뷰 목록으로 돌아가기</a>
+    <a th:href="@{/reviews/seller/{sellerId}(sellerId=${review.sellerId})}">리뷰 목록으로 돌아가기</a>
     <br/>
     <a href="/">홈으로 돌아가기</a>
 </body>
