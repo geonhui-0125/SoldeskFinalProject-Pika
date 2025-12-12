@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @ToString
 public class ReviewRequestDto {
-    private Long productId;
+    private int productId;
     private String userId;
     private Integer score;
     private String content;

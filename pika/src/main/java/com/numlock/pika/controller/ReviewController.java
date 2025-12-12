@@ -20,7 +20,7 @@ public class ReviewController {
 
     // 특정 제품에 대한 리뷰 목록을 표시합니다.
     @GetMapping("/product/{productId}")
-    public String listReviewsByProductId(@PathVariable Long productId, Model model) {
+    public String listReviewsByProductId(@PathVariable int productId, Model model) {
         List<ReviewResponseDto> reviews = reviewService.getReviewsByProductId(productId);
         model.addAttribute("reviews", reviews);
         model.addAttribute("productId", productId); // 제품 ID를 뷰로 전달
@@ -29,7 +29,7 @@ public class ReviewController {
 
     // 새 리뷰를 생성하기 위한 양식을 표시합니다.
     @GetMapping("/new/{productId}") // 특정 제품에 대한 리뷰 생성 링크
-    public String createReviewForm(@PathVariable Long productId, Model model) {
+    public String createReviewForm(@PathVariable int productId, Model model) {
         ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
         reviewRequestDto.setProductId(productId); // 제품 ID를 미리 채웁니다.
         model.addAttribute("review", reviewRequestDto);

@@ -106,10 +106,10 @@ class ReviewServiceTest {
     void getReviewsByProductId_ShouldReturnListOfReviewResponseDto() {
         // Given
         List<Reviews> reviewsList = Arrays.asList(review, Reviews.builder().reviewId(2L).productId(100L).userId("anotherUser").score(4).build());
-        when(reviewRepository.findByProductId(any(Long.class))).thenReturn(reviewsList);
+        when(reviewRepository.findByProduct_ProductId(any(int.class))).thenReturn(reviewsList);
 
         // When
-        List<ReviewResponseDto> result = reviewService.getReviewsByProductId(100L);
+        List<ReviewResponseDto> result = reviewService.getReviewsByProductId(100);
 
         // Then
         assertThat(result).isNotNull();
