@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <h1>제품 [[${productId}]]에 대한 리뷰 목록</h1>
+    <h1>판매자 [[${sellerId}]]에 대한 리뷰 목록</h1>
 
     <div th:if="${reviews.isEmpty()}">
         <p>아직 작성된 리뷰가 없습니다.</p>
@@ -37,7 +37,7 @@
     </div>
 
     <hr/>
-    <a th:href="@{/reviews/new/{productId}(productId=${productId})}">새 리뷰 작성</a>
+    <a th:href="@{/reviews/new/{sellerId}(sellerId=${sellerId})}">새 리뷰 작성</a>
     <br/>
     <a href="/">홈으로 돌아가기</a>
 </body>
