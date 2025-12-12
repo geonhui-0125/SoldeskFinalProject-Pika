@@ -20,7 +20,6 @@ import java.util.Date;
 @ToString
 public class Users {
 
-
     //PK
     @Id
     @Column(nullable = false)
@@ -38,8 +37,6 @@ public class Users {
     @NotBlank(message = "닉네임을 입력하세요.")
     private String nickname;
 
-    @Column(nullable = false)
-    private String profileImage;
 
     @Column(nullable = false)
     @NotBlank(message = "이메일 주소를 입력하세요.")
@@ -47,8 +44,13 @@ public class Users {
     private String email;
 
     //추가 입력값
+    @Column(nullable = false)
+    private String profileImage;
+
     private String address;
+
     private String phone;
+
     @DateTimeFormat(pattern = "yyyyMMdd")
     private Date birth;
 
