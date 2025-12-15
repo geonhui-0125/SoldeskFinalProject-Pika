@@ -1,13 +1,17 @@
 package com.numlock.pika.controller;
 
 import com.numlock.pika.dto.ProductDto;
-import com.numlock.pika.service.ProductService;
+import com.numlock.pika.dto.ProductRegisterDto;
+import com.numlock.pika.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/products")
@@ -31,14 +35,14 @@ public class ProductController {
         return "product/detail";
     }
 
-    @GetMapping("/new")
+    /*@GetMapping("/new")
     public String createForm(Model model) {
         List<com.numlock.pika.domain.Categories> categories = categoryService.getAllCategories();
         System.out.println("DEBUG: Fetched categories size: " + categories.size());
         model.addAttribute("product", new ProductDto());
         model.addAttribute("categories", categories);
         return "product/form";
-    }
+    }*/
 
     @PostMapping
     public String create(@ModelAttribute ProductDto productDto, java.security.Principal principal, Model model) {
@@ -49,10 +53,10 @@ public class ProductController {
                 // If not logged in and no sellerId provided, we can't create product
                 // But normally Security config protects this.
                 // Fallback for dev/test without login
-                productDto.setSellerId("user1"); 
+                productDto.setSellerId("user1");
             }
-            
-            productService.createProduct(productDto);
+
+            //productService.registerProduct(productDto, principal);
             return "redirect:/products";
         } catch (Exception e) {
             e.printStackTrace(); // Log error to console
@@ -61,5 +65,25 @@ public class ProductController {
             model.addAttribute("categories", categoryService.getAllCategories()); // Reload categories
             return "product/form";
         }
+    }
+
+    @GetMapping("/new")
+    public String newProduct(Model model) {
+
+        Map<String, List<String>> cateMap = categoryService.getAllCategoriestoMap();
+
+        model.addAttribute("cateMap", cateMap);
+
+        return "product/new";
+    }
+
+    @PostMapping("/register")
+    public String registerProduct(ProductRegisterDto productRegisterDto,
+                                @RequestParam("images") List<MultipartFile> images, Principal principal) {
+
+        System.out.println("dto 확인 : " + productRegisterDto);
+        productService.registerProduct(productRegisterDto, principal, images);
+
+        return "redirect:/products/new";
     }
 }
