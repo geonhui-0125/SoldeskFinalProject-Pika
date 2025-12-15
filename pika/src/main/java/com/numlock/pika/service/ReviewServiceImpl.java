@@ -1,15 +1,13 @@
 package com.numlock.pika.service;
 
 import com.numlock.pika.domain.Reviews;
-import com.numlock.pika.domain.Products;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.repository.ReviewRepository;
-import com.numlock.pika.repository.ProductRepository;
-import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.repository.UserRepository; // ProductRepository는 더 이상 필요 없음
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException; // AccessDeniedException import 추가
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,20 +20,22 @@ import java.util.stream.Collectors;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final ProductRepository productRepository;
+    // private final ProductRepository productRepository; // ProductRepository는 더 이상 필요 없음
     private final UserRepository userRepository;
 
     @Override
     @Transactional
     public ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto) {
-        Products product = productRepository.findById(reviewRequestDto.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + reviewRequestDto.getProductId()));
-        Users user = userRepository.findById(reviewRequestDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + reviewRequestDto.getUserId()));
+        // 판매자 조회 (리뷰 대상)
+        Users seller = userRepository.findById(reviewRequestDto.getSellerId())
+                .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
+        // 리뷰 작성자 조회
+        Users reviewer = userRepository.findById(reviewRequestDto.getUserId()) // reviewRequestDto의 userId는 리뷰 작성자 ID
+                .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
 
         Reviews review = Reviews.builder()
-                .product(product)
-                .user(user)
+                .seller(seller) // 상품 대신 판매자 설정
+                .reviewer(reviewer) // 리뷰 작성자 설정
                 .score(reviewRequestDto.getScore())
                 .content(reviewRequestDto.getContent())
                 .build();
@@ -51,8 +51,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewResponseDto> getReviewsByProductId(int productId) {
-        List<Reviews> reviews = reviewRepository.findByProduct_ProductId(productId);
+    public List<ReviewResponseDto> getReviewsBySellerId(String sellerId) { // 메서드 시그니처 변경
+        List<Reviews> reviews = reviewRepository.findBySeller_Id(sellerId); // 레포지토리 메서드 변경
         return reviews.stream()
                 .map(this::mapToReviewResponseDto)
                 .collect(Collectors.toList());
@@ -64,11 +64,11 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // 권한 확인
+        // 권한 확인 (리뷰 작성자 또는 관리자)
         checkReviewAccess(review, currentUserId);
 
-        review.update(reviewRequestDto.getScore(), reviewRequestDto.getContent()); // Reviews 엔티티의 update 메서드 사용
-        Reviews updatedReview = reviewRepository.save(review); // 변경 감지(Dirty Checking)로 인해 save를 명시적으로 호출하지 않아도 되지만, 명확성을 위해 호출
+        review.update(reviewRequestDto.getScore(), reviewRequestDto.getContent());
+        Reviews updatedReview = reviewRepository.save(review);
         return mapToReviewResponseDto(updatedReview);
     }
 
@@ -78,10 +78,10 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // 권한 확인
+        // 권한 확인 (리뷰 작성자 또는 관리자)
         checkReviewAccess(review, currentUserId);
 
-        reviewRepository.delete(review); // 물리적 삭제
+        reviewRepository.delete(review);
     }
 
     // 리뷰 접근 권한 확인 헬퍼 메서드
@@ -90,7 +90,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new AccessDeniedException("Current user not found"));
 
         // 리뷰 작성자가 아니거나 관리자가 아닌 경우 접근 거부
-        if (!review.getUser().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) {
+        if (!review.getReviewer().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) { // review.getUser() 대신 review.getReviewer() 사용
             throw new AccessDeniedException("You do not have permission to modify or delete this review.");
         }
     }
@@ -98,8 +98,8 @@ public class ReviewServiceImpl implements ReviewService {
     private ReviewResponseDto mapToReviewResponseDto(Reviews review) {
         return ReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
-                .productId(review.getProduct().getProductId())
-                .userId(review.getUser().getId())
+                .sellerId(review.getSeller().getId()) // productId 대신 sellerId 사용
+                .userId(review.getReviewer().getId()) // user ID 대신 reviewer ID 사용 (리뷰 작성자)
                 .score(review.getScore())
                 .content(review.getContent())
                 .build();
