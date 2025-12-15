@@ -1,6 +1,5 @@
-package com.numlock.pika.controller.login;
+package com.numlock.pika.controller.user;
 
-import com.numlock.pika.domain.Categories;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.UserAddInfoDto;
 import com.numlock.pika.repository.UserRepository;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -61,6 +59,8 @@ public class LoginController {
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
+        } else{
+            model.addAttribute("user", "visitor");
         }
         return "main";
     }
@@ -98,6 +98,7 @@ public class LoginController {
             user.setProfileImage(profileImagePath);
             // 3. 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
+            System.out.println("회원가입 완료 ID: " +  user.getId() + ", 닉네임: " + user.getNickname());
             loginService.joinUser(user);
             log.info("User {} joined successfully.", user.getId());
 
