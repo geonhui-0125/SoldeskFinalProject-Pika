@@ -10,8 +10,8 @@
             <!--<div th:if="${user.profileImage}">
                 <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: contain;">
             </div>-->
-            <a href="/user/logout">로그아웃</a>
-            <a href="/user/add-info">정보수정</a>
+            <a href="/user/logout" id="logout">로그아웃</a>
+            <a href="/user/add-info" id="modify">정보수정</a>
         </div>
     </div>
     <div sec:authorize="!isAuthenticated()" class="header-auth">
@@ -46,39 +46,21 @@
             </div>
             <div id="category-dropdown">
                 <p>전체 카테고리</p>
-                <!-- 피규어 -->
-                <div class="category-item">
-                    <a>피규어</a>
+
+                <div class="category-item" th:each="category : ${categoriesMap}">
+
+                    <a th:text="${category.key}"></a>
+
                     <div class="submenu">
-                        <p class="submenu-title">피규어</p>
-                        <a>넨도로이드</a>
-                        <a>피규어 프라모델</a>
-                        <a>애니 굿즈</a>
+
+                        <p class="submenu-title" th:text="${category.key}"></p>
+
+                        <th:block th:each="subCategory : ${category.value}">
+                            <a th:text="${subCategory}"></a>
+                        </th:block>
+
                     </div>
                 </div>
-
-                <!-- 전자제품 -->
-                <div class="category-item">
-                    <a>전자제품</a>
-                    <div class="submenu">
-                        <p class="submenu-title">전자제품</p>
-                        <a>노트북</a>
-                        <a>키보드</a>
-                        <a>헤드셋</a>
-                    </div>
-                </div>
-
-                <!-- 의류 -->
-                <div class="category-item">
-                    <a>의류</a>
-                    <div class="submenu">
-                        <p class="submenu-title">의류</p>
-                        <a>상의</a>
-                        <a>하의</a>
-                        <a>신발</a>
-                    </div>
-                </div>
-
             </div>
         </div>
     </div>

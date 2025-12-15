@@ -45,6 +45,10 @@ ul {
     z-index: 1000;
 }
 
+#logout {
+    padding-right: 20px;
+}
+
 #login {
     padding-right: 20px;
 }
