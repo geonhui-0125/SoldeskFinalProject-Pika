@@ -4,6 +4,7 @@ import com.numlock.pika.domain.Reviews;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.repository.ReviewRepository;
 import com.numlock.pika.repository.UserRepository; // ProductRepository는 더 이상 필요 없음
 import lombok.RequiredArgsConstructor;
@@ -93,6 +94,26 @@ public class ReviewServiceImpl implements ReviewService {
         if (!review.getReviewer().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) { // review.getUser() 대신 review.getReviewer() 사용
             throw new AccessDeniedException("You do not have permission to modify or delete this review.");
         }
+    }
+
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public SellerStatsDto getSellerStats(String sellerId) {
+        List<Reviews> sellerReviews = reviewRepository.findBySeller_Id(sellerId);
+
+        double averageRating = sellerReviews.stream()
+                .mapToInt(Reviews::getScore)
+                .average()
+                .orElse(0.0);
+
+        int reviewCount = sellerReviews.size();
+
+        return SellerStatsDto.builder()
+                .averageRating(averageRating)
+                .reviewCount(reviewCount)
+                .build();
     }
 
     private ReviewResponseDto mapToReviewResponseDto(Reviews review) {

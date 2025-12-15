@@ -2,6 +2,7 @@ package com.numlock.pika.controller;
 
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException; // 누락된 import 문 추가
@@ -21,10 +22,14 @@ public class ReviewController {
 
     // 특정 판매자에 대한 리뷰 목록을 표시합니다.
     @GetMapping("/seller/{sellerId}")
-    public String listReviewsBySellerId(@PathVariable String sellerId, Model model) {
+    public String listReviewsBySellerId(@PathVariable String sellerId, Principal principal, Model model) {
+        System.out.println("Principal object in controller: " + principal); // 이 라인을 추가
+        model.addAttribute("principal", principal); // principal 객체를 명시적으로 모델에 추가
         List<ReviewResponseDto> reviews = reviewService.getReviewsBySellerId(sellerId);
         model.addAttribute("reviews", reviews);
         model.addAttribute("sellerId", sellerId); // 판매자 ID를 뷰로 전달
+        SellerStatsDto sellerStats = reviewService.getSellerStats(sellerId); // 판매자 통계 정보 가져오기
+        model.addAttribute("sellerStats", sellerStats); // 모델에 판매자 통계 객체 추가
         return "review/list"; // Thymeleaf 템플릿 가정: /templates/review/list.html
     }
 

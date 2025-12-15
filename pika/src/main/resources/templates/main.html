@@ -93,7 +93,7 @@
         </div>
 
         <div class="product-card">
-            <a th:href="@{/product/1}">
+            <a th:href="@{/product/}">
                 <img class="product-image" th:src="@{/images/product/product1.jpg}">
             </a>
             <div class="product-info">
@@ -213,5 +213,13 @@
     </div>
 </section>
 <script th:src="@{/js/header.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const successMessage = /*[[${successMessage}]]*/ null;
+    if (successMessage) {
+        alert(successMessage)
+    }
+    /*]]>*/
+</script>
 </body>
 </html>

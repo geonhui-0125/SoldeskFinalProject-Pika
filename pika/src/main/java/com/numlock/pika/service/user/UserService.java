@@ -1,7 +1,7 @@
-package com.numlock.pika.service.login;
+package com.numlock.pika.service.user;
 
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.UserAddInfoDto;
+import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
-    public Users updateAddlInfo(String userId, UserAddInfoDto dto, MultipartFile profileImage) throws IOException {
+    public Users updateAddlInfo(String userId, AdditionalUserInfoDto dto, MultipartFile profileImage) throws IOException {
+        System.out.println("--이미지 삭제 디버깅--");
+        System.out.println("DTO prorfileImage 값: " + dto.getProfileImage());
+
         Users user = userRepository.findById (userId)
                 .orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
