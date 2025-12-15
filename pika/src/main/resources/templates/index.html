@@ -15,6 +15,7 @@
 </head>
 <body>
 <div class="container">
+    <!-- 미사용 -->
     <h1>환영합니다!</h1>
 
     <div sec:authorize="isAuthenticated()" th:if="${user}"> <!-- user 객체가 모델에 있을 때만 이 블록을 보여줍니다 -->

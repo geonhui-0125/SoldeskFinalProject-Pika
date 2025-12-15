@@ -38,13 +38,12 @@ public class LoginController {
 
     //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
-    public String index(Principal principal, Model model) {
+    public String loginUser(Principal principal, Model model) {
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
 
         System.out.println("categoriesMap 확인: " + categoriesMap);
         //카테고리 리스트 model로 전달
         model.addAttribute("categoriesMap", categoriesMap);
-
 
         if(principal != null) {
             //로그인한 사용자 아이디 호출
@@ -57,7 +56,6 @@ public class LoginController {
                 //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
                 model.addAttribute("user", user);
             });
-
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);

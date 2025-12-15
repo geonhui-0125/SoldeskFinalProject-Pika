@@ -15,7 +15,7 @@ import java.util.UUID;
 public class FileUploadService {
 
     //application.properties에 설정한 업로드 경로
-    private final String uploadDir = "src/main/resources/static/profile/";
+    private final String uploadDir = Paths.get(System.getProperty("user.home"), "pika_uploads", "profile").toString();
 
     public String storeImg(MultipartFile multipartFile) throws IOException {
         if(multipartFile.isEmpty()){
@@ -46,7 +46,7 @@ public class FileUploadService {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         }catch (IOException e){
-            e.printStackTrace();
+            throw new IOException("프로필 이미지 저장에 실패했습니다. 경로: " + destinationFile, e);
         }
 
         //웹에서 접근할 수 있는 경로
