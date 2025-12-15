@@ -2,6 +2,7 @@ package com.numlock.pika.controller;
 
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException; // 누락된 import 문 추가
@@ -25,6 +26,8 @@ public class ReviewController {
         List<ReviewResponseDto> reviews = reviewService.getReviewsBySellerId(sellerId);
         model.addAttribute("reviews", reviews);
         model.addAttribute("sellerId", sellerId); // 판매자 ID를 뷰로 전달
+        SellerStatsDto sellerStats = reviewService.getSellerStats(sellerId); // 판매자 통계 정보 가져오기
+        model.addAttribute("sellerStats", sellerStats); // 모델에 판매자 통계 객체 추가
         return "review/list"; // Thymeleaf 템플릿 가정: /templates/review/list.html
     }
 

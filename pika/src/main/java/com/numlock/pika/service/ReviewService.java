@@ -2,6 +2,7 @@ package com.numlock.pika.service;
 
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.dto.SellerStatsDto;
 
 import java.util.List;
 
@@ -12,5 +13,7 @@ public interface ReviewService {
 
     ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto reviewRequestDto, String currentUserId);
     void deleteReview(Long reviewId, String currentUserId);
+    SellerStatsDto getSellerStats(String sellerId);
+
 
 }
