@@ -7,11 +7,11 @@
 <header th:fragment="mainHeader" id="main-header">
     <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
         <div>
-            <!--<div th:if="${user.profileImage}">
-                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: contain;">
-            </div>-->
-            <a href="/user/logout" id="logout">로그아웃</a>
-            <a href="/user/add-info" id="modify">정보수정</a>
+            <div th:if="${user.profileImage}">
+                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+            </div>
+            <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
+            <a href="/user/add-info" id="modify"style="width: 100px; height: 50px">정보수정</a>
         </div>
     </div>
     <div sec:authorize="!isAuthenticated()" class="header-auth">
