@@ -1,7 +1,7 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.UserAddInfoDto;
+import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.login.LoginService;
@@ -136,12 +136,12 @@ public class LoginController {
                model.addAttribute("user", user);
            });
        }
-        model.addAttribute("userAddInfo", new UserAddInfoDto());
+        model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         return "user/addInfoForm";
     }
 
     @PostMapping("/user/add-info")
-    public String addInfo(UserAddInfoDto dto, Principal principal, Model model,
+    public String addInfo(AdditionalUserInfoDto dto, Principal principal, Model model,
                           @RequestParam(value="profileImageFile", required = false) MultipartFile profileImageFile) {
         if(principal == null) {
             //미로그인 오류 처리
