@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.io.IOException;
@@ -140,13 +141,15 @@ public class LoginController {
 
     @PostMapping("/user/add-info")
     public String addInfo(AdditionalUserInfoDto dto, Principal principal, Model model,
-                          @RequestParam(value="profileImageFile", required = false) MultipartFile profileImageFile) {
+                          @RequestParam(value="profileImageFile", required = false)
+                          MultipartFile profileImageFile, RedirectAttributes redirectAttributes) {
         if(principal == null) {
             //미로그인 오류 처리
             return "redirect:/";
         }
         try {
             userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
+            redirectAttributes.addFlashAttribute("successMessage", "수정완료되었습니다.");
         }catch (Exception e){
             log.error("추가 정보 업데이트 중 오류 발생: {}", e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());

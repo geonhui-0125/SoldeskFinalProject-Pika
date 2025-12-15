@@ -20,6 +20,9 @@ public class UserService {
     private final FileUploadService fileUploadService;
 
     public Users updateAddlInfo(String userId, AdditionalUserInfoDto dto, MultipartFile profileImage) throws IOException {
+        System.out.println("--이미지 삭제 디버깅--");
+        System.out.println("DTO prorfileImage 값: " + dto.getProfileImage());
+
         Users user = userRepository.findById (userId)
                 .orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
