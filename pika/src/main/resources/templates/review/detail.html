@@ -1,0 +1,57 @@
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰 상세</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .review-detail p { margin-bottom: 5px; }
+        .review-detail strong { color: #333; }
+        .score { color: gold; }
+        .button-group { margin-top: 15px; }
+        .button-group button, .button-group a {
+            padding: 8px 15px;
+            margin-right: 10px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            border-radius: 4px;
+        }
+        .button-group a.edit-btn { background-color: #007bff; }
+        .button-group button.delete-btn { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>리뷰 상세</h1>
+
+    <div th:if="${review}" class="review-detail">
+        <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
+        <p><strong>판매자 ID:</strong> <span th:text="${review.sellerId}">seller1</span></p>
+        <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
+        <p><strong>별점:</strong> <span class="score" th:text="${review.score}">5</span></p>
+        <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
+        <p th:if="${review.createdAt}"><strong>작성일:</strong> <span th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</span></p>
+        <p th:if="${review.updatedAt}"><strong>수정일:</strong> <span th:text="${#temporals.format(review.updatedAt, 'yyyy-MM-dd HH:mm')}">2023-01-01 11:00</span></p>
+    </div>
+    <div th:if="${errorMessage}">
+        <p th:text="${errorMessage}" style="color: red;"></p>
+    </div>
+
+    <div class="button-group" th:if="${principal != null}">
+        <span sec:authorize="isAuthenticated()">
+            <a th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
+               th:href="@{/reviews/edit/{reviewId}(reviewId=${review.reviewId})}" class="edit-btn">수정</a>
+
+            <form th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
+                  th:action="@{/reviews/{reviewId}/delete(reviewId=${review.reviewId})}" method="post" style="display:inline;">
+                <button type="submit" class="delete-btn">삭제</button>
+            </form>
+        </span>
+    </div>
+
+    <hr/>
+    <a th:href="@{/reviews/seller/{sellerId}(sellerId=${review.sellerId})}">리뷰 목록으로 돌아가기</a>
+    <br/>
+    <a href="/">홈으로 돌아가기</a>
+</body>
+</html>

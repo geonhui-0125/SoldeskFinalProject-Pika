@@ -15,6 +15,6 @@ public interface ProductRepository extends JpaRepository<Products, Integer> {
      * @param int productId
      * @return Optional<Products>
      */
-    @Query(value = "SELECT p FROM Products p Join p.seller.id where p.productId = : productId")
+    @Query(value = "SELECT p FROM Products p LEFT JOIN FETCH p.seller s WHERE p.productId = :productId")
     Optional<Products> findWithUserById(int productId);
 }

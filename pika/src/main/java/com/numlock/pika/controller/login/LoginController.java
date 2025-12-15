@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,7 +33,7 @@ public class LoginController {
     private final UserRepository userRepository;
     private final UserService userService;
 
-    //Principal 객채로 index에 사용자 정보 호출
+    //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
     public String index(Principal principal, Model model) {
         if(principal != null) {
@@ -47,7 +48,7 @@ public class LoginController {
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
         }
-        return "index";
+        return "main";
     }
 
     //회원 가입 처리(Create)
@@ -74,7 +75,7 @@ public class LoginController {
             String profileImagePath = null;
             // 1. 프로필 이미지 비어있이 않으면 저장
             if(profileImageFile != null && !profileImageFile.isEmpty()) {
-                profileImagePath = fileUploadService.store(profileImageFile);
+                profileImagePath = fileUploadService.storeImg(profileImageFile);
             }
             // 2. 프로필 이미지 업로드가 없거나 저장 실패시 기본이미지 설정
             if (profileImagePath == null) {
@@ -108,23 +109,18 @@ public class LoginController {
        if(error != null){
             model.addAttribute("errorMessage", "아이디 혹은 비밀번호가 올바르지 않습니다.");
         }
-
         model.addAttribute("user", new Users());
         return "user/loginForm";
     }
 
-    //로그인 성공 처리
-    @GetMapping("/user/loginSuccess")
-    public String loginSuccess(Principal principal, Model model) {
-        if (principal != null) {
-            model.addAttribute("loginUserId", principal.getName());
-        }
-        return "user/loginSuccess";
-    }
-
     //회원 추가정보 입력 처리(Update)
     @GetMapping("/user/add-info")
-    public String addInfoForm(Model model) {
+    public String addInfoForm(Principal principal, Model model) {
+       if(principal != null){
+           userRepository.findById(principal.getName()).ifPresent(user -> {
+               model.addAttribute("user", user);
+           });
+       }
         model.addAttribute("userAddInfo", new UserAddInfoDto());
         return "user/addInfoForm";
     }

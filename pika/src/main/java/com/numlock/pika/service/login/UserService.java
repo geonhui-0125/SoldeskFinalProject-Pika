@@ -25,7 +25,7 @@ public class UserService {
 
         //프로필 이미지 업데이트
         if(profileImage != null && !profileImage.isEmpty()){
-            String profileImagePath = fileUploadService.store(profileImage);
+            String profileImagePath = fileUploadService.storeImg(profileImage);
             user.setProfileImage(profileImagePath);
         }else if(dto.getProfileImage() != null && dto.getProfileImage().equals("default")){
             //"default" 가 DTO에서 넘어오면 기본이미지로 설정(ex. 사용자가 기존 이미지 삭제)
@@ -40,7 +40,7 @@ public class UserService {
         //전화번호 업데이트
         if(dto.getPhone()!= null && !dto.getPhone().trim().isEmpty()){
             //전화번호 유효성 검사
-            if(!dto.getPhone().matches("^\\d{2,3}-\\d{3,4}-\\d{4}$")){
+            if(!dto.getPhone().matches("^010-\\d{4}-\\d{4}$")){
                 throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다.");
             }
             user.setPhone(dto.getPhone());
