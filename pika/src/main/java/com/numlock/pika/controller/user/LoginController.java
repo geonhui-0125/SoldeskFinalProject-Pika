@@ -4,9 +4,9 @@ import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
-import com.numlock.pika.service.login.LoginService;
+import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
-import com.numlock.pika.service.login.UserService;
+import com.numlock.pika.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +39,13 @@ public class LoginController {
     //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
     public String index(Principal principal, Model model) {
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
+        System.out.println("categoriesMap 확인: " + categoriesMap);
+        //카테고리 리스트 model로 전달
+        model.addAttribute("categoriesMap", categoriesMap);
+
+
         if(principal != null) {
             //로그인한 사용자 아이디 호출
             String userId =  principal.getName();
@@ -51,16 +58,9 @@ public class LoginController {
                 model.addAttribute("user", user);
             });
 
-            Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-
-            System.out.println("categoriesMap 확인: " + categoriesMap);
-            //카테고리 리스트 model로 전달
-            model.addAttribute("categoriesMap", categoriesMap);
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
-        } else{
-            model.addAttribute("user", "visitor");
         }
         return "main";
     }
