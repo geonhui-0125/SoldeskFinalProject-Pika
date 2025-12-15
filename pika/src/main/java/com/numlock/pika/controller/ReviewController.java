@@ -22,7 +22,9 @@ public class ReviewController {
 
     // 특정 판매자에 대한 리뷰 목록을 표시합니다.
     @GetMapping("/seller/{sellerId}")
-    public String listReviewsBySellerId(@PathVariable String sellerId, Model model) {
+    public String listReviewsBySellerId(@PathVariable String sellerId, Principal principal, Model model) {
+        System.out.println("Principal object in controller: " + principal); // 이 라인을 추가
+        model.addAttribute("principal", principal); // principal 객체를 명시적으로 모델에 추가
         List<ReviewResponseDto> reviews = reviewService.getReviewsBySellerId(sellerId);
         model.addAttribute("reviews", reviews);
         model.addAttribute("sellerId", sellerId); // 판매자 ID를 뷰로 전달
