@@ -145,6 +145,7 @@ create table reviews (
     product_id number not null,
     user_id varchar2(20) not null,
     score number not null,
+    content varchar2(300) not null,
     foreign key (user_id) 
     references users (id) ON DELETE CASCADE,
     foreign key (product_id) 
