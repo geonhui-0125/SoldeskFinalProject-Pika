@@ -1,8 +1,10 @@
 package com.numlock.pika.controller.login;
 
+import com.numlock.pika.domain.Categories;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.UserAddInfoDto;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.login.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
 import com.numlock.pika.service.login.UserService;
@@ -22,6 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Controller
@@ -31,6 +35,7 @@ public class LoginController {
     private final LoginService loginService;
     private final FileUploadService fileUploadService;
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
     private final UserService userService;
 
     //Principal 객채로 main에 사용자 정보 호출
@@ -40,11 +45,20 @@ public class LoginController {
             //로그인한 사용자 아이디 호출
             String userId =  principal.getName();
 
+            System.out.println("login한 사용자 : " + userId);
+
             //아이디를 이용해 DB에서 사용자 조회
             userRepository.findById(userId).ifPresent(user -> {
                 //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
                 model.addAttribute("user", user);
             });
+
+            Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
+            System.out.println("categoriesMap 확인: " + categoriesMap);
+            //카테고리 리스트 model로 전달
+            model.addAttribute("categoriesMap", categoriesMap);
+
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
         }
