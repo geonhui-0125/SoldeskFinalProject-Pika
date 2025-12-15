@@ -21,6 +21,8 @@
 <body>
     <h1>판매자 [[${sellerId}]]에 대한 리뷰 목록</h1>
 
+    <p><strong>평균 평점:</strong> <span th:text="${#numbers.formatDecimal(sellerStats.averageRating, 0, 'POINT', 1, 'POINT')}">0.0</span>/5.0 (<span th:text="${sellerStats.reviewCount}">0</span>개 리뷰)</p>
+
     <div th:if="${reviews.isEmpty()}">
         <p>아직 작성된 리뷰가 없습니다.</p>
     </div>
