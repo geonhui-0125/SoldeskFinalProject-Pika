@@ -1,7 +1,7 @@
 package com.numlock.pika.controller.payment;
 
 import com.numlock.pika.domain.Accounts;
-import com.numlock.pika.dto.PaymentResDto;
+import com.numlock.pika.dto.payment.PaymentResDto;
 import com.numlock.pika.service.payment.PaymentApiService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
