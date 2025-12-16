@@ -53,14 +53,8 @@ public class UserService {
         }
 
         //생년월일 업데이트
-        if(dto.getBirth() != null && !dto.getBirth().trim().isEmpty()){
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                sdf.setLenient(false);
-                user.setBirth(sdf.parse(dto.getBirth()));
-            } catch (ParseException e){
-                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다.");
-            }
+        if(dto.getBirth() != null ){
+            user.setBirth(dto.getBirth());
         }
 
         //모든 추가정보 입력시 role 변경

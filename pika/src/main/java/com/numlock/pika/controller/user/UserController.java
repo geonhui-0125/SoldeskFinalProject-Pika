@@ -5,10 +5,12 @@ import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,12 +41,21 @@ public class UserController {
     }
 
     @PostMapping("/user/add-info")
-    public String addInfo(AdditionalUserInfoDto dto, Principal principal, Model model,
+    public String addInfo(@Valid AdditionalUserInfoDto dto, BindingResult result,
+                          Principal principal, Model model,
                           @RequestParam(value="profileImageFile", required = false)
                           MultipartFile profileImageFile, RedirectAttributes redirectAttributes) {
         if(principal == null) {
             //미로그인 오류 처리
             return "redirect:/";
+        }
+        //유효성 검사
+        if(result.hasErrors()){
+            log.error("--Additional User Info Validation Failed--");
+            //addInfoForm.html에서 별도의 오류 검사 필요
+            model.addAttribute("errorMessage", "생년월일이 올바르지 않습니다.");
+            model.addAttribute("userAddInfo", dto);
+            return "user/addInfoForm";
         }
         try {
             userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
