@@ -1,79 +1,83 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 </head>
 <body>
-<header th:fragment="mainHeader" id="main-header">
-    <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
-        <div>
-            <!--<div th:if="${user.profileImage}">
+	<header th:fragment="mainHeader" id="main-header">
+		<div sec:authorize="isAuthenticated()" th:if="${user}"
+			class="header-auth">
+			<div>
+				<!--<div th:if="${user.profileImage}">
                 <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: contain;">
             </div>-->
-            <a href="/user/logout" id="logout">로그아웃</a>
-            <a href="/user/add-info" id="modify">정보수정</a>
-        </div>
-    </div>
-    <div sec:authorize="!isAuthenticated()" class="header-auth">
-        <div>
-            <a href="/user/login" id="login">로그인</a>
-            <a href="/user/join" id="join">회원가입</a>
-        </div>
-    </div>
+				<a href="/user/logout" id="logout">로그아웃</a> <a href="/user/add-info"
+					id="modify">정보수정</a>
+			</div>
+		</div>
+		<div sec:authorize="!isAuthenticated()" class="header-auth">
+			<div>
+				<a href="/user/login" id="login">로그인</a> <a href="/user/join"
+					id="join">회원가입</a>
+			</div>
+		</div>
 
-    <div id="header-top">
-        <div id="header-main-content">
+		<div id="header-top">
+			<div id="header-main-content">
 
-            <a id="logo-link" th:href="@{/}">pika 피카</a>
+				<a id="logo-link" th:href="@{/}">pika 피카</a>
 
-            <div id="search-bar">
-                <input placeholder="상품을 검색해보세요">
-                <img th:src="@{/icon/search.svg}">
-            </div>
+				<div id="search-bar">
+					<input placeholder="상품을 검색해보세요"> <img
+						th:src="@{/icon/search.svg}">
+				</div>
 
-            <ul id="main-nav-menu">
-                <li><a th:href="@{/sell}">판매하기</a></li>
-                <li><a th:href="@{/mystore}">마이페이지</a></li>
-            </ul>
-        </div>
-    </div>
+				<ul id="main-nav-menu">
+					<li sec:authorize="isAuthenticated()" th:if="${user}">
+					<a th:href="@{/chat/userList}">채팅</a></li>
+					<li><a th:href="@{/sell}">판매하기</a></li>
+					<li><a th:href="@{/mystore}">마이페이지</a></li>
+				</ul>
+			</div>
+		</div>
 
-    <!-- 카테고리 라인 -->
-    <div id="category-bar">
-        <div id="category-wrapper">
-            <div id="hamburger-icon">
-                <img th:src="@{/icon/hamburger-icon.png}">
-            </div>
-            <div id="category-dropdown">
-                <p>전체 카테고리</p>
+		<!-- 카테고리 라인 -->
+		<div id="category-bar">
+			<div id="category-wrapper">
+				<div id="hamburger-icon">
+					<img th:src="@{/icon/hamburger-icon.png}">
+				</div>
+				<div id="category-dropdown">
+					<p>전체 카테고리</p>
 
-                <div class="category-item" th:each="category : ${categoriesMap}">
+					<div class="category-item" th:each="category : ${categoriesMap}">
 
-                    <a th:text="${category.key}"></a>
+						<a th:text="${category.key}"></a>
 
-                    <div class="submenu">
+						<div class="submenu">
 
-                        <p class="submenu-title" th:text="${category.key}"></p>
+							<p class="submenu-title" th:text="${category.key}"></p>
 
-                        <th:block th:each="subCategory : ${category.value}">
-                            <a th:text="${subCategory}"></a>
-                        </th:block>
+							<th:block th:each="subCategory : ${category.value}">
+								<a th:text="${subCategory}"></a>
+							</th:block>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    <!-- 오른쪽 고정 메뉴 -->
-    <div id="header-bottom-menu">
-        <div id="favorite-link">
-            <p>찜한 상품</p>
-            <img th:src="@{/icon/heart.svg}">
-        </div>
-        <div id="top-link">TOP</div>
-    </div>
+		<!-- 오른쪽 고정 메뉴 -->
+		<div id="header-bottom-menu">
+			<div id="favorite-link">
+				<p>찜한 상품</p>
+				<img th:src="@{/icon/heart.svg}">
+			</div>
+			<div id="top-link">TOP</div>
+		</div>
 
-</header>
+	</header>
 </body>
 </html>
