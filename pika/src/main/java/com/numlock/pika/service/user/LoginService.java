@@ -4,6 +4,7 @@ import com.numlock.pika.domain.Users;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ public class LoginService {
 
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final PasswordEncoder passwordEncoder;
 
     //ID,닉네임,이메일 중복 검사
     public boolean checkUser(String id) {
@@ -37,7 +39,7 @@ public class LoginService {
             throw new IllegalStateException("이미 존재하는 이메일 입니다.");
         }
         //비밀번호 암호화
-        // users.setPs(passwordEncoder.encode(users.getPs()));
+        users.setPw(passwordEncoder.encode(users.getPw()));
         return userRepository.save(users);
     }
 
@@ -47,13 +49,13 @@ public class LoginService {
         Users user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 아이디입니다."));
 
-        //암호화된 비밀번호 일치 확인 (현재 단계에서는 평문으로 직접 비교)
-        // if (!passwordEncoder.matches(password, user.getPs())) {
-        //     throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        // }
-        if (!password.equals(user.getPw())) { // 평문 비밀번호 직접 비교
+        //암호화된 비밀번호 일치 확인
+        if (!passwordEncoder.matches(password, user.getPw())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
+        /*if (!password.equals(user.getPw())) { // 평문 비밀번호 직접 비교
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }*/
         return user;
     }
 
@@ -62,10 +64,14 @@ public class LoginService {
     public void deleteUser(String userId, String rawPassword) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("존재하지 않는 사용자 입니다."));
-        //비밀번호 확인 (평문 비교)
-        if(!rawPassword.equals(user.getPw())) {
+        //비밀번호 확인
+        if(!passwordEncoder.matches(rawPassword, user.getPw())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
+        //비밀번호 확인 (평문 비교)
+        /*  if(!rawPassword.equals(user.getPw())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }*/
         userRepository.delete(user);
     }
 }
