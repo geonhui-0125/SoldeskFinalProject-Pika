@@ -1,17 +1,15 @@
 package com.numlock.pika.service.product;
 
-import com.numlock.pika.domain.Categories;
-import com.numlock.pika.domain.Products;
-import com.numlock.pika.domain.Users;
+import com.numlock.pika.domain.*;
+import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
-import com.numlock.pika.repository.CategoryRepository;
-import com.numlock.pika.repository.ProductRepository;
-import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,6 +25,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.numlock.pika.dto.ProductDetailDto.calculateTimeAgo;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -38,6 +38,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final FavoriteProductRepository  favoriteProductRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -55,6 +57,58 @@ public class ProductServiceImpl implements ProductService {
         return ProductDto.fromEntity(product);
     }
 
+    public ProductDetailDto getProductDetailById(int productId, Principal principal) {
+
+        Products products = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+
+        int favoriteCnt = favoriteProductRepository.countByProduct(products);
+
+        Users users = userRepository.findById(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
+
+        boolean wished = favoriteProductRepository.existsByUserAndProduct(users, products);
+
+        System.out.println("seller :" + products.getSeller().getId());
+        List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
+
+        double star = 0;
+        int sum = 0;
+        int count = 0;
+
+        for(Reviews reviews : reviewsList) {
+
+            count ++;
+            sum += reviews.getScore();
+
+            star = (double) sum / count;
+        }
+
+        ProductDetailDto productDetailDto = ProductDetailDto.builder()
+                .productId(productId)
+                .sellerId(products.getSeller().getId())
+                .seller(products.getSeller())
+                .buyerId(principal.getName())
+                .title(products.getTitle())
+                .description(products.getDescription())
+                .price(products.getPrice())
+                .category(products.getCategory().getCategory())
+                .favoriteCnt(favoriteCnt)
+                .viewCnt(products.getViewCnt())
+                .wished(wished)
+                .timeAgo(calculateTimeAgo(products.getCreatedAt()))
+                .star(star)
+                .images(getImageUrls(products.getProductImage()))
+                .build();
+
+        if (productDetailDto.getCategory() != null && productDetailDto.getCategory().contains(">")) {
+            productDetailDto.setCategoryOne(productDetailDto.getCategory().split(">")[0]);
+            productDetailDto.setCategoryTwo(productDetailDto.getCategory().split(">")[1]);
+        }
+
+        return productDetailDto;
+    }
+
     @Override
     public void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images) {
         Users seller = userRepository.findById(principal.getName())
@@ -64,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
         String originCategory = productRegisterDto.getCategory();
 
         Categories category = categoryRepository.findByCategory(
-                originCategory.split(" > ")[0] + ">" + originCategory.split(" > ")[1])
+                        originCategory.split(" > ")[0] + ">" + originCategory.split(" > ")[1])
                 .orElseThrow(() -> new EntityNotFoundException("카테고리 정보를 찾을 수 없습니다."));
 
         try {
@@ -83,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
                     .build();
 
             productRepository.save(products);
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("이미지 저장 실패", e);
         }
     }

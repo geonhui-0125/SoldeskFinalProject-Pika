@@ -25,6 +25,10 @@
     <h1>리뷰 상세</h1>
 
     <div th:if="${review}" class="review-detail">
+        <img th:src="@{${review.profileImage}}"
+             alt="프로필 이미지"
+             style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;"
+             th:onerror="this.onerror=null;this.src='/profile/default-profile.jpg';"/>
         <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
         <p><strong>판매자 ID:</strong> <span th:text="${review.sellerId}">seller1</span></p>
         <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
@@ -43,7 +47,8 @@
                th:href="@{/reviews/edit/{reviewId}(reviewId=${review.reviewId})}" class="edit-btn">수정</a>
 
             <form th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
-                  th:action="@{/reviews/{reviewId}/delete(reviewId=${review.reviewId})}" method="post" style="display:inline;">
+                  th:action="@{/reviews/{reviewId}/delete(reviewId=${review.reviewId})}" method="post" style="display:inline;"
+                  onsubmit="return confirm('정말로 이 리뷰를 삭제하시겠습니까?');">
                 <button type="submit" class="delete-btn">삭제</button>
             </form>
         </span>

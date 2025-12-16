@@ -2,7 +2,7 @@ package com.numlock.pika.service.payment;
 
 import com.numlock.pika.domain.Products;
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.PaymentRequestDto;
+import com.numlock.pika.dto.payment.PaymentRequestDto;
 import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

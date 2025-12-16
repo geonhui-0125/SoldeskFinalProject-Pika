@@ -1,7 +1,9 @@
 package com.numlock.pika.controller;
 
+import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
+import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final com.numlock.pika.service.CategoryService categoryService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public String list(Model model) {
@@ -33,6 +36,37 @@ public class ProductController {
         ProductDto product = productService.getProductById(id);
         model.addAttribute("product", product);
         return "product/detail";
+    }
+
+    @GetMapping("/info/{id}")
+    public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        ProductDetailDto productDetailDto = productService.getProductDetailById(id, principal);
+
+        System.out.println("productDetailDto = " + productDetailDto);
+
+        model.addAttribute("productDetailDto", productDetailDto);
+
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
+
+        return "product/info";
     }
 
     /*@GetMapping("/new")
@@ -68,11 +102,27 @@ public class ProductController {
     }
 
     @GetMapping("/new")
-    public String newProduct(Model model) {
+    public String newProduct(Model model, Principal principal) {
 
-        Map<String, List<String>> cateMap = categoryService.getAllCategoriestoMap();
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
 
-        model.addAttribute("cateMap", cateMap);
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
 
         return "product/new";
     }

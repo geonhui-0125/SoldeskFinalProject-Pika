@@ -1,12 +1,16 @@
 package com.numlock.pika.service;
 
+import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.numlock.pika.domain.Reviews;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.repository.ReviewRepository;
-import com.numlock.pika.repository.UserRepository; // ProductRepository는 더 이상 필요 없음
+import com.numlock.pika.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,9 +24,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ReviewServiceImpl implements ReviewService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReviewServiceImpl.class);
+
     private final ReviewRepository reviewRepository;
-    // private final ProductRepository productRepository; // ProductRepository는 더 이상 필요 없음
     private final UserRepository userRepository;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -31,12 +37,12 @@ public class ReviewServiceImpl implements ReviewService {
         Users seller = userRepository.findById(reviewRequestDto.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
         // 리뷰 작성자 조회
-        Users reviewer = userRepository.findById(reviewRequestDto.getUserId()) // reviewRequestDto의 userId는 리뷰 작성자 ID
+        Users reviewer = userRepository.findById(reviewRequestDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
 
         Reviews review = Reviews.builder()
-                .seller(seller) // 상품 대신 판매자 설정
-                .reviewer(reviewer) // 리뷰 작성자 설정
+                .seller(seller)
+                .reviewer(reviewer)
                 .score(reviewRequestDto.getScore())
                 .content(reviewRequestDto.getContent())
                 .build();
@@ -52,8 +58,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewResponseDto> getReviewsBySellerId(String sellerId) { // 메서드 시그니처 변경
-        List<Reviews> reviews = reviewRepository.findBySeller_Id(sellerId); // 레포지토리 메서드 변경
+    public List<ReviewResponseDto> getReviewsBySellerId(String sellerId) {
+        List<Reviews> reviews = reviewRepository.findBySeller_Id(sellerId);
         return reviews.stream()
                 .map(this::mapToReviewResponseDto)
                 .collect(Collectors.toList());
@@ -65,7 +71,6 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // 권한 확인 (리뷰 작성자 또는 관리자)
         checkReviewAccess(review, currentUserId);
 
         review.update(reviewRequestDto.getScore(), reviewRequestDto.getContent());
@@ -79,24 +84,19 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        // 권한 확인 (리뷰 작성자 또는 관리자)
         checkReviewAccess(review, currentUserId);
 
         reviewRepository.delete(review);
     }
 
-    // 리뷰 접근 권한 확인 헬퍼 메서드
     private void checkReviewAccess(Reviews review, String currentUserId) {
         Users currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AccessDeniedException("Current user not found"));
 
-        // 리뷰 작성자가 아니거나 관리자가 아닌 경우 접근 거부
-        if (!review.getReviewer().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) { // review.getUser() 대신 review.getReviewer() 사용
+        if (!review.getReviewer().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) {
             throw new AccessDeniedException("You do not have permission to modify or delete this review.");
         }
     }
-
-
 
     @Override
     @Transactional(readOnly = true)
@@ -117,12 +117,30 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private ReviewResponseDto mapToReviewResponseDto(Reviews review) {
-        return ReviewResponseDto.builder()
+        Users reviewer = review.getReviewer();
+        // Detach the potentially stale reviewer entity from the persistence context
+        if (entityManager.contains(reviewer)) { // Check if it's managed first
+            entityManager.detach(reviewer);
+        }
+        // Now, fetch a fresh copy from the database using its ID
+        Users freshReviewer = userRepository.findById(reviewer.getId())
+                                 .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewer.getId()));
+
+        logger.debug("Reviewer ID: {}", freshReviewer.getId());
+        logger.debug("Reviewer Profile Image from DB (after refresh): {}", freshReviewer.getProfileImage());
+
+        ReviewResponseDto dto = ReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
-                .sellerId(review.getSeller().getId()) // productId 대신 sellerId 사용
-                .userId(review.getReviewer().getId()) // user ID 대신 reviewer ID 사용 (리뷰 작성자)
+                .sellerId(review.getSeller().getId())
+                .userId(freshReviewer.getId())
+                .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.jpg")
                 .score(review.getScore())
                 .content(review.getContent())
+                .createdAt(review.getCreatedAt())
+                .updatedAt(review.getUpdatedAt())
                 .build();
+        
+        logger.debug("ReviewResponseDto Profile Image: {}", dto.getProfileImage());
+        return dto;
     }
 }

@@ -142,10 +142,11 @@ public class ReviewController {
 
     // 단일 리뷰의 세부 정보를 표시합니다.
     @GetMapping("/{reviewId}")
-    public String reviewDetail(@PathVariable Long reviewId, Model model) {
+    public String reviewDetail(@PathVariable Long reviewId, Principal principal, Model model) {
         try {
             ReviewResponseDto review = reviewService.getReviewById(reviewId);
             model.addAttribute("review", review);
+            model.addAttribute("principal", principal); // 이 줄을 추가합니다.
             return "review/detail"; // Thymeleaf 템플릿 가정: /templates/review/detail.html
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
