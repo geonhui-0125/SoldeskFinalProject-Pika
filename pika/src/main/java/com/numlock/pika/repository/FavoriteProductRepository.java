@@ -1,6 +1,7 @@
 package com.numlock.pika.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.numlock.pika.domain.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,10 @@ public interface FavoriteProductRepository extends JpaRepository<FavoriteProduct
 	List<FavoriteProducts> findByUser(@Param("user") Users user);
 
     int countByProduct(Products products);
+    
+    /*user와  product 엔티티로 데이터가 존재하는지 확인*/
+    boolean existsByUserAndProduct(Users user, Products product);
+    
+    /*user와  product 엔티티로 존재하는 데이터 조회*/
+    Optional<FavoriteProducts> findByUserAndProduct(Users user, Products product);
 }

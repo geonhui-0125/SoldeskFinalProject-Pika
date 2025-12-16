@@ -136,6 +136,21 @@
     cursor: pointer;
 }
 
+/* 기본 상태 (찜하지 않음 - 빈 하트나 기본 색상) */
+.like-btn {
+    color: #999;
+    border: 1px solid #ccc;
+    transition: all 0.2s; /* 부드러운 전환 효과 */
+}
+
+/* 찜했을 때 활성화되는 상태 */
+.like-btn.wished-active {
+    color: red; /* 하트 아이콘의 색상을 빨간색으로 변경 */
+    background-color: #ffeaea; /* 배경색 변경 */
+    border-color: red;
+    font-weight: bold;
+}
+
 .buy-btn {
     padding: 12px 30px;
     background: #ff4500;
