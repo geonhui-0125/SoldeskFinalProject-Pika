@@ -90,6 +90,13 @@
 <body>
     <div class="container">
         <h1>추가 정보 입력</h1>
+        <!--  디버깅용 에러 메세지 출력
+        <div th:if="${#fields.hasAnyErrors()}" class="error-message">
+            <p>다음 오류를 수정해주세요 : </p>
+            <ul>
+                <li th:each="err : ${#fields.allErrors()}" th:text="${err}" ></li>
+            </ul>
+        </div>-->
         <div th:if="${successMessage}" class="success-message">
             <p th:text="${successMessage}"></p>
         </div>
