@@ -27,6 +27,7 @@ public class ProductDetailDto {
     private String categoryOne;
     private String categoryTwo;
     private int favoriteCnt;
+    private boolean wished;
     private int viewCnt;
     private double star;
     private LocalDateTime startTime;

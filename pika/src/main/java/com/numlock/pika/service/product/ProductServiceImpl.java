@@ -1,9 +1,6 @@
 package com.numlock.pika.service.product;
 
-import com.numlock.pika.domain.Categories;
-import com.numlock.pika.domain.Products;
-import com.numlock.pika.domain.Reviews;
-import com.numlock.pika.domain.Users;
+import com.numlock.pika.domain.*;
 import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
@@ -67,6 +64,11 @@ public class ProductServiceImpl implements ProductService {
 
         int favoriteCnt = favoriteProductRepository.countByProduct(products);
 
+        Users users = userRepository.findById(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
+
+        boolean wished = favoriteProductRepository.existsByUserAndProduct(users, products);
+
         System.out.println("seller :" + products.getSeller().getId());
         List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
 
@@ -93,6 +95,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(products.getCategory().getCategory())
                 .favoriteCnt(favoriteCnt)
                 .viewCnt(products.getViewCnt())
+                .wished(wished)
                 .timeAgo(calculateTimeAgo(products.getCreatedAt()))
                 .star(star)
                 .images(getImageUrls(products.getProductImage()))

@@ -13,7 +13,8 @@
 <header th:replace="~{header :: mainHeader}"></header>
 
 <section class="product-section" th:object="${productDetailDto}">
-
+    <input class="product-id" type="hidden" th:value="*{productId}">
+    <input class="wished" type="hidden" th:value="*{wished}">
     <!-- breadcrumb -->
     <nav class="breadcrumb">
         <ul>
@@ -52,13 +53,13 @@
                th:text="${#numbers.formatDecimal(productDetailDto.price,0,'COMMA',0,'POINT')} + '원'"></p>
 
             <ul class="product-stats">
-                <li>찜 <span th:text="*{favoriteCnt}"></span></li>
-                <li>조회수 <span th:text="*{viewCnt}"></span></li>
-                <li>등록 <span th:text="*{timeAgo}"></span></li>
+                <li class="wish-cnt">찜 <span th:text="*{favoriteCnt}"></span></li>
+                <li class="view-cnt">조회수 <span th:text="*{viewCnt}"></span></li>
+                <li class="time-ago">등록 <span th:text="*{timeAgo}"></span></li>
             </ul>
 
             <div class="product-actions">
-                <button class="like-btn">찜</button>
+                <button class="like-btn" th:classappend="*{wished} ? 'wished-active' : ''">찜</button>
                 <button class="buy-btn"
                         th:onclick="|location.href='@{/payments/preview(productId=*{productId})}'|">
                     상품구매
@@ -83,7 +84,7 @@
                 <img th:src="@{${productDetailDto.seller.profileImage}}">
                 <div>
                     <p th:text="*{seller.nickname}"></p>
-                    <p>별점 <span th:text="*{star}"></span></p>
+                    <p>별점 <span th:text="*{star}"></span></p> <!--별 모양 icon 생기면 수정 -->
                 </div>
             </div>
         </section>
