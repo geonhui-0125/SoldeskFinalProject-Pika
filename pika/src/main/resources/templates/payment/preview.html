@@ -190,13 +190,13 @@
         // 결제 요청 데이터 객체
         const paymentData = {
             pg: "html5_inicis",                             // PG사 고유 코드
-            pay_method: "vbank",                             // 결제수단 card로 설정 결제만 진행함 ( 가상계좌 : vbank )
+            pay_method: "vbank",                            // 결제수단 card로 설정 결제만 진행함 ( 가상계좌 : vbank )
             merchant_uid: merchantUid,                      // 주문번호(판매자UID +  "_" + 현재날짜 (고유해야 함)
             name: productTitle,                             // 주문명
             amount: 1,                                      // 결제금액
             buyer_name: buyerName,                          // 구매자 이름
-            buyer_email: buyerEmail,                          // 구매자 전화번호
-            buyer_tel : buyerTel,                         // 구매자 이메일
+            buyer_email: buyerEmail,                        // 구매자 전화번호
+            buyer_tel : buyerTel,                           // 구매자 이메일
             buyer_addr : buyerAddr,                         // 구매자 주소
             custom_data : {                                 // 그 외 정보....
                 actualAmount: productAmount, // 실제로는 1원으로 결제하고 서버에서 검증하기 위해서 실제 가격 전달

@@ -9,15 +9,12 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import com.numlock.pika.domain.Products;
-import com.numlock.pika.dto.PaymentResDto;
+import com.numlock.pika.dto.payment.PaymentResDto;
 import com.numlock.pika.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

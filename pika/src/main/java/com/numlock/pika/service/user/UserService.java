@@ -5,12 +5,16 @@ import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +22,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
+    private final PasswordEncoder passwordEncoder;
 
+    //정보 수정 처리
     public Users updateAddlInfo(String userId, AdditionalUserInfoDto dto, MultipartFile profileImage) throws IOException {
-        System.out.println("--이미지 삭제 디버깅--");
-        System.out.println("DTO prorfileImage 값: " + dto.getProfileImage());
-
         Users user = userRepository.findById (userId)
                 .orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -75,4 +78,24 @@ public class UserService {
                 user.getPhone() != null && !user.getPhone().trim().isEmpty() &&
                 user.getBirth() != null;
     }
+
+    //비밀번호 재설정을 위한 아이디, 이메일 일치 확인
+   public boolean checkUserByIdAndEmail(String id, String email){
+        Optional<Users> userOptional = userRepository.findById(id);
+        if(userOptional.isPresent()){
+            Users user = userOptional.get();
+            return user.getEmail().equalsIgnoreCase(email);
+        }
+        return false;
+    }
+    public Users findById(String UserId){
+        return userRepository.findById(UserId).orElse(null);
+    }
+    public List<Users> findAll(){
+        Iterable<Users> iterable = userRepository.findAll();
+        return StreamSupport.stream(iterable.spliterator(), false).toList();
+    }
+    //비밀번호 재설정 메소드
+    //public void passwordReset(String userId, S)
+
 }
