@@ -30,11 +30,12 @@ public class LoginSecurity {
                 //                 .requestMatchers("/mypage/**").hasRole("USER") // '/mypage/**'는 USER 역할만 접근 가능
                 //         .anyRequest().authenticated() //나머지는 인증 필요
                 // )
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll()) // 모든 경로에 대한 접근 허용 (개발용)
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+                // 모든 경로에 대한 접근 허용 (개발용) -> 마이페이지 등 구현 후 수정 필요
                 .formLogin(form -> form.loginPage("/user/login") //사용자 정의 로그인 페이지
                         .usernameParameter("id") //loginForm의 username을 id로
                         .loginProcessingUrl("/user/login-proc") //로그인 처리 페이지
-                        .defaultSuccessUrl("/user/loginSuccess", true) //로그인 성공시 리다이렉트
+                        .defaultSuccessUrl("/", true) //로그인 성공시 리다이렉트
                         .failureUrl("/user/login?error=true")
                         .permitAll()
                 )

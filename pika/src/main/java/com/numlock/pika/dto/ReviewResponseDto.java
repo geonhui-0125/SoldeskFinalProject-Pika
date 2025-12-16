@@ -10,8 +10,8 @@ import lombok.*;
 @ToString
 public class ReviewResponseDto {
     private Long reviewId;
-    private Integer productId;
-    private String userId;
+    private String sellerId;
+    private String userId; // 리뷰 작성자 ID
     private Integer score;
     private String content;
 }

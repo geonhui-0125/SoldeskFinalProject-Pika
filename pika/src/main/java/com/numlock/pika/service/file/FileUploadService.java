@@ -15,9 +15,9 @@ import java.util.UUID;
 public class FileUploadService {
 
     //application.properties에 설정한 업로드 경로
-    private final String uploadDir = "src/main/resources/static/profile/";
+    private final String uploadDir = Paths.get(System.getProperty("user.home"), "pika_uploads", "profile").toString();
 
-    public String store(MultipartFile multipartFile) throws IOException {
+    public String storeImg(MultipartFile multipartFile) throws IOException {
         if(multipartFile.isEmpty()){
             return null;
             //업로드 파일 없을 경우 기본 이미지 반환 혹은 예외처리,
@@ -45,11 +45,27 @@ public class FileUploadService {
         //파일 저장
         try (InputStream inputStream = multipartFile.getInputStream()) {
             Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        }catch (IOException e){
+            throw new IOException("프로필 이미지 저장에 실패했습니다. 경로: " + destinationFile, e);
         }
 
         //웹에서 접근할 수 있는 경로
         return "/profile/" + storedFileName;
+    }
 
+    public void deleteImg (String webPath) throws IOException {
+        if(webPath != null || webPath.isEmpty() || !webPath.startsWith("/profile/")){
+            return;
+        }
+        String fileName = webPath.substring("/profile/".length());
+        Path filePath = Paths.get(uploadDir).resolve(fileName);
+
+        try{
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.err.println("이미지 파일 삭제 실패: " + filePath + ", 오류: " + e.getMessage());
+            throw e;
+        }
     }
 
 }

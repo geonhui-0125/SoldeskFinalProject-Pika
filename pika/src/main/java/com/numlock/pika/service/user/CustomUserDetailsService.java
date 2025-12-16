@@ -1,4 +1,4 @@
-package com.numlock.pika.service.login;
+package com.numlock.pika.service.user;
 
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.repository.UserRepository;

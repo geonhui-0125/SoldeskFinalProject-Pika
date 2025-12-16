@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <title>피카 마켓 클론 - TH 적용</title>
+    <style>
+        /*******************************
+         상품 목록
+        ********************************/
+        #product-section {
+            max-width: 1200px;
+            margin: 140px auto 20px; /* header때문에 위 여백 확보 */
+            padding: 20px;
+        }
+
+        #product-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+            padding-left: 50px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            overflow: hidden;
+            transition: .3s;
+            width: 250px;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 10px;
+        }
+
+        .product-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: .9em;
+            margin-top: 10px;
+        }
+
+        .product-price {
+            color: #ff4500;
+            font-weight: bold;
+        }
+
+        .product-time {
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+<header th:replace="~{header :: mainHeader}"></header>
+<section id="product-section">
+    <div id="product-wrap">
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <a th:href="@{/product/1}">
+                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+            </a>
+            <div class="product-info">
+                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-details">
+                    <span class="product-price">15000원</span>
+                    <span class="product-time">12일 전</span>
+                </p>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+<script th:src="@{/js/header.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const successMessage = /*[[${successMessage}]]*/ null;
+    if (successMessage) {
+        alert(successMessage)
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

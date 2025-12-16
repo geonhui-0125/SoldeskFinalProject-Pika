@@ -1,7 +1,7 @@
-package com.numlock.pika.service.login;
+package com.numlock.pika.service.user;
 
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.UserAddInfoDto;
+import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
 
-    public Users updateAddlInfo(String userId, UserAddInfoDto dto, MultipartFile profileImage) throws IOException {
+    public Users updateAddlInfo(String userId, AdditionalUserInfoDto dto, MultipartFile profileImage) throws IOException {
+        System.out.println("--이미지 삭제 디버깅--");
+        System.out.println("DTO prorfileImage 값: " + dto.getProfileImage());
+
         Users user = userRepository.findById (userId)
                 .orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         //프로필 이미지 업데이트
         if(profileImage != null && !profileImage.isEmpty()){
-            String profileImagePath = fileUploadService.store(profileImage);
+            String profileImagePath = fileUploadService.storeImg(profileImage);
             user.setProfileImage(profileImagePath);
         }else if(dto.getProfileImage() != null && dto.getProfileImage().equals("default")){
             //"default" 가 DTO에서 넘어오면 기본이미지로 설정(ex. 사용자가 기존 이미지 삭제)
@@ -40,7 +43,7 @@ public class UserService {
         //전화번호 업데이트
         if(dto.getPhone()!= null && !dto.getPhone().trim().isEmpty()){
             //전화번호 유효성 검사
-            if(!dto.getPhone().matches("^\\d{2,3}-\\d{3,4}-\\d{4}$")){
+            if(!dto.getPhone().matches("^010-\\d{4}-\\d{4}$")){
                 throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다.");
             }
             user.setPhone(dto.getPhone());

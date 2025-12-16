@@ -5,13 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAddInfoDto {
+public class AdditionalUserInfoDto {
     private String profileImage;
     private String address;
     private String phone;
