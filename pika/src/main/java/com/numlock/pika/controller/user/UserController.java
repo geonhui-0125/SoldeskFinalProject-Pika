@@ -9,18 +9,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.numlock.pika.domain.Products;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.ProductDto;
-import com.numlock.pika.repository.FavoriteProductRepository;
-import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.FavoriteProductService;
-import com.numlock.pika.service.ProductService;
-import com.numlock.pika.service.login.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Slf4j
 @Controller
@@ -59,4 +55,5 @@ public class UserController {
 
 		return "myProducts";
 	}
+
 }

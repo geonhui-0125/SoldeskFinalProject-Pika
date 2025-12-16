@@ -1,18 +1,16 @@
-package com.numlock.pika.controller.login;
+package com.numlock.pika.controller.user;
 
-import com.numlock.pika.domain.Categories;
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.UserAddInfoDto;
+import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
-import com.numlock.pika.service.login.LoginService;
+import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
-import com.numlock.pika.service.login.UserService;
+import com.numlock.pika.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.io.IOException;
@@ -40,7 +39,13 @@ public class LoginController {
 
     //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
-    public String index(Principal principal, Model model) {
+    public String loginUser(Principal principal, Model model) {
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
+        System.out.println("categoriesMap 확인: " + categoriesMap);
+        //카테고리 리스트 model로 전달
+        model.addAttribute("categoriesMap", categoriesMap);
+
         if(principal != null) {
             //로그인한 사용자 아이디 호출
             String userId =  principal.getName();
@@ -52,12 +57,6 @@ public class LoginController {
                 //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
                 model.addAttribute("user", user);
             });
-
-            Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-
-            System.out.println("categoriesMap 확인: " + categoriesMap);
-            //카테고리 리스트 model로 전달
-            model.addAttribute("categoriesMap", categoriesMap);
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
@@ -98,6 +97,7 @@ public class LoginController {
             user.setProfileImage(profileImagePath);
             // 3. 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
+            System.out.println("회원가입 완료 ID: " +  user.getId() + ", 닉네임: " + user.getNickname());
             loginService.joinUser(user);
             log.info("User {} joined successfully.", user.getId());
 
@@ -135,19 +135,21 @@ public class LoginController {
                model.addAttribute("user", user);
            });
        }
-        model.addAttribute("userAddInfo", new UserAddInfoDto());
+        model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         return "user/addInfoForm";
     }
 
     @PostMapping("/user/add-info")
-    public String addInfo(UserAddInfoDto dto, Principal principal, Model model,
-                          @RequestParam(value="profileImageFile", required = false) MultipartFile profileImageFile) {
+    public String addInfo(AdditionalUserInfoDto dto, Principal principal, Model model,
+                          @RequestParam(value="profileImageFile", required = false)
+                          MultipartFile profileImageFile, RedirectAttributes redirectAttributes) {
         if(principal == null) {
             //미로그인 오류 처리
             return "redirect:/";
         }
         try {
             userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
+            redirectAttributes.addFlashAttribute("successMessage", "수정완료되었습니다.");
         }catch (Exception e){
             log.error("추가 정보 업데이트 중 오류 발생: {}", e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());

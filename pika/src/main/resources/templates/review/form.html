@@ -17,7 +17,11 @@
 
     <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
 
-    <form th:action="@{/reviews}" th:object="${review}" method="post">
+    <form th:action="${reviewId != null} ? @{/reviews/{reviewId}(reviewId=${reviewId})} : @{/reviews}"
+          th:object="${review}"
+          method="post">
+        <input type="hidden" th:if="${reviewId != null}" name="_method" value="put" />
+        <input type="hidden" th:if="${reviewId != null}" name="reviewId" th:value="${reviewId}" />
         <div>
             <label for="sellerId">판매자 ID:</label>
             <input type="text" id="sellerId" th:field="*{sellerId}" readonly>
