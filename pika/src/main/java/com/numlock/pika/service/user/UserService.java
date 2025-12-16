@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -86,7 +88,13 @@ public class UserService {
         }
         return false;
     }
-
+    public Users findById(String UserId){
+        return userRepository.findById(UserId).orElse(null);
+    }
+    public List<Users> findAll(){
+        Iterable<Users> iterable = userRepository.findAll();
+        return StreamSupport.stream(iterable.spliterator(), false).toList();
+    }
     //비밀번호 재설정 메소드
     //public void passwordReset(String userId, S)
 
