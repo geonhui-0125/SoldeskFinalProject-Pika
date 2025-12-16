@@ -122,7 +122,7 @@ public class LoginController {
             model.addAttribute("user", userDto);
             return "user/joinForm";
         }
-        return "redirect:/user/add-info";
+        return "/user/loginForm";
     }
 
     //Spring Security가 로그인/아웃을 자동으로 처리
