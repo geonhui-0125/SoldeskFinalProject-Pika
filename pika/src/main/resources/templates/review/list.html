@@ -16,6 +16,15 @@
             border-radius: 4px;
             font-size: 0.9em;
         }
+        .detail-link { /* New style for detail link */
+            padding: 5px 10px;
+            background-color: #28a745; /* Greenish color */
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-right: 5px; /* Add some margin */
+        }
     </style>
 </head>
 <body>
@@ -28,11 +37,16 @@
     </div>
 
     <div th:each="review : ${reviews}" class="review-item">
+        <img th:src="@{${review.profileImage}}"
+             alt="프로필 이미지"
+             style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
+             th:onerror="this.onerror=null;this.src='/profile/default-profile.jpg';"/>
         <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
         <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
         <p><strong>별점:</strong> <span class="score" th:text="${review.score}">5</span></p>
         <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
         <span sec:authorize="isAuthenticated()">
+            <a th:href="@{/reviews/{reviewId}(reviewId=${review.reviewId})}" class="detail-link">상세보기</a>
             <a th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
                th:href="@{/reviews/edit/{reviewId}(reviewId=${review.reviewId})}" class="edit-link">수정</a>
         </span>

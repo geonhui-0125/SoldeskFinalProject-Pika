@@ -35,7 +35,7 @@ public class Reviews {
     @Column(name = "score", nullable = false)
     private Integer score;
 
-    @Column(name = "content", length = 500) // 새로운 content 필드 추가
+    @Column(name = "content", length = 300, nullable = false) // 새로운 content 필드 추가
     private String content;
 
     @CreationTimestamp

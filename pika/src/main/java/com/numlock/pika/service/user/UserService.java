@@ -53,14 +53,8 @@ public class UserService {
         }
 
         //생년월일 업데이트
-        if(dto.getBirth() != null && !dto.getBirth().trim().isEmpty()){
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                sdf.setLenient(false);
-                user.setBirth(sdf.parse(dto.getBirth()));
-            } catch (ParseException e){
-                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다.");
-            }
+        if(dto.getBirth() != null ){
+            user.setBirth(dto.getBirth());
         }
 
         //모든 추가정보 입력시 role 변경
@@ -88,6 +82,7 @@ public class UserService {
         }
         return false;
     }
+
     public Users findById(String UserId){
         return userRepository.findById(UserId).orElse(null);
     }
@@ -95,7 +90,13 @@ public class UserService {
         Iterable<Users> iterable = userRepository.findAll();
         return StreamSupport.stream(iterable.spliterator(), false).toList();
     }
+
     //비밀번호 재설정 메소드
-    //public void passwordReset(String userId, S)
+    public void passwordReset(String userId, String newPw){
+        Users user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        user.setPw(passwordEncoder.encode(newPw));
+        userRepository.save(user);
+    }
 
 }

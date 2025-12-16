@@ -117,7 +117,7 @@ public class LoginController {
             return "user/joinForm";
         } catch (Exception e) {
             log.error("--- Exception Occurred ---", e);
-            model.addAttribute("errorMessage", "추가정보 입력 중 오류가 발생했습니다: " + e.getMessage()); // 오류 메시지 복원
+            model.addAttribute("errorMessage", "입력된 정보가 올바르지 않습니다. " + e.getMessage()); // 오류 메시지 복원
             log.error("Error joining user {}: {}", userDto.getId(), e.toString());
             model.addAttribute("user", userDto);
             return "user/joinForm";
