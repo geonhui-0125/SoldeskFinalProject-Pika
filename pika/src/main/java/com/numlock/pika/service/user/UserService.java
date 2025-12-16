@@ -88,6 +88,7 @@ public class UserService {
         }
         return false;
     }
+
     public Users findById(String UserId){
         return userRepository.findById(UserId).orElse(null);
     }
@@ -95,7 +96,13 @@ public class UserService {
         Iterable<Users> iterable = userRepository.findAll();
         return StreamSupport.stream(iterable.spliterator(), false).toList();
     }
+
     //비밀번호 재설정 메소드
-    //public void passwordReset(String userId, S)
+    public void passwordReset(String userId, String newPw){
+        Users user = userRepository.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        user.setPw(passwordEncoder.encode(newPw));
+        userRepository.save(user);
+    }
 
 }
