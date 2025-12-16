@@ -59,16 +59,15 @@ CREATE TABLE favorite_products (
 
 create table reviews (
     review_id number primary key,
-    product_id number not null,
-    user_id varchar2(20) not null,
+    seller_id varchar2(20) not null,
+    reviewer_id varchar2(20) not null,
     score number not null,
-    content varchar2(500) NULL, -- 새롭게 추가된 내용 컬럼
-    foreign key (user_id) 
+    content varchar2(500) NULL,
+    foreign key (reviewer_id)
     references users (id) ON DELETE CASCADE,
-    foreign key (product_id) 
-    references products (product_id) ON DELETE CASCADE
+    foreign key (seller_id)
+    references users (id) ON DELETE CASCADE
 );
-
 create table accounts(
     account_id number primary key,
     seller_id varchar2(20) not null,

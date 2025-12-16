@@ -7,12 +7,16 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <title>피카 마켓 클론 - TH 적용</title>
     <style>
+        body {
+            /* 헤더 높이에 맞게 본문 콘텐츠를 아래로 밀어냄 */
+            padding-top: 100px; /* main-header의 대략적인 높이 */
+        }
         /*******************************
          상품 목록
         ********************************/
         #product-section {
             max-width: 1200px;
-            margin: 140px auto 20px; /* header때문에 위 여백 확보 */
+            margin: 120px auto 20px; /* margin-top을 0으로 변경, body의 padding-top이 대신함 */
             padding: 20px;
         }
 
@@ -76,140 +80,36 @@
 </head>
 <body>
 <header th:replace="~{header :: mainHeader}"></header>
+
 <section id="product-section">
     <div id="product-wrap">
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
+        <div th:each="product : ${products}" class="product-card">
+            <a th:href="@{/products/{productId}(productId=${product.productId})}">
+                <img class="product-image" th:src="@{${product.productImage}}" alt="상품 이미지">
             </a>
             <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
+                <p class="product-title" th:text="${product.title}"></p>
                 <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
+                    <span class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                    <span class="product-time" th:text="${#temporals.format(product.createdAt, 'yyyy-MM-dd')}"></span>
                 </p>
             </div>
         </div>
 
-        <div class="product-card">
-            <a th:href="@{/product/}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
+        <div th:if="${products != null and products.isEmpty()}" style="width: 100%; text-align: center; margin-top: 50px;">
+            <p>등록된 상품이 없습니다.</p>
         </div>
+    </div>
 
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
+    <div class="pagination" style="text-align: center; margin-top: 20px;" th:if="${totalPages > 0}">
+        <a th:if="${currentPage > 0}" th:href="@{/(page=${currentPage - 1}, size=${pageSize})}">&laquo; 이전</a>
 
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:if="${i == currentPage}" th:href="@{/(page=${i}, size=${pageSize})}" th:text="${i + 1}" style="font-weight: bold; color: blue;"></a>
+            <a th:if="${i != currentPage}" th:href="@{/(page=${i}, size=${pageSize})}" th:text="${i + 1}"></a>
+        </span>
 
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <a th:href="@{/product/1}">
-                <img class="product-image" th:src="@{/images/product/product1.jpg}">
-            </a>
-            <div class="product-info">
-                <p class="product-title">슈프림 스타 패션 스니커즈 한정판</p>
-                <p class="product-details">
-                    <span class="product-price">15000원</span>
-                    <span class="product-time">12일 전</span>
-                </p>
-            </div>
-        </div>
-
-
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/(page=${currentPage + 1}, size=${pageSize})}">다음 &raquo;</a>
     </div>
 </section>
 <script th:src="@{/js/header.js}"></script>
