@@ -136,4 +136,37 @@ public class ProductController {
 
         return "redirect:/products/new";
     }
+
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable("id") int id, Principal principal, Model model) {
+        ProductDetailDto product = productService.getProductDetailById(id, principal);
+
+        if (!product.getSellerId().equals(principal.getName())) {
+            return "redirect:/products/info/" + id;
+        }
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+        model.addAttribute("product", product);
+
+        // Transform "Main>Sub" to "Main > Sub" for the form if needed
+        String category = product.getCategory();
+        if (category != null && category.contains(">")) {
+             model.addAttribute("currentCategory", category.replace(">", " > "));
+        }
+
+        return "product/edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateProduct(@PathVariable("id") int id, ProductRegisterDto dto, Principal principal) {
+        productService.updateProduct(id, dto, principal);
+        return "redirect:/user/mypage";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable("id") int id, Principal principal) {
+        productService.deleteProduct(id, principal);
+        return "redirect:/user/mypage";
+    }
 }

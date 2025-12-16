@@ -142,6 +142,51 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductDto> getProductsBySeller(String sellerId) {
+        return productRepository.findBySeller_Id(sellerId).stream()
+                .map(ProductDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateProduct(int productId, ProductRegisterDto dto, Principal principal) {
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (!product.getSeller().getId().equals(principal.getName())) {
+            throw new SecurityException("Not authorized to update this product");
+        }
+
+        product.setTitle(dto.getTitle());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+
+        if (dto.getCategory() != null && !dto.getCategory().isEmpty()) {
+            String originCategory = dto.getCategory();
+            // Assuming category format "Main > Sub"
+            String[] parts = originCategory.split(" > ");
+            if (parts.length == 2) {
+                Categories category = categoryRepository.findByCategory(parts[0] + ">" + parts[1])
+                        .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+                product.setCategory(category);
+            }
+        }
+    }
+
+    @Override
+    public void deleteProduct(int productId, Principal principal) {
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (!product.getSeller().getId().equals(principal.getName())) {
+            throw new SecurityException("Not authorized to delete this product");
+        }
+
+        productRepository.delete(product);
+    }
+
     public String saveImages(List<MultipartFile> images) throws IOException {
         // 상품 전용 폴더명
         String folderName = UUID.randomUUID().toString();

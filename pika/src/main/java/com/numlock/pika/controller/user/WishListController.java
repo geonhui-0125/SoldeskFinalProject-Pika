@@ -1,5 +1,8 @@
 package com.numlock.pika.controller.user;
 
+import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.service.ReviewService;
+import com.numlock.pika.service.product.ProductService;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,8 @@ public class WishListController {
 
 	private final UserRepository userRepository;
 	private final FavoriteProductService favoriteProductService;
+	private final ProductService productService;
+	private final ReviewService reviewService;
 
 	@GetMapping("wishlist")
 	public String wishlist(Principal principal, Model model) {
@@ -51,7 +56,40 @@ public class WishListController {
 
 	@GetMapping("myProducts")
 	public String myProducts(Principal principal, Model model) {
-		return "myProducts";
+		if (principal == null) {
+			return "redirect:/";
+		}
+		String userId = principal.getName();
+		List<ProductDto> myProducts = productService.getProductsBySeller(userId);
+		model.addAttribute("myProducts", myProducts);
+		return "user/myProducts";
+	}
+
+	@GetMapping("mypage")
+	public String myPage(Principal principal, Model model) {
+		if (principal == null) {
+			return "redirect:/";
+		}
+		String userId = principal.getName();
+
+		// User Info
+		Users user = userRepository.findById(userId).orElse(null);
+		if(user == null) return "redirect:/";
+		model.addAttribute("user", user);
+
+		// My Products
+		List<ProductDto> myProducts = productService.getProductsBySeller(userId);
+		model.addAttribute("myProducts", myProducts);
+
+		// My Reviews (Store Reviews)
+		List<ReviewResponseDto> myReviews = reviewService.getReviewsBySellerId(userId);
+		model.addAttribute("myReviews", myReviews);
+
+		// Wishlist
+		List<ProductDto> wishlist = favoriteProductService.findFavoriteByUser(user);
+		model.addAttribute("wishlist", wishlist);
+
+		return "user/mypage";
 	}
 
 }
