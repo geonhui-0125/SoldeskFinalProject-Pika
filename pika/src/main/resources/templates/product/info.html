@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/info.css}">
+    <title>Title</title>
+</head>
+<body>
+
+<header th:replace="~{header :: mainHeader}"></header>
+
+<section class="product-section" th:object="${productDetailDto}">
+
+    <!-- breadcrumb -->
+    <nav class="breadcrumb">
+        <ul>
+            <li>홈</li>
+            <li>
+                <span>&gt;</span>
+                <span th:text="*{categoryOne}"></span>
+            </li>
+            <li>
+                <span>&gt;</span>
+                <span th:text="*{categoryTwo}"></span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- 상단 영역 -->
+    <div class="product-top">
+
+        <!-- 이미지 영역 -->
+        <div class="product-images">
+            <div class="thumbnail-list">
+                <img th:each="image : *{images}"
+                     th:src="@{${image}}"
+                     class="thumbnail">
+            </div>
+
+            <div class="main-image">
+                <img th:src="@{${productDetailDto.images[0]}}">
+            </div>
+        </div>
+
+        <!-- 상품 정보 -->
+        <div class="product-info">
+            <h2 th:text="*{title}"></h2>
+            <p class="price"
+               th:text="${#numbers.formatDecimal(productDetailDto.price,0,'COMMA',0,'POINT')} + '원'"></p>
+
+            <ul class="product-stats">
+                <li>찜 <span th:text="*{favoriteCnt}"></span></li>
+                <li>조회수 <span th:text="*{viewCnt}"></span></li>
+                <li>등록 <span th:text="*{timeAgo}"></span></li>
+            </ul>
+
+            <div class="product-actions">
+                <button class="like-btn">찜</button>
+                <button class="buy-btn"
+                        th:onclick="|location.href='@{/payments/preview(productId=*{productId})}'|">
+                    상품구매
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 정보 -->
+    <div class="product-bottom">
+
+        <!-- 상품 설명 -->
+        <section class="product-description">
+            <h3>상품정보</h3>
+            <p th:text="*{description}"></p>
+        </section>
+
+        <!-- 판매자 -->
+        <section class="seller-info">
+            <h3>판매자</h3>
+            <div class="seller-box">
+                <img th:src="@{${productDetailDto.seller.profileImage}}">
+                <div>
+                    <p th:text="*{seller.nickname}"></p>
+                    <p>별점 <span th:text="*{star}"></span></p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</section>
+
+
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/product/info.js}"></script>
+</body>
+</html>

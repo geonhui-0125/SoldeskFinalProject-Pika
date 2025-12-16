@@ -1,6 +1,6 @@
 package com.numlock.pika.controller.payment;
 
-import com.numlock.pika.dto.PaymentRequestDto;
+import com.numlock.pika.dto.payment.PaymentRequestDto;
 import com.numlock.pika.service.payment.PaymentRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
