@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DM with <th:block th:text="${recipientId}"></th:block></title>
+</head>
+<body>
+    <h2>DM with <th:block th:text="${recipientId}"></th:block></h2>
+
+    <div class="msgArea" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+        <!-- Historical messages will be loaded by the script below -->
+    </div>
+    <br>
+    <div>
+        <input type="text" placeholder="Send a message" class="content" style="width: 80%;">
+        <button type="button" onclick="sendMsg()">Send</button>
+    </div>
+    <br/>
+    <a th:href="@{/chat/userList}">Back to User List</a>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const senderId = [[${senderId}]];
+    const recipientId = [[${recipientId}]];
+    const historicalMessages = /*[[${messages}]]*/ []; // Load all messages into a JS array
+    /*]]>*/
+
+    console.log("DM Initialized. Sender:", senderId, "Recipient:", recipientId);
+    console.log("Historical Messages from server (raw):", historicalMessages);
+
+    const msgArea = document.querySelector('.msgArea');
+    const contentInput = document.querySelector('.content');
+
+    // Function to display one message
+    function displayMessage(msgObj) {
+        console.log("displayMessage called with:", msgObj);
+
+        const div = document.createElement('div');
+
+        if (msgObj.sender === 'system' || msgObj.senderId === 'system') { // Accommodate both live and historical system messages
+            console.log("displayMessage Branch: System Message");
+            div.innerText = "[System] " + (msgObj.msg || msgObj.content);
+            div.style.color = 'red';
+        } else {
+            const messageSender = msgObj.sender || msgObj.senderId;
+            const messageContent = msgObj.msg || msgObj.content;
+
+            console.log(`displayMessage - messageSender: ${messageSender}, messageContent: ${messageContent}`);
+
+            if (messageSender === senderId) { // If *I* sent this message
+                console.log("displayMessage Branch: My Message (senderId matched)");
+                div.innerText = "Me: " + messageContent;
+                div.style.textAlign = 'right';
+            } else { // If *they* sent this message (assuming the message is part of this conversation)
+                console.log("displayMessage Branch: Their Message (recipientId matched)");
+                div.innerText = messageSender + ": " + messageContent;
+            }
+        }
+
+        if (div.innerText) {
+            console.log("displayMessage Appending to msgArea:", div.innerText);
+            msgArea.append(div);
+            msgArea.scrollTop = msgArea.scrollHeight; // Scroll to bottom
+        } else {
+            console.log("displayMessage No text to append.");
+        }
+    }
+
+    // Load historical messages when the DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOMContentLoaded: Loading historical messages.");
+        for (const msg of historicalMessages) {
+            displayMessage(msg);
+        }
+    });
+
+
+    // --- WebSocket Logic ---
+    const socket = new WebSocket("ws://" + window.location.host + "/ws/chat");
+
+    socket.onopen = function (e) {
+        console.log("WebSocket: Connected.");
+        msgArea.append(createNoticeDiv('Connected to the server.'));
+    };
+
+    socket.onclose = function (e) {
+        console.log("WebSocket: Disconnected.");
+        msgArea.append(createNoticeDiv('Server connection closed.'));
+    };
+
+    socket.onerror = function (e) {
+        console.error("WebSocket Error:", e);
+        msgArea.append(createNoticeDiv('An error occurred.'));
+    };
+
+    socket.onmessage = function (e) {
+        console.log("WebSocket: Message received from server:", e.data);
+        const receivedMsg = JSON.parse(e.data);
+        displayMessage(receivedMsg); // Live messages
+    };
+
+    function sendMsg() {
+        const content = contentInput.value;
+        if (content.trim() === "") {
+            console.log("sendMsg: Content is empty, not sending.");
+            return;
+        }
+
+        const dmMsg = {
+            "type": "TALK",
+            "sender": senderId,
+            "recipientId": recipientId,
+            "msg": content
+        };
+
+        console.log("sendMsg: Sending message object:", dmMsg);
+        socket.send(JSON.stringify(dmMsg));
+
+        console.log("sendMsg: Calling displayMessage locally for my own message.");
+        displayMessage(dmMsg); // Display the sent message immediately
+        
+        contentInput.value = '';
+    }
+    
+    // Allow sending with Enter key
+    contentInput.addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            sendMsg();
+        }
+    });
+
+    function createNoticeDiv(text) {
+        const noticeDiv = document.createElement('div');
+        noticeDiv.innerText = text;
+        noticeDiv.style.color = 'gray';
+        noticeDiv.style.fontStyle = 'italic';
+        noticeDiv.style.textAlign = 'center';
+        return noticeDiv;
+    }
+
+</script>
