@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.numlock.pika.domain.Message;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.service.MessageService;
-import com.numlock.pika.service.login.UserService;
+import com.numlock.pika.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

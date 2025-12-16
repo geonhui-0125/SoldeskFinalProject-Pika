@@ -41,7 +41,7 @@ drop table users;
 --create table
 CREATE TABLE users (
 	id varchar2(20) primary key,
-    pw varchar2(20) not null,
+    pw varchar2(255) not null,
 	nickname varchar2(50) not NULL,
     profile_image varchar2(250) not NULL,
     email varchar2(50) not NULL,
