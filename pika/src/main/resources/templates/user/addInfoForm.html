@@ -43,6 +43,20 @@
         }
         .error-message {
             color: #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
             text-align: center;
             margin-bottom: 15px;
             font-weight: bold;
@@ -58,22 +72,25 @@
 <body>
     <div class="container">
         <h1>추가 정보 입력</h1>
+        <div th:if="${successMessage}" class="success-message">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="error-message">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <form id="addInfoForm" th:action="@{/user/add-info}" th:object="${userAddInfo}" method="post" enctype="multipart/form-data">
             <!-- 이미지 액션을 위한 숨겨진 필드 -->
             <input type="hidden" id="profileImageAction" name="profileImage" value="">
-
-            <!-- 현재 프로필 이미지 표시 및 삭제 버튼 -->
             <div class="form-group" th:if="${user != null}">
                 <label>현재 프로필 이미지:</label>
                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
                     <img th:src="@{${user.profileImage}}" alt="프로필 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 15px;"/>
                     <span th:if="${user.profileImage == '/profile/default-profile.jpg'}" style="color: #6c757d;">기본 이미지 사용 중</span>
-                    <!-- 기본 이미지가 아닐 경우에만 삭제 버튼 표시 -->
                     <button type="button" id="deleteImageBtn" class="btn btn-danger" style="margin-left: 15px; padding: 8px 15px; background-color: #dc3545;"
                             th:if="${user.profileImage != null and user.profileImage != '/profile/default-profile.jpg'}">이미지 삭제</button>
                 </div>
             </div>
-            <!-- 새 프로필 이미지 업로드 필드 (항상 표시) -->
             <div class="form-group">
                 <label for="profileImageFile">새 프로필 이미지 업로드:</label>
                 <input type="file" id="profileImageFile" name="profileImageFile"/>
@@ -85,7 +102,14 @@
             </div>
             <div class="form-group">
                 <label for="phone">전화번호:</label>
-                <input type="text" id="phone" th:field="*{phone}" placeholder="010-1234-5678"/>
+                <div style="display: flex; align-items: center;">
+                    <input type="text" id="phone1" maxlength="3" style="width: 28%; text-align: center;">
+                    <span style="margin: 0 10px;">-</span>
+                    <input type="text" id="phone2" maxlength="4" style="width: 33%; text-align: center;">
+                    <span style="margin: 0 10px;">-</span>
+                    <input type="text" id="phone3" maxlength="4" style="width: 33%; text-align: center;">
+                </div>
+                <input type="hidden" id="phone" th:field="*{phone}" />
                 <span th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="field-error"></span>
             </div>
             <div class="form-group">
@@ -93,6 +117,7 @@
                 <input type="text" id="birth" th:field="*{birth}" placeholder="YYYYMMDD"/>
                 <span th:if="${#fields.hasErrors('birth')}" th:errors="*{birth}" class="field-error"></span>
             </div>
+            
             <button type="submit">정보 업데이트</button>
         </form>
         <form th:action="@{/}" method="get" style="margin-top: 10px;">
@@ -102,20 +127,44 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // 기존 에러 메시지 처리 스크립트
-        const errorMessage = /*[[${errorMessage}]]*/ null;
-        if(errorMessage){
-            alert(errorMessage);
-        }
-
         // 이미지 삭제 버튼 로직
         const deleteBtn = document.getElementById('deleteImageBtn');
         if (deleteBtn) {
             deleteBtn.addEventListener('click', function() {
-                // 숨겨진 필드에 'default' 값을 설정
                 document.getElementById('profileImageAction').value = 'default';
-                // 메인 폼을 전송
                 document.getElementById('addInfoForm').submit();
+            });
+        }
+        // --- 전화번호 관련 스크립트 ---
+        const phone1 = document.getElementById('phone1');
+        const phone2 = document.getElementById('phone2');
+        const phone3 = document.getElementById('phone3');
+        const addInfoForm = document.getElementById('addInfoForm');
+
+        if (phone1 && phone2 && phone3) {
+            const filterNumericInput = function() {
+                if (this.value.length === parseInt(this.maxLength)) {
+                    if (this === phone1) {
+                        phone2.focus();
+                    } else if (this === phone2) {
+                        phone3.focus();
+                    }
+                }
+            };
+
+            phone1.addEventListener('input', filterNumericInput);
+            phone2.addEventListener('input', filterNumericInput);
+            phone3.addEventListener('input', filterNumericInput);
+        }
+
+        if (addInfoForm) {
+            addInfoForm.addEventListener('submit', function(event) {
+                if (phone1.value && phone2.value && phone3.value) {
+                    const combinedPhone = `${phone1.value}-${phone2.value}-${phone3.value}`;
+                    document.getElementById('phone').value = combinedPhone;
+                } else {
+                    document.getElementById('phone').value = '';
+                }
             });
         }
         /*]]>*/

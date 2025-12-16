@@ -1,14 +1,11 @@
-package com.numlock.pika.service.login;
+package com.numlock.pika.service.user;
 
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
