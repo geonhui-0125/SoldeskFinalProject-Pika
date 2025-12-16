@@ -78,7 +78,7 @@ public class UserService {
     }
 
     //비밀번호 재설정을 위한 아이디, 이메일 일치 확인
-    public boolean checkUserByIdAndEmail(String id, String email){
+   public boolean checkUserByIdAndEmail(String id, String email){
         Optional<Users> userOptional = userRepository.findById(id);
         if(userOptional.isPresent()){
             Users user = userOptional.get();
@@ -86,5 +86,8 @@ public class UserService {
         }
         return false;
     }
+
+    //비밀번호 재설정 메소드
+    //public void passwordReset(String userId, S)
 
 }
