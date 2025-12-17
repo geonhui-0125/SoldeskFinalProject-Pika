@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <title>검색 결과</title>
+    <style>
+        body {
+            padding-top: 100px;
+        }
+        #product-section {
+            max-width: 1200px;
+            margin: 120px auto 20px;
+            padding: 20px;
+        }
+        #search-info {
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f2f2f2;
+        }
+        #search-info h1 {
+            font-size: 1.5em;
+        }
+        #product-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: flex-start;
+            padding-left: 50px;
+        }
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            overflow: hidden;
+            transition: .3s;
+            width: 250px;
+        }
+        .product-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 10px;
+        }
+        .product-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: .9em;
+            margin-top: 10px;
+        }
+        .product-price {
+            color: #ff4500;
+            font-weight: bold;
+        }
+        .product-time {
+            color: #999;
+        }
+        .no-results {
+            width: 100%;
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<header th:replace="~{header :: mainHeader}"></header>
+
+<section id="product-section">
+    <div id="search-info">
+        <h1>상품 검색 결과</h1>
+        <p th:if="${keyword != null and not #strings.isEmpty(keyword)}">
+            검색어: '<strong th:text="${keyword}"></strong>'
+        </p>
+    </div>
+
+    <div id="product-wrap">
+        <!-- 조건 1: 검색된 상품이 있을 경우 -->
+        <div th:if="${products != null and not #lists.isEmpty(products)}" th:each="product : ${products}" class="product-card">
+            <a th:href="@{|/products/info/${product.productId}|}">
+                <img class="product-image" th:src="@{${product.productImage}}" alt="상품 이미지">
+            </a>
+            <div class="product-info">
+                <p class="product-title" th:text="${product.title}"></p>
+                <p class="product-details">
+                    <span class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                    <span class="product-time" th:text="${#temporals.format(product.createdAt, 'yyyy-MM-dd')}"></span>
+                </p>
+            </div>
+        </div>
+
+        <!-- 조건 2: 검색된 상품이 없을 경우 -->
+        <div th:unless="${products != null and not #lists.isEmpty(products)}" class="no-results">
+            <p>검색된 상품이 없습니다.</p>
+        </div>
+    </div>
+</section>
+
+<script th:src="@{/js/header.js}"></script>
+</body>
+</html>

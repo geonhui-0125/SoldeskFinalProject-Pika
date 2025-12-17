@@ -28,8 +28,12 @@
 				<a id="logo-link" th:href="@{/}">pika 피카</a>
 
 				<div id="search-bar">
-					<input placeholder="상품을 검색해보세요"> <img
-						th:src="@{/icon/search.svg}">
+					<form th:action="@{/products/search}" method="get">
+                        <input type="text" name="keyword" placeholder="검색할 상품을 입력하세요.">
+                        <button type="submit" style="background:none; border:none; padding:0">
+                            <img th:src="@{/icon/search.svg}" alt="검색">
+                        </button>
+                    </form>
 				</div>
 
 				<ul id="main-nav-menu">
