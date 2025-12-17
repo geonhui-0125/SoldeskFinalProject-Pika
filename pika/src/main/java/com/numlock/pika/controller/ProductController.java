@@ -110,7 +110,7 @@ public class ProductController {
 
         if(principal != null) {
             //로그인한 사용자 아이디 호출
-            String userId =  principal.getName();
+            String userId = principal.getName();
 
             System.out.println("login한 사용자 : " + userId);
 
@@ -122,6 +122,8 @@ public class ProductController {
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
+        }else{
+            return "redirect:/user/login";
         }
 
         return "product/new";

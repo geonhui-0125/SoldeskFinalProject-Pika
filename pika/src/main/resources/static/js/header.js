@@ -42,4 +42,13 @@ $(document).ready(function () {
         $submenu.stop(true, true).slideToggle(120);
     });
 
+    $("#favorite-link").click(function() {
+        location.href = "/user/mypage";
+    })
+
+    $("#top-link").click(function() {
+        // HTML과 BODY에 0 (상단)
+        $('html, body').scrollTop(0)
+    });
+
 });
