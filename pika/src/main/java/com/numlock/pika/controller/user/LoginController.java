@@ -2,7 +2,11 @@ package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.AdditionalUserInfoDto;
+<<<<<<< HEAD
 import com.numlock.pika.dto.ProductDto; // Added for product data
+=======
+import com.numlock.pika.dto.UserDto;
+>>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.user.LoginService;
@@ -114,24 +118,31 @@ public class LoginController {
     //회원 가입 처리(Create)
     @GetMapping("/user/join")
     public String joinForm(Model model) {
-        model.addAttribute("user", new Users());
+        model.addAttribute("user", new UserDto());
         return "user/joinForm";
     }
 
     @PostMapping("/user/joinUser")
-    public String joinUser(@Valid @ModelAttribute("user") Users user, BindingResult bindingResult,
+    public String joinUser(@Valid @ModelAttribute("user") UserDto userDto, BindingResult bindingResult,
                            @RequestParam(value = "profileImageFile", required = false)
                            MultipartFile profileImageFile, Model model) {
-        log.info("Attempting to join user: {}", user.toString());
+        log.info("Attempting to join user with DTO: {}", userDto.toString());
 
-        if(bindingResult.hasErrors()) { //유효성 검사 실패 처리 로직
+        if(bindingResult.hasErrors()) { //유효성 검사 실패 처리 로직/DTO유효성 검사
             log.error("--- Validation Failed ---");
             log.error("Validation errors for user join: {}", bindingResult.getAllErrors());
-            model.addAttribute("errorMessage", "입력값을 확인해주세요."); // 오류 메시지 추가
+            model.addAttribute("errorMessage", "회원가입 중 오류가 발생했습니다.");
             return "user/joinForm";
         }
 
         try {
+            //DTO -> Entity변환
+            Users user = new Users();
+            user.setId(userDto.getId());
+            user.setPw(userDto.getPw());
+            user.setNickname(userDto.getNickname());
+            user.setEmail(userDto.getEmail());
+
             String profileImagePath = null;
             // 1. 프로필 이미지 비어있이 않으면 저장
             if(profileImageFile != null && !profileImageFile.isEmpty()) {
@@ -150,18 +161,18 @@ public class LoginController {
 
         } catch (IOException e) {
             log.error("--- IOException Occurred ---", e);
-            log.error("File upload failed for user {}: {}", user.getId(), e.toString());
+            log.error("File upload failed for user {}: {}", userDto.getId(), e.toString());
             model.addAttribute("errorMessage", "프로필 이미지 업로드에 실패했습니다.");
-            model.addAttribute("user", user);
+            model.addAttribute("user", userDto);
             return "user/joinForm";
         } catch (Exception e) {
             log.error("--- Exception Occurred ---", e);
-            model.addAttribute("errorMessage", "추가정보 입력 중 오류가 발생했습니다: " + e.getMessage()); // 오류 메시지 복원
-            log.error("Error joining user {}: {}", user.getId(), e.toString());
-            model.addAttribute("user", user);
+            model.addAttribute("errorMessage", "입력된 정보가 올바르지 않습니다. " + e.getMessage()); // 오류 메시지 복원
+            log.error("Error joining user {}: {}", userDto.getId(), e.toString());
+            model.addAttribute("user", userDto);
             return "user/joinForm";
         }
-        return "redirect:/user/add-info";
+        return "/user/loginForm";
     }
 
     //Spring Security가 로그인/아웃을 자동으로 처리
@@ -173,60 +184,4 @@ public class LoginController {
         model.addAttribute("user", new Users());
         return "user/loginForm";
     }
-
-    //회원 추가정보 입력 처리(Update)
-    @GetMapping("/user/add-info")
-    public String addInfoForm(Principal principal, Model model) {
-       if(principal != null){
-           userRepository.findById(principal.getName()).ifPresent(user -> {
-               model.addAttribute("user", user);
-           });
-       }
-        model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
-        return "user/addInfoForm";
-    }
-
-    @PostMapping("/user/add-info")
-    public String addInfo(AdditionalUserInfoDto dto, Principal principal, Model model,
-                          @RequestParam(value="profileImageFile", required = false)
-                          MultipartFile profileImageFile, RedirectAttributes redirectAttributes) {
-        if(principal == null) {
-            //미로그인 오류 처리
-            return "redirect:/";
-        }
-        try {
-            userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
-            redirectAttributes.addFlashAttribute("successMessage", "수정완료되었습니다.");
-        }catch (Exception e){
-            log.error("추가 정보 업데이트 중 오류 발생: {}", e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("userAddInfo", dto);
-            return "user/addInfoForm";
-        }
-        return "redirect:/";
-    }
-
-    //회원 탈퇴 처리(Delete)
-    @GetMapping("/user/delete")
-    public String deleteForm() {
-        return "/user/deleteForm";
-    }
-
-    @PostMapping("/user/delete")
-    public String deleteUser(@RequestParam String rawPassword, Principal principal, HttpServletRequest request, Model model) {
-        if(principal == null) {
-            return "redirect:/user/login"; //로그인 하지 않은 사용자 접근시
-        }
-
-        try {
-            loginService.deleteUser(principal.getName(), rawPassword);
-            request.logout();
-            return "redirect:/";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "/user/deleteForm";
-        }
-
-    }
-
 }

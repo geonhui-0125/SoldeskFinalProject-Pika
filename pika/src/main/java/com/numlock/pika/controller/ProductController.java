@@ -1,7 +1,9 @@
 package com.numlock.pika.controller;
 
+import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
+import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final com.numlock.pika.service.CategoryService categoryService;
+    private final UserRepository userRepository;
 
     // ⭐️ 테스트를 위해 더미 데이터를 사용하는 임시 list 메서드 (DB 연결 불필요)
     @GetMapping
@@ -102,7 +105,49 @@ public class ProductController {
         return "product/detail";
     }
 
+<<<<<<< HEAD
     // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
+=======
+    @GetMapping("/info/{id}")
+    public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        ProductDetailDto productDetailDto = productService.getProductDetailById(id, principal);
+
+        System.out.println("productDetailDto = " + productDetailDto);
+
+        model.addAttribute("productDetailDto", productDetailDto);
+
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
+
+        return "product/info";
+    }
+
+    /*@GetMapping("/new")
+    public String createForm(Model model) {
+        List<com.numlock.pika.domain.Categories> categories = categoryService.getAllCategories();
+        System.out.println("DEBUG: Fetched categories size: " + categories.size());
+        model.addAttribute("product", new ProductDto());
+        model.addAttribute("categories", categories);
+        return "product/form";
+    }*/
+>>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
 
     @PostMapping
     public String create(@ModelAttribute ProductDto productDto, java.security.Principal principal, Model model) {
@@ -125,9 +170,34 @@ public class ProductController {
     }
 
     @GetMapping("/new")
+<<<<<<< HEAD
     public String newProduct(Model model) {
         Map<String, List<String>> cateMap = categoryService.getAllCategoriestoMap();
         model.addAttribute("cateMap", cateMap);
+=======
+    public String newProduct(Model model, Principal principal) {
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
+
+>>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
         return "product/new";
     }
 
@@ -140,4 +210,41 @@ public class ProductController {
 
         return "redirect:/products/new";
     }
+<<<<<<< HEAD
 }
+=======
+
+    @GetMapping("/edit/{id}")
+    public String editForm(@PathVariable("id") int id, Principal principal, Model model) {
+        ProductDetailDto product = productService.getProductDetailById(id, principal);
+
+        if (!product.getSellerId().equals(principal.getName())) {
+            return "redirect:/products/info/" + id;
+        }
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+        model.addAttribute("product", product);
+
+        // Transform "Main>Sub" to "Main > Sub" for the form if needed
+        String category = product.getCategory();
+        if (category != null && category.contains(">")) {
+             model.addAttribute("currentCategory", category.replace(">", " > "));
+        }
+
+        return "product/edit";
+    }
+
+    @PostMapping("/edit/{id}")
+    public String updateProduct(@PathVariable("id") int id, ProductRegisterDto dto, Principal principal) {
+        productService.updateProduct(id, dto, principal);
+        return "redirect:/user/mypage";
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteProduct(@PathVariable("id") int id, Principal principal) {
+        productService.deleteProduct(id, principal);
+        return "redirect:/user/mypage";
+    }
+}
+>>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d

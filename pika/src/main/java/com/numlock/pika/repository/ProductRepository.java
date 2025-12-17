@@ -5,6 +5,7 @@ import com.numlock.pika.domain.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Products, Integer> {
@@ -17,4 +18,6 @@ public interface ProductRepository extends JpaRepository<Products, Integer> {
      */
     @Query(value = "SELECT p FROM Products p LEFT JOIN FETCH p.seller s WHERE p.productId = :productId")
     Optional<Products> findWithUserById(int productId);
+
+    List<Products> findBySeller_Id(String sellerId);
 }

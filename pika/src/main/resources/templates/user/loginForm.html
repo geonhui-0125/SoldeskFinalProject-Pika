@@ -67,15 +67,23 @@
             <button type="submit">로그인</button>
         </form>
         <div class="link-container">
-            <a href="/user/join">아직 계정이 없으신가요? 회원가입</a>
+            <a href="/user/join">아직 계정이 없으신가요? 회원가입</a><br>
+            <a href="/user/password/find">비밀번호를 잊으셨나요?</a>
         </div>
     </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
+        // 로그인 실패 에러 메시지
         const errorMessage = /*[[${errorMessage}]]*/null;
         if (errorMessage) {
             alert(errorMessage);
+        }
+
+        // 다른 페이지에서 전달된 성공 메시지 (e.g., 비밀번호 변경 완료)
+        const successMessage = /*[[${successMessage}]]*/null;
+        if (successMessage) {
+            alert(successMessage);
         }
         /*]]>*/
     </script>

@@ -1,4 +1,4 @@
-package com.numlock.pika.dto;
+package com.numlock.pika.dto.payment;
 
 import lombok.*;
 import org.springframework.stereotype.Component;
