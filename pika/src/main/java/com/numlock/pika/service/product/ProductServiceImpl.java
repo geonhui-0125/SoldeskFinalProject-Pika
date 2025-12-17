@@ -7,8 +7,10 @@ import com.numlock.pika.dto.ProductRegisterDto;
 import com.numlock.pika.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 
+
 import java.nio.file.Files;
 import java.time.LocalDateTime;
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -52,10 +56,12 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public ProductDto getProductById(int productId) {
+        // Repository의 findById가 int를 받도록 가정
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
         return ProductDto.fromEntity(product);
     }
+
 
     public ProductDetailDto getProductDetailById(int productId, Principal principal) {
 
@@ -109,12 +115,12 @@ public class ProductServiceImpl implements ProductService {
         return productDetailDto;
     }
 
+
     @Override
     public void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images) {
         Users seller = userRepository.findById(principal.getName())
                 .orElseThrow(() -> new EntityNotFoundException("판매자 정보를 찾을 수 없습니다."));
 
-        // cateDepOne > cateDepTwo 문자열의 공백 제거(split로 분리후 앞뒤 결합)해서 데이터 조회
         String originCategory = productRegisterDto.getCategory();
 
         Categories category = categoryRepository.findByCategory(
@@ -208,7 +214,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public String saveImages(List<MultipartFile> images) throws IOException {
-        // 상품 전용 폴더명
         String folderName = UUID.randomUUID().toString();
         Path dirPath = Paths.get(uploadPath, folderName);
 
@@ -227,12 +232,11 @@ public class ProductServiceImpl implements ProductService {
             image.transferTo(savePath.toFile());
         }
 
-        // 👇 이미지 폴더 URL만 반환
         return "/upload/" + folderName + "/";
     }
 
+    @Override
     public List<String> getImageUrls(String folderUrl) {
-
         String folderName = folderUrl.replace("/upload/", "");
 
         Path dir = Paths.get(uploadPath, folderName);
@@ -250,5 +254,4 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("이미지 목록 조회 실패", e);
         }
     }
-
 }

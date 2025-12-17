@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>새 상품 등록</h1>
-    <form th:action="@{/products}" th:object="${product}" method="post">
+    <form th:action="@{/products}" th:object="${product}" method="post" enctype="multipart/form-data">
         <div>
             <label>Title(제목):</label>
             <input type="text" th:field="*{title}" required>
@@ -32,8 +32,8 @@
             <textarea th:field="*{description}" required></textarea>
         </div>
         <div>
-            <label>Image URL(이미지 URL):</label>
-            <input type="text" th:field="*{productImage}" required>
+            <label>Image(이미지):</label>
+            <input type="file" name="imageFile" required>
         </div>
         
         <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;">
@@ -44,4 +44,4 @@
     </form>
     <a th:href="@{/products}">리스트로 돌아가기</a>
 </body>
-</html>ㅇ
+</html>
