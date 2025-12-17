@@ -4,6 +4,7 @@ drop sequence seq_reviews;
 drop sequence seq_favorite_products;
 drop sequence seq_products;
 drop sequence seq_categories;
+drop sequence seq_search;
 
 create sequence seq_categories
     INCREMENT BY 1 START WITH 1
@@ -32,6 +33,11 @@ create sequence seq_accounts
 
 CREATE SEQUENCE MESSAGE_SEQ START WITH 1 INCREMENT BY 1;
 
+CREATE SEQUENCE seq_search
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
 --drop table━
 drop table accounts;
 drop table reviews;
@@ -41,6 +47,7 @@ drop table products;
 drop table categories;
 drop table MESSAGES;
 drop table users;
+drop table search;
 
 --create table
 CREATE TABLE users (
@@ -180,6 +187,13 @@ create table accounts(
                              references users (id) ON DELETE CASCADE
 );
 
+CREATE TABLE search (
+	search_id NUMBER(19) NOT NULL PRIMARY KEY,
+	keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
+	search_count NUMBER(19) DEFAULT 0 NOT NULL
+);
+
+
 --select table━
 select * from users;
 select * from categories;
@@ -189,6 +203,7 @@ select * from favorite_products;
 select * from reviews;
 select * from accounts;
 select * from MESSAGES;
+select * from search;
 
 commit;
 
