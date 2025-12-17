@@ -30,57 +30,6 @@ public class ProductController {
     private final com.numlock.pika.service.CategoryService categoryService;
     private final UserRepository userRepository;
 
-    // ⭐️ 테스트를 위해 더미 데이터를 사용하는 임시 list 메서드 (DB 연결 불필요)
-    @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "10") int size,
-                       Model model) {
-
-        // ----------------------------------------------------
-        // ⭐️ 1. 더미 데이터 100개 생성 (DB에 데이터가 없을 때 화면 테스트용)
-        // ----------------------------------------------------
-        List<ProductDto> allDummyProducts = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
-            ProductDto product = ProductDto.builder()
-                    .productId(i)
-                    .sellerId("seller" + (i % 5 + 1))
-                    .categoryId(1)
-                    .price(new BigDecimal(10000 + (i * 1000)))
-                    .title("더미 상품 " + i + " - 테스트 데이터")
-                    .description("이것은 더미 상품 " + i + "의 상세 설명입니다.")
-                    .productImage("/upload/dummy_product_folder/" + (i % 10 + 1) + ".jpg")
-                    .viewCnt(i * 10)
-                    .createdAt(LocalDateTime.now().minusDays(100 - i))
-                    .productState(0)
-                    .build();
-            allDummyProducts.add(product);
-        }
-
-        // ----------------------------------------------------
-        // ⭐️ 2. 수동 페이징 처리 로직
-        // ----------------------------------------------------
-        int totalProducts = allDummyProducts.size();
-        int totalPages = (int) Math.ceil((double) totalProducts / size);
-
-        int startIdx = page * size;
-        int endIdx = Math.min(startIdx + size, totalProducts);
-
-        List<ProductDto> paginatedProducts = new ArrayList<>();
-        if (startIdx < totalProducts) {
-            paginatedProducts = allDummyProducts.subList(startIdx, endIdx);
-        }
-
-        // 3. 모델에 데이터 및 페이징 정보 추가
-        model.addAttribute("products", paginatedProducts);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("pageSize", size);
-
-        return "main";
-    }
-    // --------------------------------------------------------------------------------------
-    // ⚠️ 주의: 실제 DB 연동 시에는 아래 코드를 사용하도록 다시 수정해야 합니다. (현재는 주석 처리 필요)
-    /*
     @GetMapping
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size,
@@ -93,10 +42,9 @@ public class ProductController {
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("pageSize", productPage.getSize());
 
-        return "main";
+        return "product/list";
     }
-    */
-    // --------------------------------------------------------------------------------------
+
 
     @GetMapping("/{id}")
     public String detail(@PathVariable("id") int id, Model model) {
@@ -139,15 +87,6 @@ public class ProductController {
         return "product/info";
     }
 
-    /*@GetMapping("/new")
-    public String createForm(Model model) {
-        List<com.numlock.pika.domain.Categories> categories = categoryService.getAllCategories();
-        System.out.println("DEBUG: Fetched categories size: " + categories.size());
-        model.addAttribute("product", new ProductDto());
-        model.addAttribute("categories", categories);
-        return "product/form";
-    }*/
-
     @PostMapping
     public String create(@ModelAttribute ProductDto productDto, java.security.Principal principal, Model model) {
         try {
@@ -161,9 +100,7 @@ public class ProductController {
         } catch (Exception e) {
             e.printStackTrace(); // Log error to console
             model.addAttribute("errorMessage", "Error registering product: " + e.getMessage());
-            model.addAttribute("product", productDto); // Keep input data
-            // Assuming categoryService.getAllCategories() exists or is stubbed for testing
-            // model.addAttribute("categories", categoryService.getAllCategories()); // Uncomment if needed
+            model.addAttribute("product", productDto);
             return "product/form";
         }
     }
@@ -237,6 +174,14 @@ public class ProductController {
     public String deleteProduct(@PathVariable("id") int id, Principal principal) {
         productService.deleteProduct(id, principal);
         return "redirect:/user/mypage";
+    }
+
+
+    @GetMapping("/bySeller/{sellerId}")
+    public String getProductsBySeller(@PathVariable("sellerId") String sellerId, Model model) {
+        List<ProductDto> products = productService.getProductsBySeller(sellerId);
+        model.addAttribute("products", products);
+        return "product/list";
     }
 
     //검색용 메소드

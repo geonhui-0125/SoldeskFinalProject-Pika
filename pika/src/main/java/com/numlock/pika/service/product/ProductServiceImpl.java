@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import static com.numlock.pika.dto.ProductDetailDto.calculateTimeAgo;
 
@@ -52,6 +54,13 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream()
                 .map(ProductDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getProductList(Pageable pageable) {
+
+        return productRepository.findAll(pageable).map(ProductDto::fromEntity);
     }
 
     @Override
