@@ -33,28 +33,16 @@ public class ProductController {
     @GetMapping
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size,
-                       Principal principal,
                        Model model) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productService.getProductList(pageable);
-
-        // 1. 카테고리 맵 추가 (헤더용)
-        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-        model.addAttribute("categoriesMap", categoriesMap);
-
-        // 2. 로그인 사용자 정보 추가 (헤더용)
-        if (principal != null) {
-            userRepository.findById(principal.getName()).ifPresent(user -> {
-                model.addAttribute("user", user);
-            });
-        }
 
         model.addAttribute("products", productPage.getContent());
         model.addAttribute("currentPage", productPage.getNumber());
         model.addAttribute("totalPages", productPage.getTotalPages());
         model.addAttribute("pageSize", productPage.getSize());
 
-        return "main";
+        return "product/list";
     }
 
 

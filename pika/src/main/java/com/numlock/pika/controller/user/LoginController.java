@@ -3,7 +3,7 @@ package com.numlock.pika.controller.user;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.AdditionalUserInfoDto;
 
-import com.numlock.pika.dto.ProductDto; // Added for product data
+
 
 import com.numlock.pika.dto.UserDto;
 
@@ -26,13 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal; // Added for product data
-import java.time.LocalDateTime; // Added for product data
+
+
 import java.security.Principal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList; // Added for product data
+
 
 @Slf4j
 @Controller
@@ -45,76 +45,7 @@ public class LoginController {
     private final CategoryService categoryService;
     private final UserService userService;
 
-    //Principal 객채로 main에 사용자 정보 호출
-    @GetMapping("/")
-    public String loginUser(Principal principal, Model model,
-                       @RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "10") int size) { // Added for pagination
-        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-
-        System.out.println("categoriesMap 확인: " + categoriesMap);
-        //카테고리 리스트 model로 전달
-        model.addAttribute("categoriesMap", categoriesMap);
-
-        if(principal != null) {
-            //로그인한 사용자 아이디 호출
-            String userId =  principal.getName();
-
-            System.out.println("login한 사용자 : " + userId);
-
-            //아이디를 이용해 DB에서 사용자 조회
-            userRepository.findById(userId).ifPresent(user -> {
-                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
-                model.addAttribute("user", user);
-            });
-
-            //아이디만 전송하는 코드
-            model.addAttribute("loginUserId", userId);
-        }
-
-        // ----------------------------------------------------
-        // ⭐️ 1. 더미 데이터 100개 생성 (DB에 데이터가 없을 때 화면 테스트용)
-        // ----------------------------------------------------
-        List<ProductDto> allDummyProducts = new ArrayList<>();
-        for (int i = 1; i <= 100; i++) {
-            ProductDto product = ProductDto.builder()
-                    .productId(i) // Long 타입으로 변경
-                    .sellerId("seller" + (i % 5 + 1))
-                    .categoryId(1)
-                    .price(new BigDecimal(10000 + (i * 1000)))
-                    .title("더미 상품 " + i + " - 테스트 데이터")
-                    .description("이것은 더미 상품 " + i + "의 상세 설명입니다.")
-                    .productImage("/upload/dummy_product_folder/" + (i % 10 + 1) + ".jpg")
-                    .viewCnt(i * 10)
-                    .createdAt(LocalDateTime.now().minusDays(100 - i))
-                    .productState(0)
-                    .build();
-            allDummyProducts.add(product);
-        }
-
-        // ----------------------------------------------------
-        // ⭐️ 2. 수동 페이징 처리 로직
-        // ----------------------------------------------------
-        int totalProducts = allDummyProducts.size();
-        int totalPages = (int) Math.ceil((double) totalProducts / size);
-
-        int startIdx = page * size;
-        int endIdx = Math.min(startIdx + size, totalProducts);
-
-        List<ProductDto> paginatedProducts = new ArrayList<>();
-        if (startIdx < totalProducts) {
-            paginatedProducts = allDummyProducts.subList(startIdx, endIdx);
-        }
-
-        // 3. 모델에 데이터 및 페이징 정보 추가
-        model.addAttribute("products", paginatedProducts);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("pageSize", size);
-        
-        return "main";
-    }
-
+    
     //회원 가입 처리(Create)
     @GetMapping("/user/join")
     public String joinForm(Model model) {
