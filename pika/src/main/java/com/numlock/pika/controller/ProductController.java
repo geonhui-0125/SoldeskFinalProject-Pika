@@ -176,11 +176,28 @@ public class ProductController {
         return "redirect:/user/mypage";
     }
 
+
     @GetMapping("/bySeller/{sellerId}")
     public String getProductsBySeller(@PathVariable("sellerId") String sellerId, Model model) {
         List<ProductDto> products = productService.getProductsBySeller(sellerId);
         model.addAttribute("products", products);
         return "product/list";
     }
+
+    //검색용 메소드
+    @GetMapping("/search")
+    public String searchProducts (
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "category", required = false) String categoryName,
+            Model model){
+
+        List<ProductDto> productList = productService.searchProducts(keyword, categoryName);
+        model.addAttribute("products", productList);
+        model.addAttribute("keyword", keyword); //검색어 화면에 표시
+        model.addAttribute("activeCategory", categoryName); //현재 카테고리 표시
+
+        return "product/search";
+    }
+
 }
 

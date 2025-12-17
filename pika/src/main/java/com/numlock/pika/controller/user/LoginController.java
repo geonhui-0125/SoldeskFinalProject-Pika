@@ -1,18 +1,19 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
+<<<<<<< HEAD
 import com.numlock.pika.dto.AdditionalUserInfoDto;
 
 
 
+=======
+>>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 import com.numlock.pika.dto.UserDto;
-
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
 import com.numlock.pika.service.user.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,15 +25,20 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+<<<<<<< HEAD
 
 
-
+=======
+>>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 import java.security.Principal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+<<<<<<< HEAD
 
+=======
+>>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 
 @Slf4j
 @Controller
@@ -45,7 +51,37 @@ public class LoginController {
     private final CategoryService categoryService;
     private final UserService userService;
 
+<<<<<<< HEAD
     
+=======
+    //Principal 객채로 main에 사용자 정보 호출
+    @GetMapping("/")
+    public String loginUser(Principal principal, Model model) {
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
+        System.out.println("categoriesMap 확인: " + categoriesMap);
+        //카테고리 리스트 model로 전달
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
+        return "main";
+    }
+
+>>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
     //회원 가입 처리(Create)
     @GetMapping("/user/join")
     public String joinForm(Model model) {

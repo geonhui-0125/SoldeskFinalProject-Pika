@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -200,6 +201,18 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.delete(product);
+    }
+
+    //검색용 메소드
+    @Override
+    public List<ProductDto> searchProducts(String keyword, String categoryName) {
+        //1. Specification을 사용하여 조건에 맞는 Products 엔티티 리스트 조회
+        Specification<Products> spec = ProductSpecification.search(keyword, categoryName);
+        List<Products> productsList = productRepository.findAll(spec);
+        //2. 조회된 엔티티 리스트를 DTO 리스트로 변환
+        return productsList.stream()
+                .map(ProductDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     public String saveImages(List<MultipartFile> images) throws IOException {

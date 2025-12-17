@@ -9,7 +9,11 @@
     <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
         <div>
             <div th:if="${user.profileImage}">
+<<<<<<< HEAD
                 <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+=======
+                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+>>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
             </div>
             <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
             <a href="/user/add-info" id="modify"style="width: 100px; height: 50px">정보수정</a>
@@ -28,8 +32,12 @@
 				<a id="logo-link" th:href="@{/}">pika 피카</a>
 
 				<div id="search-bar">
-					<input placeholder="상품을 검색해보세요"> <img
-						th:src="@{/icon/search.svg}">
+					<form th:action="@{/products/search}" method="get">
+                        <input type="text" name="keyword" placeholder="검색할 상품을 입력하세요.">
+                        <button type="submit" style="background:none; border:none; padding:0">
+                            <img th:src="@{/icon/search.svg}" alt="검색">
+                        </button>
+                    </form>
 				</div>
 
 				<ul id="main-nav-menu">

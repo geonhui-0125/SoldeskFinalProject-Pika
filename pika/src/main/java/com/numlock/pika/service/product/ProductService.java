@@ -28,5 +28,7 @@ public interface ProductService {
     List<ProductDto> getProductsBySeller(String sellerId);
     void updateProduct(int productId, ProductRegisterDto productDto, Principal principal);
     void deleteProduct(int productId, Principal principal);
+
+    List<ProductDto> searchProducts (String keyword, String categoryName); //검색용 메소드
 }
 
