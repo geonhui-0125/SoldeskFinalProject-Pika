@@ -17,7 +17,7 @@ public interface ProductService {
 
     ProductDto getProductById(int productId);
 
-    // Page<ProductDto> getProductList(Pageable pageable); // 현재 DB 연동이 아니므로 임시 주석 처리
+    Page<ProductDto> getProductList(Pageable pageable);
 
     void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images);
 
