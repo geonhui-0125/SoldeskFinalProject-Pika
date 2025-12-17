@@ -4,6 +4,7 @@ import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.service.ReviewService;
+import com.numlock.pika.service.GeminiService; // GeminiService import 추가
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException; // 누락된 import 문 추가
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors; // Collectors 임포트 추가
 
 @Controller
 @RequestMapping("/reviews") // 리뷰 관련 뷰의 기본 경로
@@ -19,6 +21,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final GeminiService geminiService; // GeminiService 주입
 
     // 특정 판매자에 대한 리뷰 목록을 표시합니다.
     @GetMapping("/seller/{sellerId}")
@@ -152,5 +155,24 @@ public class ReviewController {
             model.addAttribute("errorMessage", e.getMessage());
             return "error/404"; // 오류 페이지 가정
         }
+    }
+
+    // 특정 판매자에 대한 리뷰 요약 한줄평을 반환하는 API 엔드포인트
+    @GetMapping("/summary/{sellerId}")
+    @ResponseBody // 이 메서드가 뷰 이름을 반환하는 대신 직접 응답 본문을 반환하도록 지시합니다.
+    public String getReviewSummaryForSeller(@PathVariable String sellerId) {
+        // 1. ReviewService를 통해 해당 판매자의 모든 리뷰 내용을 가져옵니다.
+        List<ReviewResponseDto> reviews = reviewService.getReviewsBySellerId(sellerId);
+
+        // 2. ReviewResponseDto 리스트에서 리뷰 내용(content)만 추출하여 List<String>으로 변환합니다.
+        List<String> reviewContents = reviews.stream()
+                .map(ReviewResponseDto::getContent)
+                .collect(Collectors.toList());
+
+        // 3. GeminiService를 호출하여 리뷰 내용으로부터 한줄평을 생성합니다.
+        String summary = geminiService.generateReviewSummary(reviewContents);
+
+        // 4. 생성된 한줄평을 반환합니다.
+        return summary;
     }
 }
