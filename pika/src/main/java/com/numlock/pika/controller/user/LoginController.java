@@ -1,14 +1,12 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.dto.UserDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.file.FileUploadService;
 import com.numlock.pika.service.user.UserService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.io.IOException;
