@@ -1,6 +1,7 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
+
 import com.numlock.pika.dto.UserDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.security.Principal;
 import java.io.IOException;
 import java.util.List;
@@ -34,6 +34,7 @@ public class LoginController {
     private final UserRepository userRepository;
     private final CategoryService categoryService;
     private final UserService userService;
+
 
     //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
