@@ -13,6 +13,8 @@ import java.time.LocalDateTime; // LocalDateTime 임포트 추가
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "users")
 @ToString

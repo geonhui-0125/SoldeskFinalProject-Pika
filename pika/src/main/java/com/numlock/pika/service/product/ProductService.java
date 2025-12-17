@@ -17,7 +17,7 @@ public interface ProductService {
 
     ProductDto getProductById(int productId);
 
-    // Page<ProductDto> getProductList(Pageable pageable); // 현재 DB 연동이 아니므로 임시 주석 처리
+    Page<ProductDto> getProductList(Pageable pageable);
 
     void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images);
 
@@ -28,5 +28,7 @@ public interface ProductService {
     List<ProductDto> getProductsBySeller(String sellerId);
     void updateProduct(int productId, ProductRegisterDto productDto, Principal principal);
     void deleteProduct(int productId, Principal principal);
+
+    List<ProductDto> searchProducts (String keyword, String categoryName); //검색용 메소드
 }
 
