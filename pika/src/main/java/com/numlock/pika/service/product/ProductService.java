@@ -20,14 +20,13 @@ public interface ProductService {
     // Page<ProductDto> getProductList(Pageable pageable); // 현재 DB 연동이 아니므로 임시 주석 처리
 
     void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images);
-<<<<<<< HEAD
+
 
     List<String> getImageUrls(String folderUrl);
-}
-=======
+
     ProductDetailDto getProductDetailById(int id, Principal principal);
     List<ProductDto> getProductsBySeller(String sellerId);
     void updateProduct(int productId, ProductRegisterDto productDto, Principal principal);
     void deleteProduct(int productId, Principal principal);
 }
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+

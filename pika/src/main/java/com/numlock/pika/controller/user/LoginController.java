@@ -2,11 +2,11 @@ package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.AdditionalUserInfoDto;
-<<<<<<< HEAD
+
 import com.numlock.pika.dto.ProductDto; // Added for product data
-=======
+
 import com.numlock.pika.dto.UserDto;
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.user.LoginService;

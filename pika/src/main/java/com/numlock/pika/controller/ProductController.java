@@ -105,9 +105,9 @@ public class ProductController {
         return "product/detail";
     }
 
-<<<<<<< HEAD
+
     // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
-=======
+
     @GetMapping("/info/{id}")
     public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
 
@@ -147,7 +147,6 @@ public class ProductController {
         model.addAttribute("categories", categories);
         return "product/form";
     }*/
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
 
     @PostMapping
     public String create(@ModelAttribute ProductDto productDto, java.security.Principal principal, Model model) {
@@ -170,11 +169,6 @@ public class ProductController {
     }
 
     @GetMapping("/new")
-<<<<<<< HEAD
-    public String newProduct(Model model) {
-        Map<String, List<String>> cateMap = categoryService.getAllCategoriestoMap();
-        model.addAttribute("cateMap", cateMap);
-=======
     public String newProduct(Model model, Principal principal) {
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
@@ -197,7 +191,7 @@ public class ProductController {
             model.addAttribute("loginUserId", userId);
         }
 
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+
         return "product/new";
     }
 
@@ -210,9 +204,7 @@ public class ProductController {
 
         return "redirect:/products/new";
     }
-<<<<<<< HEAD
-}
-=======
+
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") int id, Principal principal, Model model) {
@@ -247,4 +239,4 @@ public class ProductController {
         return "redirect:/user/mypage";
     }
 }
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+

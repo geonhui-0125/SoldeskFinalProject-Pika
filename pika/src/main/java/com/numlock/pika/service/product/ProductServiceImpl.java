@@ -6,13 +6,12 @@ import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
 import com.numlock.pika.repository.*;
 import jakarta.persistence.EntityNotFoundException;
-<<<<<<< HEAD
-=======
+
 
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -63,8 +62,7 @@ public class ProductServiceImpl implements ProductService {
         return ProductDto.fromEntity(product);
     }
 
-<<<<<<< HEAD
-=======
+
     public ProductDetailDto getProductDetailById(int productId, Principal principal) {
 
         Products products = productRepository.findById(productId)
@@ -116,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productDetailDto;
     }
->>>>>>> e16080b888a9a2c4681a8044775f7afe0726960d
+
 
     @Override
     public void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images) {
