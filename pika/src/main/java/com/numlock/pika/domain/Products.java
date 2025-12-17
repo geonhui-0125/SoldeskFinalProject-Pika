@@ -51,6 +51,12 @@ public class Products {
     @Column(name = "product_state")
     private int productState; // 0 : selling, 1 : selled
 
+    @Column(name = "policy_violation_status", nullable = false, length = 50)
+    private String policyViolationStatus = "NORMAL"; // 운영 정책 위반 상태 (NORMAL, REPORTED, SUSPENDED, DELETED_BY_ADMIN)
+
+    @Column(name = "policy_violation_reason")
+    private String policyViolationReason; // 운영 정책 위반 사유 (null 허용)
+
     @PrePersist
     public void prePersist() {
         if (this.createdAt == null) {
