@@ -1,13 +1,7 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
-<<<<<<< HEAD
-import com.numlock.pika.dto.AdditionalUserInfoDto;
 
-
-
-=======
->>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 import com.numlock.pika.dto.UserDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
@@ -25,20 +19,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 import java.security.Principal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-<<<<<<< HEAD
-
-=======
->>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
 
 @Slf4j
 @Controller
@@ -51,9 +35,7 @@ public class LoginController {
     private final CategoryService categoryService;
     private final UserService userService;
 
-<<<<<<< HEAD
-    
-=======
+
     //Principal 객채로 main에 사용자 정보 호출
     @GetMapping("/")
     public String loginUser(Principal principal, Model model) {
@@ -81,7 +63,6 @@ public class LoginController {
         return "main";
     }
 
->>>>>>> f50f91b038dd956946c7f4c1b2cdce9a2ea667eb
     //회원 가입 처리(Create)
     @GetMapping("/user/join")
     public String joinForm(Model model) {
