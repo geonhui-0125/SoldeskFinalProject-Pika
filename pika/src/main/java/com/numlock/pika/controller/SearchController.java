@@ -27,6 +27,7 @@ public class SearchController {
             @RequestParam(value = "category", required = false) String categoryName,
             Model model){
 
+        searchService.processSearch(keyword);
         List<ProductDto> productList = productService.searchProducts(keyword, categoryName);
         model.addAttribute("products", productList);
         model.addAttribute("keyword", keyword); //검색어 화면에 표시
