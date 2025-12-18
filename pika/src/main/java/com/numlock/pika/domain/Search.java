@@ -13,7 +13,8 @@ import lombok.*;
 public class Search {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "search_seq_generator")
+    @SequenceGenerator(name = "search_seq_generator", sequenceName = "seq_search", allocationSize = 1)
     @Column(name = "search_id")
     private Long searchId;
 
