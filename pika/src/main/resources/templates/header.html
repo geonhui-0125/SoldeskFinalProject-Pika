@@ -35,15 +35,26 @@
                 </form>
             </div>
 
-            <ul id="main-nav-menu">
-                <li sec:authorize="isAuthenticated()" th:if="${user}">
-                    <a th:href="@{/chat/userList}">채팅</a>
-                </li>
-                <li><a th:href="@{/products/new}">판매하기</a></li>
-                <li><a th:href="@{/user/mypage}">마이페이지</a></li>
-            </ul>
-        </div>
-    </div>
+				<ul id="main-nav-menu">
+					<li sec:authorize="isAuthenticated()" th:if="${user}">
+					<a th:href="@{/chat/userList}">채팅</a></li>
+                    <li id="notification-btn" >
+                        <a href="#">알림</a>
+                        <span id="notification-count" class="notification-count">0</span>
+                        <div id="notification-list">
+                            <ul id="notification-items">
+                            </ul>
+                            <div id="notification-pagination">
+                                <button id="prev-notification-page">이전</button>
+                                <button id="next-notification-page">다음</button>
+                            </div>
+                        </div>
+                    </li>
+					<li><a th:href="@{/products/new}">판매하기</a></li>
+					<li><a th:href="@{/user/mypage}">마이페이지</a></li>
+				</ul>
+			</div>
+		</div>
 
     <div id="category-bar">
         <div id="category-wrapper">
