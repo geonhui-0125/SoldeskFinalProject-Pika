@@ -17,6 +17,8 @@ public interface FavoriteProductRepository extends JpaRepository<FavoriteProduct
 	@Query(value = "select fp from FavoriteProducts fp join fetch fp.product where fp.user=:user")
 	List<FavoriteProducts> findByUser(@Param("user") Users user);
 
+	List<FavoriteProducts> findByProduct(@Param("product") Products product);
+
     int countByProduct(Products products);
     
     /*user와  product 엔티티로 데이터가 존재하는지 확인*/

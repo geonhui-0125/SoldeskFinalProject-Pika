@@ -110,6 +110,87 @@ ul {
     font-size: 1em;
 }
 
+/*******************************
+ 알림(Notification)
+********************************/
+#notification-btn {
+    cursor: pointer;
+    position: relative; /* 패널의 기준점이 됨 */
+}
+
+#notification-list {
+    position: absolute;
+    top: 42px;
+    right: 0;
+    width: 300px;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#notification-list li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+#notification-list li:last-child {
+    border-bottom: none;
+}
+
+#notification-list a {
+    display: block;
+    color: #333;
+    text-decoration: none;
+}
+
+#notification-list a:hover {
+    background-color: #f5f5f5;
+}
+
+.notification-item-link {
+    cursor: pointer;
+}
+
+
+#notification-list strong {
+    font-weight: bold;
+}
+
+#notification-list p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+#notification-list span {
+    font-size: 0.8em;
+    color: #999;
+}
+
+#notification-count {
+    font-weight: bold;
+    color: #ff4500;
+}
+
+#notification-pagination {
+    text-align: center;
+    padding: 5px;
+}
+
+#notification-pagination button {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#notification-pagination button:hover {
+    background: #f5f5f5;
+}
+
 #category-wrapper {
     position: relative;
 }
@@ -232,8 +313,8 @@ ul {
 }
 
 #favorite-link img {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     margin-top: 5px;
 }
 
@@ -242,4 +323,5 @@ ul {
     border-top: 1px solid #eee;
     padding-top: 5px;
     text-align: center;
+    cursor: pointer;
 }

@@ -2,6 +2,7 @@ package com.numlock.pika.controller.payment;
 
 import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.dto.payment.PaymentResDto;
+import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.payment.PaymentApiService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -19,6 +20,7 @@ public class PaymentApiController {
 
     // 결제 완료 후 서비스 로직
     private final PaymentApiService paymentApiService;
+    private final NotificationService notificationService;
 
     // 결제 검증 controller
     @PostMapping("/api/payment/validation")
@@ -37,6 +39,8 @@ public class PaymentApiController {
 
             //Paid : 결제 완료 상태
             System.out.println("결제 검증 성공! Paid 상태 : " + paymentData.getStatus());
+
+            notificationService.sendSellerDealing(paymentResDto);
 
             return ResponseEntity.ok(iamportResponse);
 
@@ -60,6 +64,9 @@ public class PaymentApiController {
     public ResponseEntity<?> confirmPayment(@PathVariable String impUid) {
 
         try {
+            notificationService.sendSoldOut(impUid);
+            notificationService.sendSellerSoldOut(impUid);
+
             Accounts accounts = paymentApiService.confirmPayment(impUid);
 
             return ResponseEntity.ok(accounts);
@@ -81,7 +88,7 @@ public class PaymentApiController {
 
     }
 
-    //결제 확정 로직
+    /*//결제 취소 로직
     @PostMapping("api/payment/cancel/{impUid}")
     public ResponseEntity<?> cancelPayment(@PathVariable String impUid) {
 
@@ -105,7 +112,7 @@ public class PaymentApiController {
 
         }
 
-    }
+    }*/
 
 
 

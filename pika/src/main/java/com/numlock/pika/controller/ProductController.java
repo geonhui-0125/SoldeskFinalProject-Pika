@@ -3,7 +3,9 @@ package com.numlock.pika.controller;
 import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
+import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ public class ProductController {
     private final ProductService productService;
     private final com.numlock.pika.service.CategoryService categoryService;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
@@ -117,7 +120,7 @@ public class ProductController {
 
         if(principal != null) {
             //로그인한 사용자 아이디 호출
-            String userId =  principal.getName();
+            String userId = principal.getName();
 
             System.out.println("login한 사용자 : " + userId);
 
@@ -129,6 +132,8 @@ public class ProductController {
 
             //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
+        }else{
+            return "redirect:/user/login";
         }
 
 
@@ -169,6 +174,9 @@ public class ProductController {
 
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable("id") int id, ProductRegisterDto dto, Principal principal) {
+
+        notificationService.sendProductChange(id, dto);
+
         productService.updateProduct(id, dto, principal);
         return "redirect:/user/mypage";
     }
