@@ -61,7 +61,27 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public Page<ProductDto> getProductList(Pageable pageable) {
 
-        return productRepository.findAll(pageable).map(ProductDto::fromEntity);
+        return productRepository.findAll(pageable).map(product -> {
+            ProductDto dto = ProductDto.fromEntity(product);
+
+            String folderUrl = dto.getProductImage();
+
+            if (folderUrl != null && !folderUrl.isEmpty()) {
+                List<String> imageUrls = getImageUrls(folderUrl);
+
+                if (!imageUrls.isEmpty()) {
+                    dto.setProductImage(imageUrls.get(0));
+                } else {
+                    // 이미지가 없는 경우, 디폴트 이미지
+                    dto.setProductImage(null);
+                }
+            } else {
+                // 폴더 URL 자체가 없는 경우 디폴트 이미지
+                dto.setProductImage(null);
+            }
+
+            return dto;
+        });
     }
 
     @Override
