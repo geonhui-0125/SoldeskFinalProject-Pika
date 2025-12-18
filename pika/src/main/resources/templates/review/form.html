@@ -3,16 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>리뷰 작성</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}"> <!-- Add this -->
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Change margin to 0 */
+            padding-top: 230px !important; /* Add this for vertical positioning */
+            background-color: #ffffff; /* Consistent background */
+        }
+        .container { /* New container for centering */
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
         form div { margin-bottom: 10px; }
         label { display: inline-block; width: 80px; }
-        input[type="text"], input[type="number"] { width: 200px; padding: 5px; }
-        input[type="submit"] { padding: 8px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;} /* Adjust width for full container */
+        input[type="submit"] { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px;}
         .error-message { color: red; }
     </style>
 </head>
 <body>
+<header th:replace="~{header :: mainHeader}"></header> <!-- Add this -->
+
+<div class="container"> <!-- Wrap content -->
     <h1>새 리뷰 작성</h1>
 
     <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
@@ -44,6 +62,7 @@
     <a th:href="@{/reviews/seller/{sellerId}(sellerId=${review.sellerId})}">리뷰 목록으로 돌아가기</a>
     <br/>
     <a href="/">홈으로 돌아가기</a>
+</div> <!-- End container wrap -->
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

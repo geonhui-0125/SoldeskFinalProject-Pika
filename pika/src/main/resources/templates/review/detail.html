@@ -43,7 +43,7 @@
 
     <div class="button-group" th:if="${principal != null}">
         <span sec:authorize="isAuthenticated()">
-            <a th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
+            <a th:if="${principal.name == review.userId}"
                th:href="@{/reviews/edit/{reviewId}(reviewId=${review.reviewId})}" class="edit-btn">수정</a>
 
             <form th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"

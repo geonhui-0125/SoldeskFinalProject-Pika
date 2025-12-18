@@ -82,11 +82,13 @@
         <section class="seller-info">
             <h3>판매자</h3>
             <div class="seller-box">
-                <img th:src="@{${productDetailDto.seller.profileImage}}">
-                <div>
-                    <p th:text="*{seller.nickname}"></p>
-                    <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
-                </div>
+                <a th:href="@{/reviews/seller/{sellerId}(sellerId=*{seller.id})}" style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                    <img th:src="@{${productDetailDto.seller.profileImage}}">
+                    <div>
+                        <p th:text="*{seller.nickname}"></p>
+                        <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
+                    </div>
+                </a>
             </div>
         </section>
 
