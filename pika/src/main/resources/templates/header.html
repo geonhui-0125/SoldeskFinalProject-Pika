@@ -81,7 +81,7 @@
                     <div class="submenu">
                         <p class="submenu-title" th:text="${category.key}"></p>
                         <th:block th:each="subCategory : ${category.value}">
-                            <a th:href="@{/products/search(category=${category.key + '>' + subCategory})}"
+                            <a href="#"
                                th:text="${subCategory}" th:attr="data-category-value=${category.key + '>' + subCategory}"></a>
                         </th:block>
                     </div>
