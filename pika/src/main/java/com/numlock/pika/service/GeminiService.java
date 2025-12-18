@@ -28,7 +28,7 @@ public class GeminiService {
         }
         this.geminiClient = Client.builder()
                 .apiKey(geminiApiKey)
-                .httpOptions(HttpOptions.builder().apiVersion("v1").build()) // API 버전을 v1으로 설정
+                .httpOptions(HttpOptions.builder().apiVersion("v1beta").build()) // API 버전을 v1으로 설정
                 .build();
     }
 
@@ -56,7 +56,7 @@ public class GeminiService {
         try {
             // Gemini API를 호출하여 요약을 생성합니다.
             // gemini-1.5-flash 모델은 빠르고 비용 효율적이므로 우선적으로 사용합니다.
-            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, null);
+            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-3-pro-preview", prompt, null);
 
             // API 응답을 파싱하여 생성된 한줄평을 추출합니다.
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {

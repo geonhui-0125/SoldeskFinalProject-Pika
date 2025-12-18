@@ -265,9 +265,7 @@ public class ProductServiceImpl implements ProductService {
             dto.setTitle(product.getTitle());
             dto.setPrice(product.getPrice());
             dto.setCreatedAt(product.getCreatedAt());
-
-            // 2. 이미지 처리 (엔티티의 productImage 필드 사용)
-            dto.setProductImage(product.getProductImage());
+            dto.setProductImage(getImageUrls(product.getProductImage()).get(0));
 
             // 3. 카테고리 처리 (Products -> Categories -> category 문자열)
             if (product.getCategory() != null) {
