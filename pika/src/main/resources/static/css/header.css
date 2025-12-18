@@ -157,23 +157,38 @@ ul {
     padding-bottom: 10px;
 }
 
-#category-dropdown a {
+/* 대분류 아이템을 감싸는 박스 설정 */
+.category-item {
+    position: relative; /* 소분류 위치의 기준점 */
+    width: 100%;
+}
+
+.category-item a {
     display: block;
     padding: 8px 15px;
 }
 
-#category-dropdown a:hover {
+/* 대분류 호버 시 배경색 */
+.category-item:hover > a {
     background-color: #f5f5f5;
+    color: #ff4500;
 }
+
+/* [핵심] 대분류에 마우스 올리면 소분류 보여주기 */
+.category-item:hover .submenu {
+    display: block !important;
+}
+
 .submenu {
     position: absolute;
     top: 0;
-    left: 217px;
+    left: 218px; /* 박스 간의 경계를 살짝 겹치게 하여 마우스 이동 원활하게 함 */
     width: 200px;
     background: white;
     border: 1px solid #ddd;
     box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
-    display: none;
+    display: none; /* 기본 숨김 */
+    z-index: 10001; /* 메뉴가 위로 올라오도록 설정 */
 }
 
 .submenu-title {
@@ -188,11 +203,11 @@ ul {
     padding: 8px 15px;
 }
 
-
+/* 소분류 내부 메뉴 호버 */
 .submenu a:hover {
     background-color: #f5f5f5;
+    color: #ff4500;
 }
-
 
 /*******************************
  우측 떠 있는 메뉴

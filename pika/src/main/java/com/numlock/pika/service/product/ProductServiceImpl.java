@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -211,13 +212,33 @@ public class ProductServiceImpl implements ProductService {
     //검색용 메소드
     @Override
     public List<ProductDto> searchProducts(String keyword, String categoryName) {
-        //1. Specification을 사용하여 조건에 맞는 Products 엔티티 리스트 조회
-        Specification<Products> spec = ProductSpecification.search(keyword, categoryName);
-        List<Products> productsList = productRepository.findAll(spec);
-        //2. 조회된 엔티티 리스트를 DTO 리스트로 변환
-        return productsList.stream()
-                .map(ProductDto::fromEntity)
-                .collect(Collectors.toList());
+        // 1. Repository에서 필터링된 엔티티 리스트 조회
+        List<Products> productsList = productRepository.searchByFilters(keyword, categoryName);
+
+        List<ProductDto> dtoList = new ArrayList<>();
+
+        for (Products product : productsList) {
+            ProductDto dto = new ProductDto();
+
+            // 엔티티 필드명에 맞춰 매핑
+            dto.setProductId(product.getProductId());
+            dto.setTitle(product.getTitle());
+            dto.setPrice(product.getPrice());
+            dto.setCreatedAt(product.getCreatedAt());
+
+            // 2. 이미지 처리 (엔티티의 productImage 필드 사용)
+            dto.setProductImage(product.getProductImage());
+
+            // 3. 카테고리 처리 (Products -> Categories -> category 문자열)
+            if (product.getCategory() != null) {
+                // ProductDto의 카테고리 설정 메서드 이름이 다를 수 있으니 확인하세요!
+                // 보통 dto.setCategory() 혹은 dto.setCategoryName() 일 것입니다.
+                dto.setCategoryId(product.getCategory().getCategoryId());
+            }
+
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
     public String saveImages(List<MultipartFile> images) throws IOException {

@@ -195,16 +195,24 @@ public class ProductController {
 
     //검색용 메소드
     @GetMapping("/search")
-    public String searchProducts (
+    public String searchProducts(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "category", required = false) String categoryName,
-            Model model){
+            Model model) {
 
+        // 1. 헤더 출력을 위한 카테고리 맵 다시 담기 (헤더가 공통이라 매번 필요함)
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        // 2. 서비스에서 필터링된 리스트 가져오기
+        // categoryName이 "피규어"면 하위 항목 포함 검색, "피규어>인형"이면 정밀 검색 로직 필요
         List<ProductDto> productList = productService.searchProducts(keyword, categoryName);
-        model.addAttribute("products", productList);
-        model.addAttribute("keyword", keyword); //검색어 화면에 표시
-        model.addAttribute("activeCategory", categoryName); //현재 카테고리 표시
 
+        model.addAttribute("products", productList);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("activeCategory", categoryName);
+
+        // 3. 검색 결과를 보여줄 페이지 (main.html과 구조가 같다면 main을 재사용해도 됨)
         return "product/search";
     }
 
