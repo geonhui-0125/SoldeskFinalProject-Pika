@@ -33,22 +33,26 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto) {
-        // 판매자 조회 (리뷰 대상)
-        Users seller = userRepository.findById(reviewRequestDto.getSellerId())
-                .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
-        // 리뷰 작성자 조회
-        Users reviewer = userRepository.findById(reviewRequestDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
-
-        Reviews review = Reviews.builder()
-                .seller(seller)
-                .reviewer(reviewer)
-                .score(reviewRequestDto.getScore())
-                .content(reviewRequestDto.getContent())
-                .build();
-        Reviews savedReview = reviewRepository.save(review);
-        return mapToReviewResponseDto(savedReview);
-    }
+                    // 판매자 조회 (리뷰 대상)
+                    Users seller = userRepository.findById(reviewRequestDto.getSellerId())
+                            .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
+                    // 리뷰 작성자 조회
+                    Users reviewer = userRepository.findById(reviewRequestDto.getUserId())
+                            .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
+        
+                    // 판매자가 자신에게 리뷰를 작성하는 것을 방지
+                    if (seller.getId().equals(reviewer.getId())) {
+                        throw new IllegalArgumentException("Seller cannot review themselves.");
+                    }
+        
+                    Reviews review = Reviews.builder()
+                            .seller(seller)
+                            .reviewer(reviewer)
+                            .score(reviewRequestDto.getScore())
+                            .content(reviewRequestDto.getContent())
+                            .build();
+                    Reviews savedReview = reviewRepository.save(review);
+                    return mapToReviewResponseDto(savedReview);    }
 
     @Override
     public ReviewResponseDto getReviewById(Long reviewId) {
@@ -71,7 +75,7 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        checkReviewAccess(review, currentUserId);
+        checkReviewAuthor(review, currentUserId); // Call the new specific method
 
         review.update(reviewRequestDto.getScore(), reviewRequestDto.getContent());
         Reviews updatedReview = reviewRepository.save(review);
@@ -84,17 +88,25 @@ public class ReviewServiceImpl implements ReviewService {
         Reviews review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found with ID: " + reviewId));
 
-        checkReviewAccess(review, currentUserId);
+        checkReviewAuthorOrAdmin(review, currentUserId);
 
         reviewRepository.delete(review);
     }
 
-    private void checkReviewAccess(Reviews review, String currentUserId) {
+    // 리뷰 수정/삭제 시 작성자 본인 또는 ADMIN만 허용하는 로직 (삭제에 사용)
+    private void checkReviewAuthorOrAdmin(Reviews review, String currentUserId) {
         Users currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new AccessDeniedException("Current user not found"));
 
         if (!review.getReviewer().getId().equals(currentUserId) && !currentUser.getRole().equals("ADMIN")) {
             throw new AccessDeniedException("You do not have permission to modify or delete this review.");
+        }
+    }
+
+    // 리뷰 수정 시 작성자 본인만 허용하는 로직 (수정에 사용)
+    private void checkReviewAuthor(Reviews review, String currentUserId) {
+        if (!review.getReviewer().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("You do not have permission to modify this review.");
         }
     }
 

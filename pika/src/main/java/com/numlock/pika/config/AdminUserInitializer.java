@@ -23,7 +23,7 @@ public class AdminUserInitializer implements CommandLineRunner {
                     .pw(passwordEncoder.encode("ad123")) // 안전한 비밀번호로 변경 권장
                     .nickname("관리자")
                     .email("admin@example.com")
-                    .profileImage("default-profile.jpg") // 프로필 이미지 플레이스홀더 추가
+                    .profileImage("/profile/admin_hat.png") // 프로필 이미지 플레이스홀더 추가
                     .role("ADMIN")
                     .build();
             /*

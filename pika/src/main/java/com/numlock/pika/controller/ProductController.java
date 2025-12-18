@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList; // ArrayList 임포트 추가
 
 @Controller
 @RequestMapping("/products")
@@ -81,10 +84,18 @@ public class ProductController {
         return "product/list";
     }
 
-    /**
-     * 상품 상세 페이지 (정보수정 및 채팅 가능 버전)
-     * 경로: GET /products/info/{id}
-     */
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
+    public String detail(@PathVariable("id") int id, Model model) {
+        ProductDto product = productService.getProductById(id);
+        model.addAttribute("product", product);
+        return "product/detail";
+    }
+
+
+    // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
+
     @GetMapping("/info/{id}")
     public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
 
@@ -92,10 +103,18 @@ public class ProductController {
         model.addAttribute("categoriesMap", categoriesMap);
 
         ProductDetailDto productDetailDto = productService.getProductDetailById(id, principal);
+
+        System.out.println("productDetailDto = " + productDetailDto);
+
         model.addAttribute("productDetailDto", productDetailDto);
 
-        if (principal != null) {
-            String userId = principal.getName();
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
             userRepository.findById(userId).ifPresent(user -> {
                 model.addAttribute("user", user);
             });
@@ -105,19 +124,48 @@ public class ProductController {
         return "product/info";
     }
 
-    /**
-     * 상품 등록 페이지 이동
-     */
+    @PostMapping
+    public String create(@ModelAttribute ProductDto productDto, java.security.Principal principal, Model model) {
+        try {
+            if (principal != null) {
+                productDto.setSellerId(principal.getName());
+            } else if (productDto.getSellerId() == null || productDto.getSellerId().isEmpty()) {
+                productDto.setSellerId("user1");
+            }
+            //productService.registerProduct(productDto, principal);
+            return "redirect:/products";
+        } catch (Exception e) {
+            e.printStackTrace(); // Log error to console
+            model.addAttribute("errorMessage", "Error registering product: " + e.getMessage());
+            model.addAttribute("product", productDto);
+            return "product/form";
+        }
+    }
+
     @GetMapping("/new")
     public String newProduct(Model model, Principal principal) {
         if (principal == null) return "redirect:/user/login";
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+
         model.addAttribute("categoriesMap", categoriesMap);
 
-        userRepository.findById(principal.getName()).ifPresent(user -> {
-            model.addAttribute("user", user);
-        });
+        if(principal != null) {
+            //로그인한 사용자 아이디 호출
+            String userId =  principal.getName();
+
+            System.out.println("login한 사용자 : " + userId);
+
+            //아이디를 이용해 DB에서 사용자 조회
+            userRepository.findById(userId).ifPresent(user -> {
+                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
+                model.addAttribute("user", user);
+            });
+
+            //아이디만 전송하는 코드
+            model.addAttribute("loginUserId", userId);
+        }
+
 
         return "product/new";
     }
@@ -128,6 +176,8 @@ public class ProductController {
     @PostMapping("/register")
     public String registerProduct(ProductRegisterDto productRegisterDto,
                                   @RequestParam("images") List<MultipartFile> images, Principal principal) {
+
+        System.out.println("dto 확인 : " + productRegisterDto);
         productService.registerProduct(productRegisterDto, principal, images);
         return "redirect:/"; // 등록 후 메인으로 이동
     }
@@ -147,6 +197,7 @@ public class ProductController {
         model.addAttribute("categoriesMap", categoriesMap);
         model.addAttribute("product", product);
 
+        // Transform "Main>Sub" to "Main > Sub" for the form if needed
         String category = product.getCategory();
         if (category != null && category.contains(">")) {
             model.addAttribute("currentCategory", category.replace(">", " > "));
