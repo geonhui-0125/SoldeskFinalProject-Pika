@@ -37,7 +37,7 @@ public class LoginController {
 
 
     //Principal 객채로 main에 사용자 정보 호출
-    @GetMapping("/")
+    @GetMapping("/login")
     public String loginUser(Principal principal, Model model) {
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
 
