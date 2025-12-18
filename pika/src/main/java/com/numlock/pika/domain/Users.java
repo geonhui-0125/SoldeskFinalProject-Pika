@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.time.LocalDateTime; // LocalDateTime 임포트 추가
 
 @Getter
 @Setter
@@ -49,6 +50,19 @@ public class Users {
     //로그인 타입 분류
     @Column(nullable = false)
     private String role;
+
+/*
+    @Column(nullable = false)
+    private Integer warningCount = 0; // 경고 횟수
+
+    @Column(nullable = false)
+    private Boolean isRestricted = false; // 이용 제한 여부
+
+    private String restrictionReason; // 이용 제한 사유 (null 허용)
+
+    @DateTimeFormat(pattern = "yyyyMMddHHmmss") // 날짜 및 시간 형식 지정
+    private LocalDateTime restrictionEndDate; // 이용 제한 종료일 (null 허용)
+*/
 
     @Builder
     public Users(String id, String pw, String nickname, String profileImage, String email, String role) {

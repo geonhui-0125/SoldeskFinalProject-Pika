@@ -197,11 +197,16 @@ public class ProductServiceImpl implements ProductService {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        if (!product.getSeller().getId().equals(principal.getName())) {
+        // 현재 로그인한 사용자 정보 조회
+        Users currentUser = userRepository.findById(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // ADMIN 역할이거나 해당 상품의 판매자인 경우에만 삭제 허용
+        if ("ADMIN".equals(currentUser.getRole()) || product.getSeller().getId().equals(currentUser.getId())) {
+            productRepository.delete(product);
+        } else {
             throw new SecurityException("Not authorized to delete this product");
         }
-
-        productRepository.delete(product);
     }
 
     //검색용 메소드

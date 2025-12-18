@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,9 +32,11 @@ public class ProductController {
     private final UserRepository userRepository;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size,
                        Model model) {
+
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productService.getProductList(pageable);
 
@@ -170,9 +173,15 @@ public class ProductController {
         return "redirect:/user/mypage";
     }
 
-    @PostMapping("/delete/{id}")
-    public String deleteProduct(@PathVariable("id") int id, Principal principal) {
-        productService.deleteProduct(id, principal);
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
+    public String deleteProduct(@PathVariable("id") int id,
+                                @RequestParam(value = "redirect", required = false) String redirect,
+                                Principal principal) {
+        productService.deleteProduct(id, principal); // ProductServiceImpl은 판매자 또는 ADMIN 권한을 확인
+        if ("productlist".equals(redirect)) {
+            return "redirect:/products";
+        }
         return "redirect:/user/mypage";
     }
 
