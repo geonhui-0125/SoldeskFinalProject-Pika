@@ -46,6 +46,12 @@ public class LoginSecurity {
                         .logoutUrl("/user/logout") //로그아웃 처리 URL
                         .logoutSuccessUrl("/") //로그아웃 성공시 리다이렉트
                         .invalidateHttpSession(true) //세션 무효화
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        // 인증된 사용자가 권한 없는 페이지 접근 시 처리
+                        // 현재는 메인 페이지로 리다이렉트하지만,
+                        // 추후 '권한이 없습니다' 메시지를 보여주는 커스텀 페이지(예: /access-denied)로 변경 가능
+                        .accessDeniedPage("/")
                 );
 
             return  http.build();

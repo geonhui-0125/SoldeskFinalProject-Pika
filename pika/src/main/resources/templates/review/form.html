@@ -33,7 +33,7 @@
         </div>
         <div>
             <label for="content">리뷰 내용:</label>
-            <textarea id="content" th:field="*{content}" rows="3" cols="30"></textarea>
+            <textarea id="content" th:field="*{content}" rows="3" cols="30" maxlength="1000"></textarea>
         </div>
         <div>
             <input type="submit" value="리뷰 제출">
@@ -44,5 +44,35 @@
     <a th:href="@{/reviews/seller/{sellerId}(sellerId=${review.sellerId})}">리뷰 목록으로 돌아가기</a>
     <br/>
     <a href="/">홈으로 돌아가기</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('content');
+        if (textarea) { // Ensure textarea exists
+            const maxLength = textarea.getAttribute('maxlength');
+            const charCountDisplay = document.createElement('p');
+            charCountDisplay.style.fontSize = '0.8em';
+            charCountDisplay.style.color = '#666';
+            charCountDisplay.style.marginTop = '5px'; // Add some margin
+
+            // Insert the counter display right after the textarea's parent div
+            textarea.closest('div').appendChild(charCountDisplay);
+
+
+            function updateCharCount() {
+                const currentLength = textarea.value.length;
+                charCountDisplay.textContent = `글자 수: ${currentLength} / ${maxLength}`;
+                if (currentLength > maxLength) {
+                    charCountDisplay.style.color = 'red'; // Indicate overflow visually
+                } else {
+                    charCountDisplay.style.color = '#666';
+                }
+            }
+
+            textarea.addEventListener('input', updateCharCount);
+            updateCharCount(); // Initial count
+        }
+    });
+</script>
 </body>
 </html>

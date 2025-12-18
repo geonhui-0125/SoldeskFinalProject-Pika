@@ -42,7 +42,7 @@
              style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
              th:onerror="this.onerror=null;this.src='/profile/default-profile.jpg';"/>
         <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
-        <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
+        <p><strong>리뷰 작성자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>
         <p><strong>별점:</strong> <span class="score" th:text="${review.score}">5</span></p>
         <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
         <span sec:authorize="isAuthenticated()">
