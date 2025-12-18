@@ -47,7 +47,7 @@
         <p><strong>내용:</strong> <span th:text="${review.content}">리뷰 내용입니다.</span></p>
         <span sec:authorize="isAuthenticated()">
             <a th:href="@{/reviews/{reviewId}(reviewId=${review.reviewId})}" class="detail-link">상세보기</a>
-            <a th:if="${principal.name == review.userId or #authorization.expression('hasRole(''ADMIN'')')}"
+            <a th:if="${principal.name == review.userId}"
                th:href="@{/reviews/edit/{reviewId}(reviewId=${review.reviewId})}" class="edit-link">수정</a>
         </span>
     </div>
