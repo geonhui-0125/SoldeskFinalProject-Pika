@@ -50,6 +50,7 @@ public class ProductController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
     public String detail(@PathVariable("id") int id, Model model) {
         ProductDto product = productService.getProductById(id);
         model.addAttribute("product", product);
