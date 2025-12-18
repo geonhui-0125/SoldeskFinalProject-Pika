@@ -75,7 +75,7 @@
                 <p>전체 카테고리</p>
 
                 <div class="category-item" th:each="category : ${categoriesMap}">
-                    <a th:href="@{/products/search(category=${category.key})}"
+                    <a href="#"
                        th:text="${category.key}" th:attr="data-category-value=${category.key}"></a>
 
                     <div class="submenu">

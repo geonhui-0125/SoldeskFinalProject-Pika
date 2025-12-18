@@ -80,6 +80,33 @@ ul {
     white-space: nowrap;
 }
 
+/* New: Wrapper for category display and search bar */
+.search-wrapper {
+    display: flex; /* Arrange category display and search bar horizontally */
+    align-items: center; /* Vertically align items */
+    gap: 10px; /* Space between category display and search bar */
+}
+
+/* New: Category Display next to search bar */
+#search-category-display {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background-color: #f0f0f0;
+    font-size: 0.9em;
+    color: #333;
+    white-space: nowrap; /* Prevent text wrapping */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 80px; /* Minimum width to make it look decent */
+}
+
+#search-category-display span {
+    margin-right: 5px;
+}
+
 /* 검색창 */
 #search-bar {
     position: relative;
