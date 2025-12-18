@@ -33,6 +33,11 @@
                         <img th:src="@{/icon/search.svg}" alt="검색">
                     </button>
                 </form>
+                <div id="popular-searches-container" style="display: none;">
+                    <h5>인기 검색어</h5>
+                    <ul id="popular-searches-list">
+                    </ul>
+                </div>
             </div>
 
 				<ul id="main-nav-menu">
@@ -80,6 +85,7 @@
         </div>
     </div>
 
+    <!-- 오른쪽 고정 메뉴 -->
     <div id="header-bottom-menu">
         <div id="favorite-link">
             <p>찜한 상품</p>
@@ -87,6 +93,7 @@
         </div>
         <div id="top-link">TOP</div>
     </div>
+
 </header>
 </body>
 </html>

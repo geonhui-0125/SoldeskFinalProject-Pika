@@ -3,8 +3,12 @@ package com.numlock.pika.service.product;
 import com.numlock.pika.domain.Search;
 import com.numlock.pika.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +28,13 @@ public class SearchServiceImpl implements SearchService {
                         .build());
         search.incrementSearchCount();
         searchRepository.save(search);
+        searchRepository.flush();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Search> getPopularKeywords() {
+        Pageable pageable = PageRequest.of(0, 10);
+        return searchRepository.findTopPopular(pageable);
     }
 }
