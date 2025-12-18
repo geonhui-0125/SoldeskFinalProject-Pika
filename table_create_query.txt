@@ -169,7 +169,7 @@ create table reviews (
                          seller_id varchar2(20) not null,
                          reviewer_id varchar2(20) not null,
                          score number not null,
-                         content varchar2(300) not null,
+                         content varchar2(1000) not null,
                          created_at DATE not null,
                          updated_at DATE not null,
                          foreign key (reviewer_id)
