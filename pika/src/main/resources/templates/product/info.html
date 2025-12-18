@@ -14,6 +14,7 @@
 
 <section class="product-section" th:object="${productDetailDto}">
     <input class="product-id" type="hidden" th:value="*{productId}">
+    <input class="seller-id" type="hidden" th:value="*{seller.id}">
     <input class="wished" type="hidden" th:value="*{wished}">
     <!-- breadcrumb -->
     <nav class="breadcrumb">
@@ -84,7 +85,7 @@
                 <img th:src="@{${productDetailDto.seller.profileImage}}">
                 <div>
                     <p th:text="*{seller.nickname}"></p>
-                    <p>별점 <span th:text="*{star}"></span></p> <!--별 모양 icon 생기면 수정 -->
+                    <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
                 </div>
             </div>
         </section>

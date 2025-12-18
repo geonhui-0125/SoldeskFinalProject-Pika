@@ -37,6 +37,15 @@
     <div>
         <label>Created At:</label> <span th:text="${product.createdAt}"></span>
     </div>
+
+    <!-- 관리자용 상품 삭제 버튼 -->
+    <div th:if="${currentUserRole != null and currentUserRole == 'ADMIN'}" style="margin-top: 20px;">
+        <form id="deleteProductForm" th:action="@{/products/delete/{id}(id=${product.productId})}" method="post">
+            <input type="hidden" name="_method" value="DELETE"/>
+            <button type="submit" class="btn btn-danger">상품 삭제 (관리자용)</button>
+        </form>
+    </div>
+
     <a th:href="@{/products}">Back to List</a>
 </body>
 </html>

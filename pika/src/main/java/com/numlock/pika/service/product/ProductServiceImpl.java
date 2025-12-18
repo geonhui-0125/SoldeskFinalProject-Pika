@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,10 +25,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import static com.numlock.pika.dto.ProductDetailDto.calculateTimeAgo;
 
@@ -51,6 +55,13 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll().stream()
                 .map(ProductDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProductDto> getProductList(Pageable pageable) {
+
+        return productRepository.findAll(pageable).map(ProductDto::fromEntity);
     }
 
     @Override
@@ -206,11 +217,48 @@ public class ProductServiceImpl implements ProductService {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        if (!product.getSeller().getId().equals(principal.getName())) {
+        // 현재 로그인한 사용자 정보 조회
+        Users currentUser = userRepository.findById(principal.getName())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // ADMIN 역할이거나 해당 상품의 판매자인 경우에만 삭제 허용
+        if ("ADMIN".equals(currentUser.getRole()) || product.getSeller().getId().equals(currentUser.getId())) {
+            productRepository.delete(product);
+        } else {
             throw new SecurityException("Not authorized to delete this product");
         }
+    }
 
-        productRepository.delete(product);
+    //검색용 메소드
+    @Override
+    public List<ProductDto> searchProducts(String keyword, String categoryName) {
+        // 1. Repository에서 필터링된 엔티티 리스트 조회
+        List<Products> productsList = productRepository.searchByFilters(keyword, categoryName);
+
+        List<ProductDto> dtoList = new ArrayList<>();
+
+        for (Products product : productsList) {
+            ProductDto dto = new ProductDto();
+
+            // 엔티티 필드명에 맞춰 매핑
+            dto.setProductId(product.getProductId());
+            dto.setTitle(product.getTitle());
+            dto.setPrice(product.getPrice());
+            dto.setCreatedAt(product.getCreatedAt());
+
+            // 2. 이미지 처리 (엔티티의 productImage 필드 사용)
+            dto.setProductImage(product.getProductImage());
+
+            // 3. 카테고리 처리 (Products -> Categories -> category 문자열)
+            if (product.getCategory() != null) {
+                // ProductDto의 카테고리 설정 메서드 이름이 다를 수 있으니 확인하세요!
+                // 보통 dto.setCategory() 혹은 dto.setCategoryName() 일 것입니다.
+                dto.setCategoryId(product.getCategory().getCategoryId());
+            }
+
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 
     public String saveImages(List<MultipartFile> images) throws IOException {

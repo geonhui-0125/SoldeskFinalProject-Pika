@@ -64,3 +64,26 @@ document.querySelector(".like-btn").addEventListener('click', () => {
 
 });
 
+// 판매자 리뷰 요약 가져오기
+document.addEventListener('DOMContentLoaded', function() {
+    const sellerId = document.querySelector('.seller-id').value;
+    const reviewSummaryElement = document.querySelector('.review-summary');
+
+    if (sellerId && reviewSummaryElement) {
+        fetch(`/reviews/summary/${sellerId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('리뷰 요약을 가져오는 데 실패했습니다.');
+                }
+                return response.text();
+            })
+            .then(summary => {
+                reviewSummaryElement.textContent = summary;
+            })
+            .catch(error => {
+                console.error('Error fetching review summary:', error);
+                reviewSummaryElement.textContent = '리뷰 요약 로딩 실패';
+                reviewSummaryElement.style.color = 'red';
+            });
+    }
+});
