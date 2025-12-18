@@ -67,9 +67,9 @@ public class PaymentApiController {
             notificationService.sendSoldOut(impUid);
             notificationService.sendSellerSoldOut(impUid);
 
-            Accounts accounts = paymentApiService.confirmPayment(impUid);
+            String result = paymentApiService.confirmPayment(impUid);
 
-            return ResponseEntity.ok(accounts);
+            return ResponseEntity.ok(result);
 
         } catch (IamportResponseException e) {
             System.out.println("PortOne API 통신 오류 : " + e.getMessage());

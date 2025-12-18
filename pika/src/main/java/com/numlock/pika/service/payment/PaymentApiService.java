@@ -134,7 +134,7 @@ public class PaymentApiService {
     }
 
     //주문 결제 확정 시
-    public Accounts confirmPayment(String impUid) throws IamportResponseException, IOException {
+    public String confirmPayment(String impUid) throws IamportResponseException, IOException {
 
         //결제 정보 찾기
         Payments payments = paymentRepository.findById(impUid)
@@ -159,7 +159,7 @@ public class PaymentApiService {
         // 구매 확정을 누르면 판매자에게 메시지를 전송
         smsService.sendMessage();
 
-        return accounts;
+        return "구매 확정이 완료되었습니다";
 
     }
 
