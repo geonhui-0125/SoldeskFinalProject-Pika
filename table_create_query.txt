@@ -4,6 +4,12 @@ drop sequence seq_reviews;
 drop sequence seq_favorite_products;
 drop sequence seq_products;
 drop sequence seq_categories;
+drop sequence SEQ_NOTIFICATIONS;
+
+create sequence SEQ_NOTIFICATIONS
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
 
 create sequence seq_categories
     INCREMENT BY 1 START WITH 1
@@ -40,6 +46,7 @@ drop table payments;
 drop table products;
 drop table categories;
 drop table MESSAGES;
+drop table NOTIFICATIONS;
 drop table users;
 
 --create table
@@ -53,6 +60,18 @@ CREATE TABLE users (
                        phone varchar2(20) null,
                        birth DATE null,
                        role varchar2(20)
+);
+
+CREATE TABLE NOTIFICATIONS (
+                               NOTIFICATION_ID NUMBER primary key NOT NULL, -- 고유 ID (PK)
+                               RECEIVER_ID varchar2(20) NOT NULL, -- 수신자 유저 ID
+                               TYPE VARCHAR2(50) NOT NULL, -- 내부 로직 구분용 코드 (예: PRICE_DROP)
+                               TITLE VARCHAR2(50) NOT NULL, -- 알림 제목 (예: 찜한 상품 가격 변동)
+                               CONTENT VARCHAR2(200) NOT NULL, -- 알림 내용 (예: 강아지 인형 가격이...)
+                               ACTION_URL VARCHAR2(100), -- 클릭 시 이동할 경로
+                               IS_READ NUMBER(1) DEFAULT 0 NOT NULL, -- 읽음 상태 (0: 안읽음, 1: 읽음)
+                               CREATED_AT DATE DEFAULT CURRENT_TIMESTAMP NOT NULL, -- 생성일시
+                               foreign key (RECEIVER_ID) references users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE MESSAGES (
@@ -182,6 +201,7 @@ create table accounts(
 
 --select table━
 select * from users;
+select * from NOTIFICATIONS;
 select * from categories;
 select * from products;
 select * from payments;

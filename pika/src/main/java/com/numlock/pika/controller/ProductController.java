@@ -3,7 +3,9 @@ package com.numlock.pika.controller;
 import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
+import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,7 @@ public class ProductController {
     private final ProductService productService;
     private final com.numlock.pika.service.CategoryService categoryService;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     // ⭐️ 테스트를 위해 더미 데이터를 사용하는 임시 list 메서드 (DB 연결 불필요)
     @GetMapping
@@ -231,6 +234,9 @@ public class ProductController {
 
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable("id") int id, ProductRegisterDto dto, Principal principal) {
+
+        notificationService.sendProductChange(id, dto);
+
         productService.updateProduct(id, dto, principal);
         return "redirect:/user/mypage";
     }

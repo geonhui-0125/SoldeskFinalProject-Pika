@@ -6,6 +6,7 @@ import com.numlock.pika.domain.Users;
 import com.numlock.pika.repository.FavoriteProductRepository;
 import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.product.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class WishApiService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final FavoriteProductRepository favoriteProductRepository;
+    private final NotificationService notificationService;
 
     public int upWishCount(int productId, Principal principal) {
 
@@ -33,6 +35,8 @@ public class WishApiService {
                                 .user(users)
                                 .product(products)
                                 .build();
+
+        notificationService.sendSellerProductWished(productId, principal);
 
         favoriteProductRepository.save(favoriteProducts);
 
