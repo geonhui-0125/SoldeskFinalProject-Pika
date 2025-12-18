@@ -42,4 +42,222 @@ $(document).ready(function () {
         $submenu.stop(true, true).slideToggle(120);
     });
 
+    $("#favorite-link").click(function() {
+        location.href = "/user/mypage";
+    })
+
+    $("#top-link").click(function() {
+        // HTML과 BODY에 0 (상단)
+        $('html, body').scrollTop(0)
+    });
+
+    /*******************************
+     알림(Notification)
+     ********************************/
+
+    let currentPage = 0;
+    let totalPages = 0;
+
+    function fetchNotifications(page) {
+        $.ajax({
+            url: "/notifications",
+            type: "GET",
+            data: { page: page, size: 2 },
+            success: function (response) {
+                const notificationItems = $("#notification-items");
+                notificationItems.empty();
+                totalPages = response.totalPages;
+                currentPage = response.number;
+
+                if (response.content.length === 0) {
+                    notificationItems.append('<li>새 알림이 없습니다.</li>');
+                } else {
+                    response.content.forEach(function (notification) {
+                        const notificationItem =
+                            '<li>' +
+                            '<div class="notification-item-link" data-url="' + notification.actionUrl + '" data-notification-id="' + notification.notificationId + '">' +
+                            '<strong>' + notification.title + '</strong>' +
+                            '<p>' + notification.content + '</p>' +
+                            '<span>' + notification.timeAgo + '</span>' +
+                            '</div>' +
+                            '</li>';
+                        notificationItems.append(notificationItem);
+                    });
+                }
+
+                $("#prev-notification-page").prop('disabled', currentPage === 0);
+                $("#next-notification-page").prop('disabled', currentPage >= totalPages - 1);
+            },
+            error: function () {
+                const notificationItems = $("#notification-items");
+                notificationItems.empty();
+                notificationItems.append('<li>알림을 불러오는데 실패했습니다.</li>');
+            }
+        });
+    }
+
+    function updateNotificationCount() {
+        $.ajax({
+            url: "/notifications/count",
+            type: "GET",
+            success: function (count) {
+                const countElement = $("#notification-count");
+                if (count > 0) {
+                    countElement.text('(' + count + ')');
+                } else {
+                    countElement.text('');
+                }
+            }
+        });
+    }
+    
+    // 페이지 로드 시 안읽은 알림 개수 업데이트
+    updateNotificationCount();
+
+    $("#notification-btn").click(function (e) {
+        e.stopPropagation();
+        var notificationList = $("#notification-list");
+        notificationList.toggle();
+
+        if (notificationList.is(":visible")) {
+            fetchNotifications(0);
+        }
+    });
+    
+    $("#prev-notification-page").click(function() {
+        if(currentPage > 0) {
+            fetchNotifications(currentPage - 1);
+        }
+    });
+
+    $("#next-notification-page").click(function() {
+        if(currentPage < totalPages - 1) {
+            fetchNotifications(currentPage + 1);
+        }
+    });
+
+    const notificationItemsEl = document.getElementById('notification-items');
+    if (notificationItemsEl) {
+        notificationItemsEl.addEventListener('click', function(e) {
+            let target = e.target;
+            // 클릭된 요소가 .notification-item-link 클래스를 가질 때까지 부모로 이동
+            while (target && !target.classList.contains('notification-item-link')) {
+                target = target.parentElement;
+            }
+
+            if (target && target.classList.contains('notification-item-link')) {
+                const notificationId = target.getAttribute('data-notification-id');
+                const href = target.getAttribute('data-url');
+
+                console.log("Marking notification as read. ID: " + notificationId + ", URL: " + href);
+
+                fetch('/notifications/read/' + notificationId, {
+                    method: 'PUT'
+                })
+                .then(resp => {
+                    if (!resp.ok) {
+                        console.error('Failed to mark notification as read. Status: ' + resp.status);
+                    }
+                    // 성공하든 실패하든 링크로 이동
+                    window.location.href = href;
+                })
+                .catch(error => {
+                    console.error('Error in fetch call:', error);
+                    // 에러 발생 시에도 링크로 이동
+                    window.location.href = href;
+                });
+            }
+        });
+    }
+
+    $(document).click(function () {
+        if ($("#notification-list").is(":visible")) {
+            $("#notification-list").hide();
+        }
+    });
+
+    $("#notification-list").click(function (e) {
+        e.stopPropagation();
+    });
+
+    // ----- 인기 검색어 기능 (디버그 모드) -----
+    console.log("디버그: 인기 검색어 스크립트 블록 시작.");
+
+    const $searchBarInput = $('#search-bar input[name="keyword"]');
+    const $popularSearchesContainer = $('#popular-searches-container');
+    const $popularSearchesList = $('#popular-searches-list');
+    const $searchForm = $('#search-bar form');
+
+    console.log("디버그: 인기 검색어 컨테이너 찾은 개수:", $popularSearchesContainer.length);
+    console.log("디버그: 인기 검색어 리스트 찾은 개수:", $popularSearchesList.length);
+
+    let popularKeywordsData = [];
+
+    function fetchAndDisplayPopularKeywords() {
+        console.log("디버그: fetchAndDisplayPopularKeywords 함수 시작.");
+        // 캐시를 사용하지 않고 항상 새로 가져오도록 수정 (디버깅 용도)
+        // if (popularKeywordsData.length === 0) {
+            console.log("디버그: AJAX 요청 시작.");
+            $.ajax({
+                url: '/search/popular',
+                method: 'GET',
+                success: function (data) {
+                    console.log("디버그: AJAX 요청 성공!", data);
+                    popularKeywordsData = data;
+                    $popularSearchesList.empty();
+                    if (data && data.length > 0) {
+                        data.forEach(function (searchItem) {
+                            const listItem = $('<li><a href="#"></a></li>');
+                            listItem.find('a').text(searchItem.keyword).attr('data-keyword', searchItem.keyword);
+                            $popularSearchesList.append(listItem);
+                        });
+                    } else {
+                        $popularSearchesList.append('<li><span class="no-results">인기 검색어가 없습니다.</span></li>');
+                    }
+                    $popularSearchesContainer.slideDown(120);
+                },
+                error: function (xhr, status, error) {
+                    console.error("디버그: AJAX 요청 실패!", status, error);
+                    $popularSearchesList.empty().append('<li><span class="error-msg">인기 검색어를 불러올 수 없습니다.</span></li>');
+                    $popularSearchesContainer.slideDown(120);
+                }
+            });
+        // } else {
+        //     console.log("디버그: 캐시된 데이터 사용.");
+        //     $popularSearchesList.empty();
+        //     popularKeywordsData.forEach(function (searchItem) {
+        //         const listItem = $('<li><a href="#"></a></li>');
+        //         listItem.find('a').text(searchItem.keyword).attr('data-keyword', searchItem.keyword);
+        //         $popularSearchesList.append(listItem);
+        //     });
+        //     $popularSearchesContainer.slideDown(120);
+        // }
+    }
+
+    console.log("디버그: 검색 입력 필드 jQuery 객체:", $searchBarInput);
+    console.log("디버그: 찾은 입력 필드 개수:", $searchBarInput.length);
+
+    $searchBarInput.on('focus', function (event) {
+        console.log("디버그: 검색창 포커스 이벤트 발생!");
+        event.stopPropagation();
+        fetchAndDisplayPopularKeywords();
+    });
+
+    $popularSearchesList.on('click', 'a', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const keyword = $(this).attr('data-keyword');
+        $searchBarInput.val(keyword);
+        $searchForm.submit();
+        $popularSearchesContainer.slideUp(120);
+    });
+
+    // 외부 클릭 시 인기 검색어 숨기기
+    $(document).on('click', function (event) {
+        if (!$(event.target).closest('#search-bar').length && !$popularSearchesContainer.is(event.target) && $popularSearchesContainer.has(event.target).length === 0) {
+            if ($popularSearchesContainer.is(":visible")) {
+                $popularSearchesContainer.slideUp(120);
+            }
+        }
+    });
 });

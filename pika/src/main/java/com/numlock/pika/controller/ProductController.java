@@ -4,7 +4,9 @@ import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
+import com.numlock.pika.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,11 +30,45 @@ import java.util.ArrayList; // ArrayList 임포트 추가
 public class ProductController {
 
     private final ProductService productService;
-    private final com.numlock.pika.service.CategoryService categoryService;
+    private final CategoryService categoryService;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
+    /**
+     * [추가] 상품 검색 및 카테고리 필터링
+     * 경로: GET /products/search
+     */
+    @GetMapping("/search")
+    public String searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
+                                 @RequestParam(value = "category", required = false) String category,
+                                 Model model, Principal principal) {
+
+        // 헤더 카테고리 메뉴 구성을 위한 데이터
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
+        // 검색 로직 수행 (Service에서 keyword와 category를 처리)
+        List<ProductDto> products = productService.searchProducts(keyword, category);
+
+        model.addAttribute("products", products);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("activeCategory", category);
+
+        // 헤더 사용자 프로필 처리를 위한 로직
+        if (principal != null) {
+            userRepository.findById(principal.getName()).ifPresent(user -> {
+                model.addAttribute("user", user);
+            });
+        }
+
+        return "product/search"; // search.html 렌더링
+    }
+
+    /**
+     * 관리자용 상품 목록 조회
+     */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
+    @PreAuthorize("hasRole('ADMIN')")
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(defaultValue = "10") int size,
                        Model model) {
@@ -80,11 +116,8 @@ public class ProductController {
 
             //아이디를 이용해 DB에서 사용자 조회
             userRepository.findById(userId).ifPresent(user -> {
-                //조회된 Users 객체를 "user"라는 이름으로 모델에 추가
                 model.addAttribute("user", user);
             });
-
-            //아이디만 전송하는 코드
             model.addAttribute("loginUserId", userId);
         }
 
@@ -111,6 +144,7 @@ public class ProductController {
 
     @GetMapping("/new")
     public String newProduct(Model model, Principal principal) {
+        if (principal == null) return "redirect:/user/login";
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
 
@@ -136,17 +170,21 @@ public class ProductController {
         return "product/new";
     }
 
+    /**
+     * 실제 상품 등록 처리
+     */
     @PostMapping("/register")
     public String registerProduct(ProductRegisterDto productRegisterDto,
                                   @RequestParam("images") List<MultipartFile> images, Principal principal) {
 
         System.out.println("dto 확인 : " + productRegisterDto);
         productService.registerProduct(productRegisterDto, principal, images);
-
-        return "redirect:/products/new";
+        return "redirect:/"; // 등록 후 메인으로 이동
     }
 
-
+    /**
+     * 상품 수정 페이지 이동
+     */
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable("id") int id, Principal principal, Model model) {
         ProductDetailDto product = productService.getProductDetailById(id, principal);
@@ -162,60 +200,44 @@ public class ProductController {
         // Transform "Main>Sub" to "Main > Sub" for the form if needed
         String category = product.getCategory();
         if (category != null && category.contains(">")) {
-             model.addAttribute("currentCategory", category.replace(">", " > "));
+            model.addAttribute("currentCategory", category.replace(">", " > "));
         }
 
         return "product/edit";
     }
 
+    /**
+     * 상품 정보 업데이트 처리
+     */
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable("id") int id, ProductRegisterDto dto, Principal principal) {
+        notificationService.sendProductChange(id, dto);
         productService.updateProduct(id, dto, principal);
         return "redirect:/user/mypage";
     }
 
+    /**
+     * 상품 삭제 처리
+     */
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // ADMIN 역할만 접근 가능
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public String deleteProduct(@PathVariable("id") int id,
                                 @RequestParam(value = "redirect", required = false) String redirect,
                                 Principal principal) {
-        productService.deleteProduct(id, principal); // ProductServiceImpl은 판매자 또는 ADMIN 권한을 확인
+        productService.deleteProduct(id, principal);
         if ("productlist".equals(redirect)) {
             return "redirect:/products";
         }
         return "redirect:/user/mypage";
     }
 
-
+    /**
+     * 특정 판매자의 상품 목록 조회
+     */
     @GetMapping("/bySeller/{sellerId}")
     public String getProductsBySeller(@PathVariable("sellerId") String sellerId, Model model) {
         List<ProductDto> products = productService.getProductsBySeller(sellerId);
         model.addAttribute("products", products);
         return "product/list";
     }
-
-    //검색용 메소드
-    @GetMapping("/search")
-    public String searchProducts(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "category", required = false) String categoryName,
-            Model model) {
-
-        // 1. 헤더 출력을 위한 카테고리 맵 다시 담기 (헤더가 공통이라 매번 필요함)
-        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-        model.addAttribute("categoriesMap", categoriesMap);
-
-        // 2. 서비스에서 필터링된 리스트 가져오기
-        // categoryName이 "피규어"면 하위 항목 포함 검색, "피규어>인형"이면 정밀 검색 로직 필요
-        List<ProductDto> productList = productService.searchProducts(keyword, categoryName);
-
-        model.addAttribute("products", productList);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("activeCategory", categoryName);
-
-        // 3. 검색 결과를 보여줄 페이지 (main.html과 구조가 같다면 main을 재사용해도 됨)
-        return "product/search";
-    }
-
 }
-

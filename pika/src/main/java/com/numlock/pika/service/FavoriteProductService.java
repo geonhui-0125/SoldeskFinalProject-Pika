@@ -3,6 +3,7 @@ package com.numlock.pika.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.numlock.pika.service.product.ProductServiceImpl;
 import org.springframework.stereotype.Service;
 
 import com.numlock.pika.domain.FavoriteProducts;
@@ -18,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FavoriteProductService{
 	private final FavoriteProductRepository favoriteProductRepository;
+    private final ProductServiceImpl productServiceImpl;
+
 	public List<ProductDto> findFavoriteByUser(Users user){
 		/*
 		 * favoriteProductRepository에서 user를 매개로 상품조회
@@ -28,7 +31,28 @@ public class FavoriteProductService{
 		 */
 		List<FavoriteProducts> favoriteProducts = favoriteProductRepository.findByUser(user);
 		return favoriteProducts.stream().map(favorite->favorite.getProduct())
-				.map(products->ProductDto.fromEntity(products)).collect(Collectors.toList());
+				.map(products-> {
+                    ProductDto dto = ProductDto.fromEntity(products);
+
+                    String folderUrl = dto.getProductImage();
+
+                    if (folderUrl != null && !folderUrl.isEmpty()) {
+                        List<String> imageUrls = productServiceImpl.getImageUrls(folderUrl);
+
+                        if (!imageUrls.isEmpty()) {
+                            dto.setProductImage(imageUrls.get(0));
+                        } else {
+                            // 이미지가 없는 경우, 디폴트 이미지
+                            dto.setProductImage(null);
+                        }
+                    } else {
+                        // 폴더 URL 자체가 없는 경우 디폴트 이미지
+                        dto.setProductImage(null);
+                    }
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
 	}
 	
 }
