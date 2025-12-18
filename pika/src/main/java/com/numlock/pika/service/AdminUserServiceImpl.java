@@ -39,7 +39,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void warnUser(String userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        user.setWarningCount(user.getWarningCount() + 1);
+        // user.setWarningCount(user.getWarningCount() + 1);
         userRepository.save(user);
     }
 
@@ -48,9 +48,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void restrictUser(String userId, String reason, LocalDateTime endDate) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        user.setIsRestricted(true);
-        user.setRestrictionReason(reason);
-        user.setRestrictionEndDate(endDate);
+        // user.setIsRestricted(true);
+        // user.setRestrictionReason(reason);
+        // user.setRestrictionEndDate(endDate);
         userRepository.save(user);
     }
 
@@ -59,9 +59,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void liftRestriction(String userId) {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        user.setIsRestricted(false);
-        user.setRestrictionReason(null);
-        user.setRestrictionEndDate(null);
+        // user.setIsRestricted(false);
+        // user.setRestrictionReason(null);
+        // user.setRestrictionEndDate(null);
         userRepository.save(user);
     }
 }

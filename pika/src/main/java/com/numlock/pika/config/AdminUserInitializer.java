@@ -26,8 +26,10 @@ public class AdminUserInitializer implements CommandLineRunner {
                     .profileImage("default-profile.jpg") // 프로필 이미지 플레이스홀더 추가
                     .role("ADMIN")
                     .build();
-            adminUser.setWarningCount(0); // 세터로 warningCount 설정
-            adminUser.setIsRestricted(false); // 세터로 isRestricted 설정
+            /*
+            // adminUser.setWarningCount(0); // 세터로 warningCount 설정
+            // adminUser.setIsRestricted(false); // 세터로 isRestricted 설정
+            */
             userRepository.save(adminUser);
             System.out.println("Admin user 'admin' created successfully.");
         } else {

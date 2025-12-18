@@ -21,10 +21,10 @@ public class AdminUserDto {
     private String phone;
     private Date birth;
     private String role;
-    private Integer warningCount;
-    private Boolean isRestricted;
-    private String restrictionReason;
-    private LocalDateTime restrictionEndDate;
+    // private Integer warningCount;
+    // private Boolean isRestricted;
+    // private String restrictionReason;
+    // private LocalDateTime restrictionEndDate;
 
     // Entity -> DTO
     public static AdminUserDto fromEntity(Users user) {
@@ -37,10 +37,10 @@ public class AdminUserDto {
                 .phone(user.getPhone())
                 .birth(user.getBirth())
                 .role(user.getRole())
-                .warningCount(user.getWarningCount())
-                .isRestricted(user.getIsRestricted())
-                .restrictionReason(user.getRestrictionReason())
-                .restrictionEndDate(user.getRestrictionEndDate())
+                // .warningCount(user.getWarningCount())
+                // .isRestricted(user.getIsRestricted())
+                // .restrictionReason(user.getRestrictionReason())
+                // .restrictionEndDate(user.getRestrictionEndDate())
                 .build();
     }
 }

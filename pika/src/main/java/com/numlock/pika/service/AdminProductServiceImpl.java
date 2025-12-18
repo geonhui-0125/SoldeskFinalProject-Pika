@@ -30,8 +30,8 @@ public class AdminProductServiceImpl implements AdminProductService {
     public void deleteProductByAdmin(int productId, String reason) {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
-        product.setPolicyViolationStatus("DELETED_BY_ADMIN");
-        product.setPolicyViolationReason(reason);
+        // product.setPolicyViolationStatus("DELETED_BY_ADMIN");
+        // product.setPolicyViolationReason(reason);
         productRepository.save(product);
     }
 
@@ -41,8 +41,8 @@ public class AdminProductServiceImpl implements AdminProductService {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
         // 예를 들어, "REPORTED" 또는 "SUSPENDED" 등으로 상태 설정
-        product.setPolicyViolationStatus("REPORTED"); // 또는 SUSPENDED
-        product.setPolicyViolationReason(reason);
+        // product.setPolicyViolationStatus("REPORTED"); // 또는 SUSPENDED
+        // product.setPolicyViolationReason(reason);
         productRepository.save(product);
     }
 
@@ -51,8 +51,8 @@ public class AdminProductServiceImpl implements AdminProductService {
     public void liftProductViolation(int productId) {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
-        product.setPolicyViolationStatus("NORMAL");
-        product.setPolicyViolationReason(null);
+        // product.setPolicyViolationStatus("NORMAL");
+        // product.setPolicyViolationReason(null);
         productRepository.save(product);
     }
 }

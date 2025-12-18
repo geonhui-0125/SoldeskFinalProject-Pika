@@ -51,6 +51,7 @@ public class Users {
     @Column(nullable = false)
     private String role;
 
+/*
     @Column(nullable = false)
     private Integer warningCount = 0; // 경고 횟수
 
@@ -61,6 +62,7 @@ public class Users {
 
     @DateTimeFormat(pattern = "yyyyMMddHHmmss") // 날짜 및 시간 형식 지정
     private LocalDateTime restrictionEndDate; // 이용 제한 종료일 (null 허용)
+*/
 
     @Builder
     public Users(String id, String pw, String nickname, String profileImage, String email, String role) {
