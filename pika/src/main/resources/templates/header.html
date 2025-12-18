@@ -88,6 +88,8 @@
                 </div>
             </div>
         </div>
+        <!-- 상품 리스트 (관리자용) 버튼 - currentUserRole이 ADMIN일 때만 표시 -->
+        <a th:if="${currentUserRole != null and currentUserRole == 'ADMIN'}" th:href="@{/products}" class="nav-link" style="margin-left: auto; align-self: center; padding: 0 15px;">상품 리스트 (관리자용)</a>
     </div>
 
     <!-- 오른쪽 고정 메뉴 -->
