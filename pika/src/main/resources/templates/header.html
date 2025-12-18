@@ -9,7 +9,7 @@
     <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
         <div>
             <div th:if="${user.profileImage}">
-                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
             </div>
             <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
             <a href="/user/add-info" id="modify"style="width: 100px; height: 50px">정보수정</a>
@@ -54,18 +54,20 @@
 				<div id="category-dropdown">
 					<p>전체 카테고리</p>
 
-                    <div class="category-item" th:each="category : ${categoriesMap}">
-                        <a th:href="@{/products/search(category=${category.key})}" th:text="${category.key}"></a>
+					<div class="category-item" th:each="category : ${categoriesMap}">
 
-                        <div class="submenu">
-                            <p class="submenu-title" th:text="${category.key}"></p>
+						<a th:text="${category.key}"></a>
 
-                            <th:block th:each="subCategory : ${category.value}">
-                                <a th:href="@{/products/search(category=${category.key + '>' + subCategory})}"
-                                   th:text="${subCategory}"></a>
-                            </th:block>
-                        </div>
-                    </div>
+						<div class="submenu">
+
+							<p class="submenu-title" th:text="${category.key}"></p>
+
+							<th:block th:each="subCategory : ${category.value}">
+								<a th:text="${subCategory}"></a>
+							</th:block>
+
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
