@@ -26,8 +26,13 @@
         <div id="header-main-content">
             <a id="logo-link" th:href="@{/}">pika 피카</a>
 
+        <div class="search-wrapper">
+            <div id="search-category-display">
+                <span>전체</span>
+            </div>
             <div id="search-bar">
-                <form th:action="@{/products/search}" method="get">
+                <form th:action="@{/search}" method="get">
+                    <input type="hidden" name="category" id="search-category-input" value="">
                     <input type="text" name="keyword" placeholder="검색할 상품을 입력하세요.">
                     <button type="submit" style="background:none; border:none; padding:0">
                         <img th:src="@{/icon/search.svg}" alt="검색">
@@ -39,7 +44,7 @@
                     </ul>
                 </div>
             </div>
-
+        </div>
 				<ul id="main-nav-menu">
 					<li sec:authorize="isAuthenticated()" th:if="${user}">
 					<a th:href="@{/chat/userList}">채팅</a></li>
@@ -71,13 +76,13 @@
 
                 <div class="category-item" th:each="category : ${categoriesMap}">
                     <a th:href="@{/products/search(category=${category.key})}"
-                       th:text="${category.key}"></a>
+                       th:text="${category.key}" th:attr="data-category-value=${category.key}"></a>
 
                     <div class="submenu">
                         <p class="submenu-title" th:text="${category.key}"></p>
                         <th:block th:each="subCategory : ${category.value}">
                             <a th:href="@{/products/search(category=${category.key + '>' + subCategory})}"
-                               th:text="${subCategory}"></a>
+                               th:text="${subCategory}" th:attr="data-category-value=${category.key + '>' + subCategory}"></a>
                         </th:block>
                     </div>
                 </div>

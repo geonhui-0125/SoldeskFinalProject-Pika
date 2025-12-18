@@ -180,29 +180,21 @@ $(document).ready(function () {
         e.stopPropagation();
     });
 
-    // ----- 인기 검색어 기능 (디버그 모드) -----
-    console.log("디버그: 인기 검색어 스크립트 블록 시작.");
+    // ----- 인기 검색어 기능  -----
 
     const $searchBarInput = $('#search-bar input[name="keyword"]');
     const $popularSearchesContainer = $('#popular-searches-container');
     const $popularSearchesList = $('#popular-searches-list');
     const $searchForm = $('#search-bar form');
 
-    console.log("디버그: 인기 검색어 컨테이너 찾은 개수:", $popularSearchesContainer.length);
-    console.log("디버그: 인기 검색어 리스트 찾은 개수:", $popularSearchesList.length);
-
     let popularKeywordsData = [];
 
     function fetchAndDisplayPopularKeywords() {
-        console.log("디버그: fetchAndDisplayPopularKeywords 함수 시작.");
-        // 캐시를 사용하지 않고 항상 새로 가져오도록 수정 (디버깅 용도)
-        // if (popularKeywordsData.length === 0) {
-            console.log("디버그: AJAX 요청 시작.");
+        if (popularKeywordsData.length === 0) { // 캐시 사용 활성화
             $.ajax({
                 url: '/search/popular',
                 method: 'GET',
                 success: function (data) {
-                    console.log("디버그: AJAX 요청 성공!", data);
                     popularKeywordsData = data;
                     $popularSearchesList.empty();
                     if (data && data.length > 0) {
@@ -217,28 +209,22 @@ $(document).ready(function () {
                     $popularSearchesContainer.slideDown(120);
                 },
                 error: function (xhr, status, error) {
-                    console.error("디버그: AJAX 요청 실패!", status, error);
                     $popularSearchesList.empty().append('<li><span class="error-msg">인기 검색어를 불러올 수 없습니다.</span></li>');
                     $popularSearchesContainer.slideDown(120);
                 }
             });
-        // } else {
-        //     console.log("디버그: 캐시된 데이터 사용.");
-        //     $popularSearchesList.empty();
-        //     popularKeywordsData.forEach(function (searchItem) {
-        //         const listItem = $('<li><a href="#"></a></li>');
-        //         listItem.find('a').text(searchItem.keyword).attr('data-keyword', searchItem.keyword);
-        //         $popularSearchesList.append(listItem);
-        //     });
-        //     $popularSearchesContainer.slideDown(120);
-        // }
+        } else { // 캐시된 데이터 사용
+            $popularSearchesList.empty();
+            popularKeywordsData.forEach(function (searchItem) {
+                const listItem = $('<li><a href="#"></a></li>');
+                listItem.find('a').text(searchItem.keyword).attr('data-keyword', searchItem.keyword);
+                $popularSearchesList.append(listItem);
+            });
+            $popularSearchesContainer.slideDown(120);
+        }
     }
 
-    console.log("디버그: 검색 입력 필드 jQuery 객체:", $searchBarInput);
-    console.log("디버그: 찾은 입력 필드 개수:", $searchBarInput.length);
-
     $searchBarInput.on('focus', function (event) {
-        console.log("디버그: 검색창 포커스 이벤트 발생!");
         event.stopPropagation();
         fetchAndDisplayPopularKeywords();
     });
