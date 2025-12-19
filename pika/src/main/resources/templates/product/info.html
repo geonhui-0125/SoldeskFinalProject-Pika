@@ -137,8 +137,7 @@
         <!-- 판매자 -->
         <section class="seller-info">
             <h3>판매자</h3>
-            <div class="seller-box">
-                <a th:href="@{/reviews/seller/{sellerId}(sellerId=*{seller.id})}"
+            <div class="seller-box"
                    style="text-decoration: none; color: inherit; display: flex; align-items: center;">
                     <img th:src="@{${productDetailDto.seller.profileImage}}">
                     <div>
@@ -146,9 +145,13 @@
                         <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span
                                 class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
                     </div>
-                </a>
-            </div>
+                </div>
         </section>
+
+        <!-- 리뷰 폼 (상품 구매 후 표시) -->
+        <th:block th:if="${productDetailDto.productStat == 1 and productDetailDto.buyerType == 'buy'}">
+            <div th:insert="~{review/form :: reviewForm(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}"></div>
+        </th:block>
 
     </div>
 </section>
@@ -156,5 +159,6 @@
 
 <script th:src="@{/js/header.js}"></script>
 <script th:src="@{/js/product/info.js}"></script>
+<script th:src="@{/js/review/form.js}"></script>
 </body>
 </html>
