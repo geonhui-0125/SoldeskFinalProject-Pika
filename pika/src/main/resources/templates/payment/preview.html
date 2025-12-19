@@ -173,6 +173,7 @@
     const productTitle = "[[${paymentRequestDto.productTitle}]]";
     const productId = "[[${paymentRequestDto.productId}]]"
     const productAmount = "[[${paymentRequestDto.amount}]]";
+    const buyerId = "[[${paymentRequestDto.buyerId}]]";
     const buyerName = "[[${paymentRequestDto.buyerName}]]";
     const buyerTel = "[[${paymentRequestDto.buyerTel}]]";
     const buyerEmail = "[[${paymentRequestDto.buyerEmail}]]";
@@ -214,7 +215,8 @@
                     response.imp_uid,                       // 결제 고유 코드
                     response.merchant_uid,                  // 상품 고유 코드 + 날짜
                     response.custom_data.taskId,
-                    response.custom_data.actualAmount);     // 검증을 위해 서버로는 실제 상품 가격 전달
+                    response.custom_data.actualAmount,     // 검증을 위해 서버로는 실제 상품 가격 전달
+                    buyerId)
             } else {
                 alert(`결제 실패: ${response.error_msg}`);
             }
@@ -222,11 +224,12 @@
     }
 
     // 백엔드 서버에 결제 검증 요청
-    async function validatePaymentOnServer(impUid, merchantUid, taskId, amount) {
+    async function validatePaymentOnServer(impUid, merchantUid, taskId, amount, userId) {
 
         // 초기화
         const merchantId = merchantUid;
         const actualAmount = amount;
+        const buyerId = userId;
 
         console.log('결제 검증 데이터 확인 : ' + impUid, merchantId, taskId, actualAmount);
 
@@ -243,7 +246,8 @@
                     impUid: impUid,
                     merchantUid: merchantId,
                     taskId: taskId,
-                    amount: actualAmount
+                    amount: actualAmount,
+                    buyerId: buyerId
                 }),
             });
 
@@ -258,7 +262,7 @@
             alert("결제가 완료되었습니다.");
 
             // 상품 구매 확정을 위해 결제한 상품의 고유 코드 전달
-            window.location.href = `/payment/result?impUid=${data.response.impUid}`;
+            window.location.href = `/products/info/${taskId}`;
 
         } catch (e) {
             console.error("서버 검증 실패:", e.message);

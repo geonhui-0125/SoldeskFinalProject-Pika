@@ -26,14 +26,15 @@ public class ProductDetailDto {
     private String category;
     private String categoryOne;
     private String categoryTwo;
+    private int productStat;
+    private String buyerType;
     private int favoriteCnt;
     private boolean wished;
     private int viewCnt;
     private double star;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
     private List<String> images;
     private String timeAgo;
+    private String impUid;
 
     public static String calculateTimeAgo(LocalDateTime createdAt) {
 

@@ -2,26 +2,25 @@ package com.numlock.pika.service.payment;
 
 import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.domain.Payments;
+import com.numlock.pika.domain.Products;
+import com.numlock.pika.dto.payment.PaymentResDto;
 import com.numlock.pika.repository.AccountRepository;
 import com.numlock.pika.repository.PaymentRepository;
+import com.numlock.pika.repository.ProductRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
-import lombok.extern.slf4j.Slf4j;
-import com.numlock.pika.domain.Products;
-import com.numlock.pika.dto.payment.PaymentResDto;
-import com.numlock.pika.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-@Slf4j
 @Service
 public class PaymentApiService {
 
@@ -39,7 +38,7 @@ public class PaymentApiService {
     @Autowired
     private SmsService smsService;
 
-    //생성자로 IamportClient 초기화 
+    //생성자로 IamportClient 초기화
     //불변성 보장, null값 방지
     //properties.application 파일의 포트원 키 정보 가져옴
     public PaymentApiService(@Value("${imp.access}") String apiKey,
@@ -63,15 +62,15 @@ public class PaymentApiService {
         // 결제 검증 데이터 impUid, amount 초기화
         String impUid =  paymentResDto.getImpUid();
         BigDecimal amount = paymentResDto.getAmount();
-        
+
         // 상품 데이터 데이터베이스 조회
-        // taskId(상품 Id) 로 조회 findById 
+        // taskId(상품 Id) 로 조회 findById
         // Optional<> orElseThrow로 상품이 존재하지 않으면 에러 생성
         Optional<Products> productOptional = productRepository.findById(paymentResDto.getTaskId());
         Products product = productOptional.orElseThrow(
                 () -> new IllegalArgumentException("해당 상품은 존재하지 않습니다."));
 
-        //포트원으로 부터 클라이언트가 결제한 impUid(결제 고유 ID)를 전달해 클라이언트 결제 정보 응답 
+        //포트원으로 부터 클라이언트가 결제한 impUid(결제 고유 ID)를 전달해 클라이언트 결제 정보 응답
         IamportResponse<Payment> iamportResponse = iamportClient.paymentByImpUid(impUid);
         Payment paymentData = iamportResponse.getResponse();
 
@@ -106,15 +105,23 @@ public class PaymentApiService {
         return iamportResponse;
     }
 
+    @Transactional
     public void savePaymentInfo(PaymentResDto paymentResDto) {
         Payments payment = Payments.builder()
                 .impUid(paymentResDto.getImpUid())
                 .merchantUid(paymentResDto.getMerchantUid())
                 .taskId(paymentResDto.getTaskId())
                 .amount(paymentResDto.getAmount())
+                .buyerId(paymentResDto.getBuyerId())
                 .build();
 
         paymentRepository.save(payment);
+
+        // 상품 상태를 '결제 진행중'(2)으로 변경
+        Products product = productRepository.findById(paymentResDto.getTaskId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + paymentResDto.getTaskId()));
+        product.setProductState(2);
+        productRepository.save(product);
     }
 
     //주문 결제 환불/취소 시
@@ -134,11 +141,18 @@ public class PaymentApiService {
     }
 
     //주문 결제 확정 시
+    @Transactional
     public String confirmPayment(String impUid) throws IamportResponseException, IOException {
 
         //결제 정보 찾기
         Payments payments = paymentRepository.findById(impUid)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new RuntimeException("결제 정보를 찾을 수 없습니다."));
+
+        // 상품 상태를 '판매완료'(1)로 변경
+        Products product = productRepository.findById(payments.getTaskId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTaskId()));
+        product.setProductState(1);
+        productRepository.save(product);
 
         System.out.println("payments 확인 : " + payments);
 
@@ -157,7 +171,7 @@ public class PaymentApiService {
         System.out.println("계좌 번호 : " + accounts.getAccountNumber());
 
         // 구매 확정을 누르면 판매자에게 메시지를 전송
-        smsService.sendMessage();
+        /*smsService.sendMessage();*/
 
         return "구매 확정이 완료되었습니다";
 

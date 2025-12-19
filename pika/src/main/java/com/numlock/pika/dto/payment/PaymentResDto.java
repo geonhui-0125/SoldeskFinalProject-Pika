@@ -19,5 +19,6 @@ public class PaymentResDto {
     private String merchantUid; //가맹점 주문번호 결제 요청마다 고유하게 지정
     private int taskId; //결제 상품의 고유 ID
     private BigDecimal amount; //결제금액
+    private String buyerId; // 구매자 고유 ID
     
 }

@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -64,12 +66,17 @@ public class PaymentApiController {
     public ResponseEntity<?> confirmPayment(@PathVariable String impUid) {
 
         try {
+
+
             notificationService.sendSoldOut(impUid);
             notificationService.sendSellerSoldOut(impUid);
 
-            String result = paymentApiService.confirmPayment(impUid);
+            String resultMessage = paymentApiService.confirmPayment(impUid);
 
-            return ResponseEntity.ok(result);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", resultMessage);
+
+            return ResponseEntity.ok(response);
 
         } catch (IamportResponseException e) {
             System.out.println("PortOne API 통신 오류 : " + e.getMessage());
