@@ -69,6 +69,9 @@ CREATE TABLE users (
                        role varchar2(20)
 );
 
+INSERT INTO users (id, pw, nickname, profile_image, email, address, phone, birth, role)
+VALUES ('tester1', 'tester1', '테스터1', '/profile/default.jpg', 'tester1@example.com', 'Seoul, Korea', '010-1234-5678', TO_DATE('1990-01-01', 'YYYY-MM-DD'), 'USER');
+
 CREATE TABLE NOTIFICATIONS (
                                NOTIFICATION_ID NUMBER primary key NOT NULL, -- 고유 ID (PK)
                                RECEIVER_ID varchar2(20) NOT NULL, -- 수신자 유저 ID
