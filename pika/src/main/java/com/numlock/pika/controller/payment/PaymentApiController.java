@@ -1,7 +1,9 @@
 package com.numlock.pika.controller.payment;
 
 import com.numlock.pika.domain.Accounts;
+import com.numlock.pika.domain.Payments;
 import com.numlock.pika.dto.payment.PaymentResDto;
+import com.numlock.pika.repository.PaymentRepository;
 import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.payment.PaymentApiService;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -66,8 +68,6 @@ public class PaymentApiController {
     public ResponseEntity<?> confirmPayment(@PathVariable String impUid) {
 
         try {
-
-
             notificationService.sendSoldOut(impUid);
             notificationService.sendSellerSoldOut(impUid);
 
@@ -94,6 +94,18 @@ public class PaymentApiController {
         }
 
     }
+
+    @DeleteMapping("api/payments/cancel")
+    public  String cancelPayment(@RequestBody PaymentResDto paymentResDto) {
+
+        System.out.println("취소할 결제 - impUid : " + paymentResDto.getImpUid());
+
+        int productId = paymentApiService.cancelPayment(paymentResDto.getImpUid());
+
+        return "forward:/products/info/" + productId;
+    }
+
+
 
     /*//결제 취소 로직
     @PostMapping("api/payment/cancel/{impUid}")

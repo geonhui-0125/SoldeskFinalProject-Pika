@@ -55,6 +55,7 @@ public class PaymentApiService {
      * @throws IOException
      */
 
+    @Transactional
     //BigDecimal : 매우 정밀하고 정확한 십진수 연산을 수행하기 위해 제공되는 클래스
     public IamportResponse<Payment> validatePayment(PaymentResDto paymentResDto)
             throws IamportResponseException, IOException {
@@ -87,9 +88,6 @@ public class PaymentApiService {
                 System.out.println("amount : " + amount);
                 System.out.println("actualAmount : " + actualAmount);
 
-                // 금액 불일치 시, 즉시 결제 취소(환불) 로직 호출
-                cancelPayment(impUid);
-
                 throw new RuntimeException("결제 금액이 서버와 불일치 합니다.");
             }
             // 만약 금액이 일치하면 데이터 베이스에 결제 정보 저장
@@ -97,8 +95,6 @@ public class PaymentApiService {
 
         } else {
             // 결제 데이터가 존재하지 않음 (오류) 결제가 안된 경우일 확률이 높아서 안돌아갈 가능성이 높음
-            cancelPayment(impUid);
-
             throw new RuntimeException("유효하지 않은 결제 정보입니다.");
         }
 
@@ -122,22 +118,6 @@ public class PaymentApiService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + paymentResDto.getTaskId()));
         product.setProductState(2);
         productRepository.save(product);
-    }
-
-    //주문 결제 환불/취소 시
-    public IamportResponse<Payment> cancelPayment(String impUid) throws IamportResponseException, IOException {
-
-        CancelData cancelData = new CancelData(impUid, true); // amount를 생략하면 전액 취소
-
-        IamportResponse<Payment> cancelResponse = iamportClient.cancelPaymentByImpUid(cancelData);
-
-        if (cancelResponse.getResponse() != null) {
-            System.out.println("결제 취소 성공 : " + cancelResponse.getResponse());
-
-            return cancelResponse;
-        } else {
-            throw new RuntimeException("결제 취소 실패 : " + cancelResponse.getMessage());
-        }
     }
 
     //주문 결제 확정 시
@@ -175,6 +155,23 @@ public class PaymentApiService {
 
         return "구매 확정이 완료되었습니다";
 
+    }
+
+    public int cancelPayment(String impUid) {
+
+        Payments payments = paymentRepository.findById(impUid)
+                .orElseThrow(() -> new RuntimeException("결제 내역을 찾을 수 없습니다."));
+
+        System.out.println("payments : " + payments);
+
+        Products product = productRepository.findById(payments.getTaskId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTaskId()));
+        product.setProductState(0);
+        productRepository.save(product);
+
+        paymentRepository.delete(payments);
+
+        return product.getProductId();
     }
 
 }

@@ -13,12 +13,22 @@
 /*******************************
  Breadcrumb
 ********************************/
+.breadcrumb {
+    display: flex;
+    justify-content: space-between;
+}
+
 .breadcrumb ul {
     display: flex;
     gap: 8px;
     font-size: 0.9em;
     color: #666;
     margin-bottom: 25px;
+}
+
+#product-update {
+    font-size: 0.9em;
+    color: #666;
 }
 
 /*******************************

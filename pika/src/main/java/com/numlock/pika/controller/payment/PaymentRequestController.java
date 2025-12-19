@@ -5,8 +5,7 @@ import com.numlock.pika.service.payment.PaymentRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -27,15 +26,6 @@ public class PaymentRequestController {
         model.addAttribute("paymentRequestDto", paymentRequestDto);
         // 상품 결제 미리보기 페이지 리턴
         return "payment/preview";
-    }
-
-    //결제 결과 화면 이동
-    @GetMapping("/payment/result")
-    public String getPaymentResult(@RequestParam("impUid") String impUid, Model model) {
-
-        model.addAttribute("impUid", impUid);
-
-        return "payment/result";
     }
 
 }
