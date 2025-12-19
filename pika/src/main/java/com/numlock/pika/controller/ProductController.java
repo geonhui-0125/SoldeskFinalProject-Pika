@@ -140,6 +140,8 @@ public class ProductController {
     @GetMapping("/info/{id}")
     public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
 
+        productService.upView(id);
+
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
         model.addAttribute("categoriesMap", categoriesMap);
 

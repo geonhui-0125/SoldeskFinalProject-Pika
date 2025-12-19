@@ -84,6 +84,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    public void upView(int productId) {
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + productId));
+        product.setViewCnt(product.getViewCnt() + 1);
+        productRepository.save(product);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProductDto getProductById(int productId) {
         // Repository의 findById가 int를 받도록 가정
