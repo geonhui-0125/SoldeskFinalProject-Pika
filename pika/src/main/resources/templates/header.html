@@ -50,7 +50,7 @@
 				<ul id="main-nav-menu">
 					<li sec:authorize="isAuthenticated()" th:if="${user}">
 					<a th:href="@{/chat/userList}">채팅</a></li>
-                    <li id="notification-btn" >
+                    <li id="notification-btn" sec:authorize="isAuthenticated()" th:if="${user}">
                         <a href="#">알림</a>
                         <span id="notification-count" class="notification-count">0</span>
                         <div id="notification-list">

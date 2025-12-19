@@ -222,3 +222,16 @@
 .product-submit-btn:hover {
     background: #e63e00;
 }
+
+.invalid {
+    border: 2px solid #ff4d4f !important;
+    background-color: #fff2f0 !important;
+}
+
+/* 선택 사항: 입력창 아래 에러 메시지를 띄우고 싶을 때 */
+.error-text {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
