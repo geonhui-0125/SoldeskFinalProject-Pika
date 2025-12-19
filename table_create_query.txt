@@ -189,12 +189,15 @@ CREATE TABLE favorite_products (
 
 create table reviews (
                          review_id number primary key,
+                         product_id number not null, 
                          seller_id varchar2(20) not null,
                          reviewer_id varchar2(20) not null,
                          score number not null,
                          content varchar2(1000 CHAR) not null,
                          created_at DATE not null,
                          updated_at DATE not null,
+                         foreign key (product_id)
+                             references products (product_id) ON DELETE CASCADE,
                          foreign key (reviewer_id)
                              references users (id) ON DELETE CASCADE,
                          foreign key (seller_id)

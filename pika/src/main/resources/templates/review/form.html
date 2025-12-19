@@ -1,5 +1,5 @@
 <div class="review-form-container" th:fragment="reviewForm(productId, sellerId)">
-    <h1>새 리뷰 작성</h1>
+    <h1>새 리뷰 작성하기</h1>
 
     <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
 
@@ -16,12 +16,20 @@
         </div>
         <!-- user_id는 Principal에서 가져오므로 폼에 노출하지 않음 -->
         <div>
-            <label for="score">별점 (1-5):</label>
-            <input type="number" id="score" th:field="*{score}" min="1" max="5" required>
+            <div style="display: flex; align-items: center;">
+                <span>별점 (1-5):</span>
+                <div class="star-rating">
+                                    <input type="radio" id="star1" name="score" value="1" /><label for="star1" title="1점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star2" name="score" value="2" /><label for="star2" title="2점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star3" name="score" value="3" /><label for="star3" title="3점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star4" name="score" value="4" /><label for="star4" title="4점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star5" name="score" value="5" /><label for="star5" title="5점"><i class="fa-solid fa-star"></i></label>                </div>
+            </div>
+            <input type="hidden" id="scoreValue" th:field="*{score}" />
         </div>
         <div>
             <label for="content">리뷰 내용:</label>
-            <textarea id="content" th:field="*{content}" rows="3" cols="30" maxlength="1000"></textarea>
+            <textarea id="content" th:field="*{content}" rows="10" cols="30" maxlength="1000"></textarea>
         </div>
         <div>
             <input type="submit" value="리뷰 제출">
