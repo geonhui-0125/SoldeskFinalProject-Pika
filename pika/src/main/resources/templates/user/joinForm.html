@@ -81,10 +81,10 @@
                 <input type="text" id="nickname" th:field="*{nickname}" required/>
                 <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="field-error"></span>
             </div>
-            <!--<div class="form-group">
+            <div class="form-group">
                 <label for="profileImageFile">프로필 이미지:</label>
                 <input type="file" id="profileImageFile" name="profileImageFile"/>
-            </div>-->
+            </div>
             <div class="form-group">
                 <label for="email">이메일:</label>
                 <input type="email" id="email" th:field="*{email}" required/>

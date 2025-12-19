@@ -88,7 +88,7 @@ public class PaymentApiController {
 
         } catch (RuntimeException e) {
             // 주로 PaymentService에서 금액 불일치 시 던지는 예외
-            System.out.println("결제 취소 실패 : " + e.getMessage());
+            System.out.println("결제 확정 실패 : " + e.getMessage());
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 
         }
