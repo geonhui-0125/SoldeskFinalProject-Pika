@@ -73,10 +73,13 @@
 
     <!-- 1. 등록한 상품 (My Products) -->
     <div class="product-block">
-        <h1 class="product-block-title">내 상품 관리 <span th:text="'(' + ${#lists.size(myProducts)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
-        
-        <table th:if="${!#lists.isEmpty(myProducts)}">
-            <thead>
+        <h1 class="product-block-title">
+            내 상품 관리 <span th:text="'(' + ${#lists.size(myProducts)} + ')'" style="font-size:0.7em; color:#888;"></span>
+        </h1>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(myProducts)}">
+            <table>
+                <thead>
                 <tr>
                     <th style="width: 80px;">이미지</th>
                     <th>상품명</th>
@@ -84,8 +87,8 @@
                     <th>상태</th>
                     <th>관리</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr th:each="p : ${myProducts}">
                     <td><img th:src="${p.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
                     <td style="text-align: left;">
@@ -106,8 +109,9 @@
                         </form>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
         <div th:if="${#lists.isEmpty(myProducts)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
             등록된 상품이 없습니다.
         </div>
@@ -116,17 +120,18 @@
     <!-- 2. 찜 목록 (Wishlist) -->
     <div class="product-block">
         <h1 class="product-block-title">찜한 상품 <span th:text="'(' + ${#lists.size(wishlist)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
-        
-        <table th:if="${!#lists.isEmpty(wishlist)}">
-            <thead>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(wishlist)}">
+            <table>
+                <thead>
                 <tr>
                     <th style="width: 80px;">이미지</th>
                     <th>상품명</th>
                     <th>가격</th>
                     <th>관리</th>
                 </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
                 <tr th:each="w : ${wishlist}">
                     <td><img th:src="${w.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
                     <td style="text-align: left;">
@@ -138,8 +143,9 @@
                         <button class="btn-action btn-danger" th:onclick="'deleteWish(' + ${w.productId} + ')'">찜 취소</button>
                     </td>
                 </tr>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
         <div th:if="${#lists.isEmpty(wishlist)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
             찜한 상품이 없습니다.
         </div>
@@ -148,20 +154,22 @@
     <!-- 3. 상점 후기 (Reviews) -->
     <div class="product-block">
         <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
-        
-        <div class="review-list" th:if="${!#lists.isEmpty(myReviews)}">
-            <div th:each="r : ${myReviews}" class="review-card">
-                <div class="review-header">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <img th:if="${r.profileImage != null}" th:src="${r.profileImage}" style="width: 24px; height: 24px; border-radius: 50%;" onerror="this.src='/images/no-image.png'">
-                        <strong th:text="${r.userId}" style="color: #333;">작성자</strong>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(myReviews)}">
+            <div class="review-list">
+                <div th:each="r : ${myReviews}" class="review-card">
+                    <div class="review-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img th:if="${r.profileImage != null}" th:src="${r.profileImage}" style="width: 24px; height: 24px; border-radius: 50%;" onerror="this.src='/images/no-image.png'">
+                            <strong th:text="${r.userId}" style="color: #333;">작성자</strong>
+                        </div>
+                        <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
                     </div>
-                    <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                    <div style="margin-bottom: 8px;">
+                        <span class="score">★ <span th:text="${r.score}">5</span></span>
+                    </div>
+                    <p th:text="${r.content}" style="color: #555; line-height: 1.5; margin: 0;">후기 내용</p>
                 </div>
-                <div style="margin-bottom: 8px;">
-                    <span class="score">★ <span th:text="${r.score}">5</span></span>
-                </div>
-                <p th:text="${r.content}" style="color: #555; line-height: 1.5; margin: 0;">후기 내용</p>
             </div>
         </div>
         <div th:if="${#lists.isEmpty(myReviews)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">

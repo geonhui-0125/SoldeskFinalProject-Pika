@@ -30,6 +30,12 @@
                 <span th:text="*{categoryTwo}"></span>
             </li>
         </ul>
+        <th:block th:if="*{buyerType == 'sell'}">
+            <div id="product-update"
+                 th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">
+                수정
+            </div>
+        </th:block>
     </nav>
 
     <!-- 상단 영역 -->
@@ -91,27 +97,7 @@
                             <th:block th:if="${type == 'buy'}">
                                 <input type="hidden" id="impUid" th:value="*{impUid}" />
                                 <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
-                                <script th:inline="javascript">
-                                /*<![CDATA[*/
-                                    async function onclickConfirmPayment() {
-                                        const impUid = document.getElementById('impUid').value;
-                                        if (!impUid) {
-                                            alert("결제 정보를 찾을 수 없습니다.");
-                                            return;
-                                        }
-                                        try {
-                                            const serverResponse = await fetch(`/api/payment/confirm/${impUid}`, { method: "POST" });
-                                            const data = await serverResponse.json();
-                                            if (!serverResponse.ok) { throw new Error(data.message || '서버 검증 응답 오류'); }
-                                            alert("구매 확정 성공!");
-                                            window.location.reload();
-                                        } catch (e) {
-                                            console.error("서버 검증 실패:", e);
-                                            alert('구매 확정 실패: ' + e.message);
-                                        }
-                                    }
-                                /*]]>*/
-                                </script>
+                                <button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>
                             </th:block>
                             <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품예약중</button>
                         </th:block>
