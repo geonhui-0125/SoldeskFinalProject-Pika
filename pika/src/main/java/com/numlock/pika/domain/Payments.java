@@ -28,4 +28,7 @@ public class Payments {
     @Column(name = "amount")
     private BigDecimal amount; // 포트원에서 보낸 결제 가격
 
+    @Column(name = "buyer_id")
+    private String buyerId; // 포트원에서 보낸 구매자 고유 ID
+
 }

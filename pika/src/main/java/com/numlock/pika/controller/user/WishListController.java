@@ -71,7 +71,7 @@ public class WishListController {
 	@GetMapping("mypage")
 	public String myPage(Principal principal, Model model) {
 		if (principal == null) {
-			return "redirect:/";
+			return "redirect:/user/login";
 		}
 		String userId = principal.getName();
 

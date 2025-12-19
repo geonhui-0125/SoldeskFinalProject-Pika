@@ -9,9 +9,9 @@ document.querySelectorAll('.thumbnail').forEach(img => {
     });
 });
 
-document.querySelector(".like-btn").addEventListener('click', () => {
+document.querySelector(".wish-btn").addEventListener('click', () => {
 
-    const likeButton = document.querySelector(".like-btn");
+    const likeButton = document.querySelector(".wish-btn");
     const productId = document.querySelector('.product-id').value;
     const wishedInput = document.querySelector('.wished'); // <input> 태그
 

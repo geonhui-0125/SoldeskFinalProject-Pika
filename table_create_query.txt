@@ -173,7 +173,8 @@ create table payments (
                           imp_uid varchar2(50) primary key,
                           merchant_uid varchar2(50) not null,
                           task_id NUMBER not null,
-                          amount NUMBER not null
+                          amount NUMBER not null,
+                          buyer_id varchar2(50) NOT NULL
 );
 
 CREATE TABLE favorite_products (
@@ -210,9 +211,9 @@ create table accounts(
 );
 
 CREATE TABLE search (
-	search_id NUMBER(19) NOT NULL PRIMARY KEY,
-	keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
-	search_count NUMBER(19) DEFAULT 0 NOT NULL
+                        search_id NUMBER(19) NOT NULL PRIMARY KEY,
+                        keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
+                        search_count NUMBER(19) DEFAULT 0 NOT NULL
 );
 
 
