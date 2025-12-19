@@ -91,6 +91,7 @@
                     <td style="text-align: left;">
                         <a th:href="@{/products/info/{id}(id=${p.productId})}" th:text="${p.title}" style="font-weight: 600;">상품명</a>
                         <div style="font-size: 0.8em; color: #999; margin-top: 4px;" th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일</div>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${p.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
                     </td>
                     <td th:text="${#numbers.formatInteger(p.price, 0, 'COMMA')} + '원'">가격</td>
                     <td>
@@ -130,6 +131,7 @@
                     <td><img th:src="${w.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
                     <td style="text-align: left;">
                         <a th:href="@{/products/info/{id}(id=${w.productId})}" th:text="${w.title}" style="font-weight: 600;">상품명</a>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${w.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
                     </td>
                     <td th:text="${#numbers.formatInteger(w.price, 0, 'COMMA')} + '원'">가격</td>
                     <td>
