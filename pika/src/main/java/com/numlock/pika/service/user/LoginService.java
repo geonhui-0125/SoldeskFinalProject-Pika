@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class LoginService {
 
     private final UserRepository userRepository;
@@ -18,11 +17,14 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
 
     //ID,닉네임,이메일 중복 검사
+    @Transactional(readOnly = true)
     public boolean checkUser(String id) {
         return userRepository.existsById(id);
     }
+    @Transactional(readOnly = true)
     public boolean checkNickname(String nickname) {
         return userRepository.existsByNickname(nickname);}
+    @Transactional(readOnly = true)
     public boolean checkEmail(String email) {
         return userRepository.existsByEmail(email);
     }
