@@ -1,5 +1,6 @@
 package com.numlock.pika.controller;
 
+import com.numlock.pika.domain.Search;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.product.SearchService;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -34,5 +36,11 @@ public class SearchController {
         model.addAttribute("activeCategory", categoryName); //현재 카테고리 표시
 
         return "product/search";
+    }
+
+    @GetMapping("/popular")
+    @ResponseBody //JSON 데이터 직접 반환
+    public List<Search> getPopularKeywordsApi(){
+        return searchService.getPopularKeywords();
     }
 }

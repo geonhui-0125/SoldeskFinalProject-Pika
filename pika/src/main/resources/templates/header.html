@@ -33,17 +33,33 @@
                         <img th:src="@{/icon/search.svg}" alt="검색">
                     </button>
                 </form>
+                <div id="popular-searches-container" style="display: none;">
+                    <h5>인기 검색어</h5>
+                    <ul id="popular-searches-list">
+                    </ul>
+                </div>
             </div>
 
-            <ul id="main-nav-menu">
-                <li sec:authorize="isAuthenticated()" th:if="${user}">
-                    <a th:href="@{/chat/userList}">채팅</a>
-                </li>
-                <li><a th:href="@{/products/new}">판매하기</a></li>
-                <li><a th:href="@{/user/mypage}">마이페이지</a></li>
-            </ul>
-        </div>
-    </div>
+				<ul id="main-nav-menu">
+					<li sec:authorize="isAuthenticated()" th:if="${user}">
+					<a th:href="@{/chat/userList}">채팅</a></li>
+                    <li id="notification-btn" >
+                        <a href="#">알림</a>
+                        <span id="notification-count" class="notification-count">0</span>
+                        <div id="notification-list">
+                            <ul id="notification-items">
+                            </ul>
+                            <div id="notification-pagination">
+                                <button id="prev-notification-page">이전</button>
+                                <button id="next-notification-page">다음</button>
+                            </div>
+                        </div>
+                    </li>
+					<li><a th:href="@{/products/new}">판매하기</a></li>
+					<li><a th:href="@{/user/mypage}">마이페이지</a></li>
+				</ul>
+			</div>
+		</div>
 
     <div id="category-bar">
         <div id="category-wrapper">
@@ -67,8 +83,11 @@
                 </div>
             </div>
         </div>
+        <!-- 상품 리스트 (관리자용) 버튼 - currentUserRole이 ADMIN일 때만 표시 -->
+        <a th:if="${currentUserRole != null and currentUserRole == 'ADMIN'}" th:href="@{/products}" class="nav-link" style="margin-left: auto; align-self: center; padding: 0 15px;">상품 리스트 (관리자용)</a>
     </div>
 
+    <!-- 오른쪽 고정 메뉴 -->
     <div id="header-bottom-menu">
         <div id="favorite-link">
             <p>찜한 상품</p>
@@ -76,6 +95,7 @@
         </div>
         <div id="top-link">TOP</div>
     </div>
+
 </header>
 </body>
 </html>
