@@ -164,20 +164,5 @@
 </section>
 
 <script th:src="@{/js/header.js}"></script>
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    $(document).ready(function () {
-        const activeCategory = /*[[${activeCategory}]]*/ null;
-        if (activeCategory){
-            const searchForm = $('#search-bar form');
-            const keywordInput = $('#search-bar input[name="keyword"]');
-            //카테고리로 검색범위 제한
-            searchForm.append('<input type="hidden" name="category" value="' +activeCategory +'">');
-            //카테고리 진입 시 '(카테고리명) + 상품검색' 표기
-            keywordInput.attr('placeholder', activeCategory + '상품 검색');
-        }
-    });
-    /*]]>*/
-</script>
 </body>
 </html>
