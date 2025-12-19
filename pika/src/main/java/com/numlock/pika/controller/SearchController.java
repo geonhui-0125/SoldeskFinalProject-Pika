@@ -2,6 +2,7 @@ package com.numlock.pika.controller;
 
 import com.numlock.pika.domain.Search;
 import com.numlock.pika.dto.ProductDto;
+import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.product.SearchService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/search")
@@ -21,6 +23,7 @@ public class SearchController {
 
     private final ProductService productService;
     private final SearchService searchService;
+    private final CategoryService categoryService;
 
     //검색용 메소드
     @GetMapping
@@ -28,6 +31,9 @@ public class SearchController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "category", required = false) String categoryName,
             Model model){
+
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
 
         searchService.processSearch(keyword);
         List<ProductDto> productList = productService.searchProducts(keyword, categoryName);
