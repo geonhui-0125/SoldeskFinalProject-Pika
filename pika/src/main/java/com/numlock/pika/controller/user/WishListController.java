@@ -1,10 +1,12 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.dto.ReviewResponseDto;
+import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.ReviewService;
 import com.numlock.pika.service.product.ProductService;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,7 @@ public class WishListController {
 	private final FavoriteProductService favoriteProductService;
 	private final ProductService productService;
 	private final ReviewService reviewService;
+	private final CategoryService categoryService;
 
 	@GetMapping("wishlist")
 	public String wishlist(Principal principal, Model model) {
@@ -71,6 +74,10 @@ public class WishListController {
 			return "redirect:/";
 		}
 		String userId = principal.getName();
+
+		// Header
+		Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+		model.addAttribute("categoriesMap", categoriesMap);
 
 		// User Info
 		Users user = userRepository.findById(userId).orElse(null);
