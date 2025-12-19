@@ -19,8 +19,9 @@ public interface ProductService {
 
     Page<ProductDto> getProductList(Pageable pageable);
 
-    void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images);
+    Page<ProductDto> searchProducts(String keyword, String categoryName, Pageable pageable);
 
+    void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images);
 
     List<String> getImageUrls(String folderUrl);
 
@@ -29,6 +30,5 @@ public interface ProductService {
     void updateProduct(int productId, ProductRegisterDto productDto, Principal principal);
     void deleteProduct(int productId, Principal principal);
 
-    List<ProductDto> searchProducts (String keyword, String categoryName); //검색용 메소드
 }
 

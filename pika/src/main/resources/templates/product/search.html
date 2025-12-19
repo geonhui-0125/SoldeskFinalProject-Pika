@@ -161,6 +161,25 @@
             <p>조건에 맞는 상품이 아직 없습니다.</p>
         </div>
     </div>
+
+    <div class="pagination" th:if="${totalPages > 0}" style="text-align: center; margin-top: 50px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+
+        <a th:if="${startPage > 1}"
+           th:href="@{/products/search(page=${startPage - 2}, size=${pageSize}, keyword=${keyword}, category=${activeCategory})}"
+           style="text-decoration: none; color: #333; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px;">&laquo;</a>
+
+        <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+        <a th:href="@{/products/search(page=${i - 1}, size=${pageSize}, keyword=${keyword}, category=${activeCategory})}"
+           th:text="${i}"
+           th:styleappend="${(i - 1) == currentPage} ? 'background-color: #ff4500; color: white; border-color: #ff4500;' : ''"
+           style="text-decoration: none; color: #333; padding: 5px 12px; border: 1px solid #ddd; border-radius: 4px;"></a>
+    </span>
+
+        <a th:if="${endPage < totalPages}"
+           th:href="@{/products/search(page=${endPage}, size=${pageSize}, keyword=${keyword}, category=${activeCategory})}"
+           style="text-decoration: none; color: #333; padding: 5px 10px; border: 1px solid #ddd; border-radius: 4px;">&raquo;</a>
+    </div>
+    
 </section>
 
 <script th:src="@{/js/header.js}"></script>

@@ -171,13 +171,18 @@
     </div>
 
     <div class="pagination" th:if="${totalPages > 0}">
-        <a th:if="${currentPage > 0}" th:href="@{/(page=${currentPage - 1}, size=${pageSize})}">&laquo;</a>
-        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-            <a th:href="@{/(page=${i}, size=${pageSize})}"
-               th:text="${i + 1}"
-               th:classappend="${i == currentPage} ? 'active' : ''"></a>
-        </span>
-        <a th:if="${currentPage < totalPages - 1}" th:href="@{/(page=${currentPage + 1}, size=${pageSize})}">&raquo;</a>
+        <a th:if="${startPage > 1}"
+           th:href="@{/(page=${startPage - 2}, size=${pageSize})}">&laquo; 이전</a>
+
+        <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+        <a th:href="@{/(page=${i - 1}, size=${pageSize})}"
+           th:text="${i}"
+           th:classappend="${(i - 1) == currentPage} ? 'active' : ''"></a>
+    </span>
+
+        <a th:if="${endPage < totalPages}"
+           th:href="@{/(page=${endPage}, size=${pageSize})}">다음 &raquo;</a>
+    </div>
     </div>
 </section>
 

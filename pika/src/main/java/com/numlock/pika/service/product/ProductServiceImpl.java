@@ -251,34 +251,32 @@ public class ProductServiceImpl implements ProductService {
 
     //검색용 메소드
     @Override
-    public List<ProductDto> searchProducts(String keyword, String categoryName) {
-        // 1. Repository에서 필터링된 엔티티 리스트 조회
-        List<Products> productsList = productRepository.searchByFilters(keyword, categoryName);
+    public Page<ProductDto> searchProducts(String keyword, String categoryName, Pageable pageable) {
+        // 1. Repository에서 페이징이 적용된 엔티티 Page 조회 (pageable 전달 필수)
+        Page<Products> productsPage = productRepository.searchByFilters(keyword, categoryName, pageable);
 
-        List<ProductDto> dtoList = new ArrayList<>();
-
-        for (Products product : productsList) {
+        // 2. Page 객체의 map 기능을 사용하여 Entity를 DTO로 변환
+        return productsPage.map(product -> {
             ProductDto dto = new ProductDto();
-
-            // 엔티티 필드명에 맞춰 매핑
             dto.setProductId(product.getProductId());
             dto.setTitle(product.getTitle());
             dto.setPrice(product.getPrice());
             dto.setCreatedAt(product.getCreatedAt());
-            dto.setProductImage(getImageUrls(product.getProductImage()).get(0));
 
-            // 3. 카테고리 처리 (Products -> Categories -> category 문자열)
+            // 이미지 처리
+            List<String> images = getImageUrls(product.getProductImage());
+            if (images != null && !images.isEmpty()) {
+                dto.setProductImage(images.get(0));
+            }
+
+            // 카테고리 처리
             if (product.getCategory() != null) {
-                // ProductDto의 카테고리 설정 메서드 이름이 다를 수 있으니 확인하세요!
-                // 보통 dto.setCategory() 혹은 dto.setCategoryName() 일 것입니다.
                 dto.setCategoryId(product.getCategory().getCategoryId());
             }
 
-            dtoList.add(dto);
-        }
-        return dtoList;
+            return dto;
+        });
     }
-
     public String saveImages(List<MultipartFile> images) throws IOException {
         String folderName = UUID.randomUUID().toString();
         Path dirPath = Paths.get(uploadPath, folderName);
