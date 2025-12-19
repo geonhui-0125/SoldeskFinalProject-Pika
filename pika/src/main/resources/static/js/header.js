@@ -55,39 +55,6 @@ $(document).ready(function () {
     });
 
     /*******************************
-     카테고리 검색기능
-     *******************************/
-
-    const $searchCategoryDisplay = $('#search-category-display');
-    const $searchCategoryDisplaySpan = $('#search-category-display span');
-    const $searchCategoryInput = $('#search-category-input');
-    const $categoryDropdown = $('#category-dropdown');
-
-    //메인 카테고리 및 서브 카테고리 링크 클릭 시
-    $('#category-dropdown').on('click', '.category-item a, .submenu a', function (event){
-        event.preventDefault(); //기본 링크 이동 방지
-        event.stopPropagation(); //상위 요소로의 이벤트 버블링 방지
-
-        const fullCategoryName = $(this).text(); //메인 or 메인>서브 카테고리
-        const categoryValue = $(this).data('category-value');
-
-        $searchCategoryDisplaySpan.text(fullCategoryName); //선택한 카테고리 표시
-        $searchCategoryInput.val(categoryValue) //검색 폼 hidden input 값 업데이트(data-category-value사용)
-        $categoryDropdown.slideUp(120); //카테고리 드롭다운
-        $searchForm.submit(); //키워드 없이 카테고리만으로 검색 실행
-    });
-
-    //"전체" 카테고리 표시 클릭시 필터 초기화
-    $searchCategoryDisplay.on('click', function (event){
-        if($searchCategoryDisplaySpan.text() !== '전체'){
-            event.stopPropagation();
-            $searchCategoryDisplaySpan.text('전체');
-            $searchCategoryInput.val(''); //hidden input 값 초기화
-            $searchForm.submit();
-        }
-    });
-
-    /*******************************
      알림(Notification)
      ********************************/
 
