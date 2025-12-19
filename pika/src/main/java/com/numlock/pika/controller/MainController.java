@@ -27,11 +27,28 @@ public class MainController {
 
     @GetMapping("/")
     public String home(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "10") int size,
+                       @RequestParam(defaultValue = "20") int size,
                        Principal principal,
                        Model model) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productService.getProductList(pageable);
+
+        //페이징 블록 계산 로직 ---
+        int blockLimit = 10;
+        int totalPages = productPage.getTotalPages();
+        int currentPage = productPage.getNumber();
+
+        // 시작 페이지 계산 (1, 11, 21...)
+        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
+
+        // 끝 페이지 계산 (10, 20, 30...)
+        int endPage = Math.min((startPage + blockLimit - 1), totalPages);
+
+        // 페이지가 아예 없을 때 에러 방지
+        if (totalPages == 0) endPage = startPage;
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
         // 1. 카테고리 맵 추가 (헤더용)
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();

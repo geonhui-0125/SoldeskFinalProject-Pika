@@ -41,27 +41,48 @@ public class ProductController {
     @GetMapping("/search")
     public String searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
                                  @RequestParam(value = "category", required = false) String category,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "15") int size,
                                  Model model, Principal principal) {
 
-        // 헤더 카테고리 메뉴 구성을 위한 데이터
-        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-        model.addAttribute("categoriesMap", categoriesMap);
+        // 1. 페이징 설정 (한 페이지 15개)
+        Pageable pageable = PageRequest.of(page, size);
 
-        // 검색 로직 수행 (Service에서 keyword와 category를 처리)
-        List<ProductDto> products = productService.searchProducts(keyword, category);
+        // 2. 검색 로직 수행 (Service 메서드가 Page<ProductDto>를 반환하도록 수정되어야 함)
+        Page<ProductDto> productPage = productService.searchProducts(keyword, category, pageable);
 
-        model.addAttribute("products", products);
+        // 3. 페이징 블록 계산 (10개 단위)
+        int blockLimit = 10;
+        int totalPages = productPage.getTotalPages();
+        int currentPage = productPage.getNumber();
+
+        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
+        int endPage = Math.min((startPage + blockLimit - 1), totalPages);
+
+        if (totalPages == 0) endPage = startPage;
+
+        // 4. 모델 데이터 추가
+        model.addAttribute("products", productPage.getContent()); // 실제 상품 리스트
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("pageSize", size);
+
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeCategory", category);
 
-        // 헤더 사용자 프로필 처리를 위한 로직
+        // 헤더 및 사용자 정보 (기존 로직 유지)
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
         if (principal != null) {
             userRepository.findById(principal.getName()).ifPresent(user -> {
                 model.addAttribute("user", user);
             });
         }
 
-        return "product/search"; // search.html 렌더링
+        return "product/search";
     }
 
     /**
@@ -70,16 +91,35 @@ public class ProductController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "10") int size,
+                       @RequestParam(defaultValue = "20") int size,
                        Model model) {
 
+        // 1. 페이지 요청 생성 (한 페이지에 15개씩)
         Pageable pageable = PageRequest.of(page, size);
         Page<ProductDto> productPage = productService.getProductList(pageable);
 
+        // 2. 페이징 블록 계산 로직 (10개 단위)
+        int blockLimit = 10; // 하단에 보여줄 페이지 번호 개수
+        int totalPages = productPage.getTotalPages();
+        int currentPage = productPage.getNumber(); // 0부터 시작
+
+        // 현재 페이지가 속한 블록의 시작 번호 (1, 11, 21...)
+        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
+
+        // 현재 페이지가 속한 블록의 끝 번호 (10, 20, 30...)
+        int endPage = Math.min((startPage + blockLimit - 1), totalPages);
+
+        // 만약 totalPages가 0일 경우 endPage가 startPage보다 작아지는 것 방지
+        if (totalPages == 0) endPage = startPage;
+
+        // 3. 모델에 데이터 추가
         model.addAttribute("products", productPage.getContent());
-        model.addAttribute("currentPage", productPage.getNumber());
-        model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("pageSize", productPage.getSize());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("pageSize", size);
+
+        model.addAttribute("startPage", startPage); // 시작 페이지 번호 추가
+        model.addAttribute("endPage", endPage);     // 끝 페이지 번호 추가
 
         return "product/list";
     }
