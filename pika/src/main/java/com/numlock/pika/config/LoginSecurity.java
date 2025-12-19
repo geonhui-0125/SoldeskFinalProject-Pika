@@ -31,7 +31,7 @@ public class LoginSecurity {
                 /*.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/icon/**", "/upload/**", "/profile/**").permitAll()
                         .requestMatchers("/", "/user/login", "/user/join", "/search/**", "/products/info/**").permitAll()
-                        //마이페이지, 상품등록 가입사용자 모두 접근 가능(USER/GUEST 권환 분리 논의 필요)
+                        //마이페이지, 상품등록 가입사 용자 모두 접근 가능(USER/GUEST 권환 분리 논의 필요)
                         .requestMatchers("/user/mypage/**", "/products/new").hasAnyRole("USER", "GUEST", "ADMIN")
                         .anyRequest().authenticated() //나머지는 인증 필요
                 )*/

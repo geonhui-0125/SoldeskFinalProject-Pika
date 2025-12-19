@@ -63,6 +63,7 @@ public class LoginController {
             user.setNickname(userDto.getNickname());
             user.setEmail(userDto.getEmail());
 
+            /*
             String profileImagePath = null;
             // 1. 프로필 이미지 비어있이 않으면 저장
             if(profileImageFile != null && !profileImageFile.isEmpty()) {
@@ -72,6 +73,8 @@ public class LoginController {
             if (profileImagePath == null) {
                 profileImagePath = "/profile/default-profile.jpg"; // 기본 이미지 경로
             }
+            */
+            String profileImagePath = "/profile/default-profile.jpg";
             user.setProfileImage(profileImagePath);
             // 3. 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
@@ -79,12 +82,12 @@ public class LoginController {
             loginService.joinUser(user);
             log.info("User {} joined successfully.", user.getId());
 
-        } catch (IOException e) {
+        /*} catch (IOException e) {
             log.error("--- IOException Occurred ---", e);
             log.error("File upload failed for user {}: {}", userDto.getId(), e.toString());
             model.addAttribute("errorMessage", "프로필 이미지 업로드에 실패했습니다.");
             model.addAttribute("user", userDto);
-            return "user/joinForm";
+            return "user/joinForm";*/
         } catch (Exception e) {
             log.error("--- Exception Occurred ---", e);
             model.addAttribute("errorMessage", "입력된 정보가 올바르지 않습니다. " + e.getMessage()); // 오류 메시지 복원

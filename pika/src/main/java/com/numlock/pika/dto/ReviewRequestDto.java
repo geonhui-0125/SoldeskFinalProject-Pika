@@ -13,4 +13,5 @@ public class ReviewRequestDto {
     private String userId;
     private Integer score;
     private String content;
+    private Integer productId;
 }

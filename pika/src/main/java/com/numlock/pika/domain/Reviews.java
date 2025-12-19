@@ -12,10 +12,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder // @Builder는 @AllArgsConstructor를 포함하므로 명시적인 추가 불필요
+@NoArgsConstructor // Lombok이 빌더 패턴과 함께 자동으로 생성하지 않으므로 추가
+@AllArgsConstructor // Lombok이 빌더 패턴과 함께 자동으로 생성하지 않으므로 추가
 @ToString
-@Builder
 public class Reviews {
 
     @Id
@@ -23,6 +23,10 @@ public class Reviews {
     @SequenceGenerator(name = "seq_reviews", sequenceName = "seq_reviews", allocationSize = 1)
     @Column(name = "review_id")
     private Long reviewId;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Products product; // 리뷰 대상 상품 ID
 
     @ManyToOne
     @JoinColumn(name = "seller_id")
