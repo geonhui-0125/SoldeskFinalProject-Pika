@@ -14,17 +14,14 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -133,17 +130,18 @@ public class ProductServiceImpl implements ProductService {
             buyerType = "visit"; // 비로그인 방문자
         }
 
+        System.out.println("seller :" + products.getSeller().getId());
         List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
 
         double star = 0;
         int sum = 0;
         int count = 0;
 
-        for (Reviews reviews : reviewsList) {
-            count++;
+        for(Reviews reviews : reviewsList) {
+
+            count ++;
             sum += reviews.getScore();
-        }
-        if (count > 0) {
+
             star = (double) sum / count;
         }
 
@@ -174,6 +172,7 @@ public class ProductServiceImpl implements ProductService {
 
         return productDetailDto;
     }
+
 
     @Override
     public void registerProduct(ProductRegisterDto productRegisterDto, Principal principal, List<MultipartFile> images) {
