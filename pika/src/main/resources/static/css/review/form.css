@@ -1,0 +1,38 @@
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding-top: 0 !important; /* Remove padding-top from body as it will be included in info.html */
+            background-color: #ffffff;
+        }
+        .review-form-container { /* Renamed from .container to avoid conflict */
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-top: 20px; /* Add some top margin for separation */
+        }
+        .review-form-container div { margin-bottom: 10px; }
+        .review-form-container label { display: inline-block; width: 80px; }
+        .review-form-container input[type="text"],
+        .review-form-container input[type="number"],
+        .review-form-container textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .review-form-container input[type="submit"] {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .error-message { color: red; }
+    
