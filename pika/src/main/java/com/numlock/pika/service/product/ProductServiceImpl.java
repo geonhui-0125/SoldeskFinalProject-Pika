@@ -101,10 +101,22 @@ public class ProductServiceImpl implements ProductService {
 
         int favoriteCnt = favoriteProductRepository.countByProduct(products);
 
-        Users users = userRepository.findById(principal.getName())
+        //권한문제로 비로그인 사용자가 상품상세페이지 접속불가 -> 로직 수정
+        boolean wished = false;
+        String buyerId = null;
+
+        //로그인한 사용자일때만
+        if(principal != null){
+            Users currentUser = userRepository.findById(principal.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
+            wished = favoriteProductRepository.existsByUserAndProduct(currentUser, products);
+            buyerId = principal.getName();
+        }
+
+        /*Users users = userRepository.findById(principal.getName())
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
 
-        boolean wished = favoriteProductRepository.existsByUserAndProduct(users, products);
+        boolean wished = favoriteProductRepository.existsByUserAndProduct(users, products);*/
 
         System.out.println("seller :" + products.getSeller().getId());
         List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
@@ -115,9 +127,10 @@ public class ProductServiceImpl implements ProductService {
 
         for(Reviews reviews : reviewsList) {
 
-            count ++;
+            count++;
             sum += reviews.getScore();
-
+        }
+        if(count > 0){
             star = (double) sum / count;
         }
 
@@ -125,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
                 .productId(productId)
                 .sellerId(products.getSeller().getId())
                 .seller(products.getSeller())
-                .buyerId(principal.getName())
+                .buyerId(buyerId)
                 .title(products.getTitle())
                 .description(products.getDescription())
                 .price(products.getPrice())

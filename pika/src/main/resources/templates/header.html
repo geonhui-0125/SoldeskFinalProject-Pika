@@ -27,8 +27,15 @@
             <a id="logo-link" th:href="@{/}">pika 피카</a>
 
             <div id="search-bar">
-                <form th:action="@{/products/search}" method="get">
-                    <input type="text" name="keyword" placeholder="검색할 상품을 입력하세요.">
+                <form th:action="@{/search}" method="get">
+                    <!--url에 category 파라미터가 있으면 숨겨진 input에 추가-->
+                   <input th:if="${param.category != null and not #strings.isEmpty(param.category)}" type="hidden"
+                        name="category" th:value="${param.category}"/>
+                    <!--category 파라미터 유무에 따라 placeholder 텍스트 동적으로 설정-->
+                    <th:block th:with="placeholderText=${(param.category != null and not
+                        #strings.isEmpty(param.category)) ? param.category + ' 상품검색' : '검색할 상품을 입력하세요.'}">
+                        <input type="text" name="keyword" th:placeholder="${placeholderText}" class="search-input">
+                    </th:block>
                     <button type="submit" style="background:none; border:none; padding:0">
                         <img th:src="@{/icon/search.svg}" alt="검색">
                     </button>
@@ -39,7 +46,7 @@
                     </ul>
                 </div>
             </div>
-
+        </div>
 				<ul id="main-nav-menu">
 					<li sec:authorize="isAuthenticated()" th:if="${user}">
 					<a th:href="@{/chat/userList}">채팅</a></li>
@@ -70,13 +77,13 @@
                 <p>전체 카테고리</p>
 
                 <div class="category-item" th:each="category : ${categoriesMap}">
-                    <a th:href="@{/products/search(category=${category.key})}"
+                    <a th:href="@{/search(category=${category.key})}"
                        th:text="${category.key}"></a>
 
                     <div class="submenu">
                         <p class="submenu-title" th:text="${category.key}"></p>
                         <th:block th:each="subCategory : ${category.value}">
-                            <a th:href="@{/products/search(category=${category.key + '>' + subCategory})}"
+                            <a th:href="@{/search(category=${category.key + '>' + subCategory})}"
                                th:text="${subCategory}"></a>
                         </th:block>
                     </div>
