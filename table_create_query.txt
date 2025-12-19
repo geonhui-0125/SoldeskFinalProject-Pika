@@ -173,8 +173,7 @@ create table payments (
                           imp_uid varchar2(50) primary key,
                           merchant_uid varchar2(50) not null,
                           task_id NUMBER not null,
-                          amount NUMBER not null,
-                          buyer_id varchar2(50) NOT NULL
+                          amount NUMBER not null
 );
 
 CREATE TABLE favorite_products (
@@ -206,14 +205,15 @@ create table accounts(
                          seller_id varchar2(20) not null,
                          bank_code number not null,
                          account_number varchar(100),
+                         buyer_id varchar(50),
                          foreign key (seller_id)
                              references users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE search (
-                        search_id NUMBER(19) NOT NULL PRIMARY KEY,
-                        keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
-                        search_count NUMBER(19) DEFAULT 0 NOT NULL
+	search_id NUMBER(19) NOT NULL PRIMARY KEY,
+	keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
+	search_count NUMBER(19) DEFAULT 0 NOT NULL
 );
 
 
@@ -230,10 +230,6 @@ select * from MESSAGES;
 select * from search;
 
 commit;
-
-
-
-
 
 
 
