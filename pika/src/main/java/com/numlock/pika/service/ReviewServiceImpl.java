@@ -1,5 +1,7 @@
 package com.numlock.pika.service;
 
+import com.numlock.pika.domain.Products;
+import com.numlock.pika.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,31 +30,42 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository; // ProductRepository 주입
     private final EntityManager entityManager;
 
     @Override
     @Transactional
     public ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto) {
-                    // 판매자 조회 (리뷰 대상)
-                    Users seller = userRepository.findById(reviewRequestDto.getSellerId())
-                            .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
-                    // 리뷰 작성자 조회
-                    Users reviewer = userRepository.findById(reviewRequestDto.getUserId())
-                            .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
-        
-                    // 판매자가 자신에게 리뷰를 작성하는 것을 방지
-                    if (seller.getId().equals(reviewer.getId())) {
-                        throw new IllegalArgumentException("Seller cannot review themselves.");
-                    }
-        
-                    Reviews review = Reviews.builder()
-                            .seller(seller)
-                            .reviewer(reviewer)
-                            .score(reviewRequestDto.getScore())
-                            .content(reviewRequestDto.getContent())
-                            .build();
-                    Reviews savedReview = reviewRepository.save(review);
-                    return mapToReviewResponseDto(savedReview);    }
+        // 상품 조회
+        Products product = productRepository.findById(reviewRequestDto.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + reviewRequestDto.getProductId()));
+        // 판매자 조회 (리뷰 대상)
+        Users seller = userRepository.findById(reviewRequestDto.getSellerId())
+                .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + reviewRequestDto.getSellerId()));
+        // 리뷰 작성자 조회
+        Users reviewer = userRepository.findById(reviewRequestDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Reviewer not found with ID: " + reviewRequestDto.getUserId()));
+
+        // 판매자가 자신에게 리뷰를 작성하는 것을 방지
+        if (seller.getId().equals(reviewer.getId())) {
+            throw new IllegalArgumentException("Seller cannot review themselves.");
+        }
+
+        // 특정 상품에 대해 동일한 사용자가 이미 리뷰를 작성했는지 확인
+        if (reviewRepository.existsByProductAndReviewer(product, reviewer)) {
+            throw new IllegalArgumentException("You have already reviewed this product.");
+        }
+
+        Reviews review = Reviews.builder()
+                .product(product) // Product 엔티티 연결
+                .seller(seller)
+                .reviewer(reviewer)
+                .score(reviewRequestDto.getScore())
+                .content(reviewRequestDto.getContent())
+                .build();
+        Reviews savedReview = reviewRepository.save(review);
+        return mapToReviewResponseDto(savedReview);
+    }
 
     @Override
     public ReviewResponseDto getReviewById(Long reviewId) {
@@ -143,6 +156,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponseDto dto = ReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
+                .productId(review.getProduct().getProductId()) // productId 추가
                 .sellerId(review.getSeller().getId())
                 .userId(freshReviewer.getId())
                 .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.jpg")

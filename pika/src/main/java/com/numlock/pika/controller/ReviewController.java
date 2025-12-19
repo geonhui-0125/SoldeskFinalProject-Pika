@@ -56,7 +56,7 @@ public class ReviewController {
 
         try {
             reviewService.createReview(reviewRequestDto);
-            return "redirect:/reviews/seller/" + reviewRequestDto.getSellerId(); // sellerId로 리다이렉트
+            return "redirect:/products/info/" + reviewRequestDto.getProductId(); // 상품 상세 페이지로 리다이렉트
         } catch (Exception e) {
             model.addAttribute("errorMessage", "리뷰 작성 중 오류가 발생했습니다: " + e.getMessage());
             return "review/form";
