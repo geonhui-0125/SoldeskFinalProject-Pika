@@ -14,19 +14,17 @@ import java.time.LocalDateTime;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,6 +46,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final FavoriteProductRepository  favoriteProductRepository;
     private final ReviewRepository reviewRepository;
+    private final PaymentRepository paymentRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -101,10 +100,35 @@ public class ProductServiceImpl implements ProductService {
 
         int favoriteCnt = favoriteProductRepository.countByProduct(products);
 
-        Users users = userRepository.findById(principal.getName())
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
+        Users users;
+        boolean wished;
+        String buyerId;
+        String buyerType;
+        String impUid = null;
 
-        boolean wished = favoriteProductRepository.existsByUserAndProduct(users, products);
+        if (principal != null) {
+            users = userRepository.findById(principal.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 사용자 정보를 찾지 못했습니다."));
+            wished = favoriteProductRepository.existsByUserAndProduct(users, products);
+            buyerId = principal.getName();
+
+            if (buyerId.equals(products.getSeller().getId())) {
+                buyerType = "sell"; // 판매자
+            } else {
+                // 특정 상품과 구매자에 대한 결제 정보 확인
+                Optional<Payments> paymentOpt = paymentRepository.findByBuyerIdAndTaskId(buyerId, productId);
+                if (paymentOpt.isPresent()) {
+                    buyerType = "buy"; // 해당 상품을 결제한 구매자
+                    impUid = paymentOpt.get().getImpUid();
+                } else {
+                    buyerType = "view"; // 로그인했지만 구매/판매자 아닌 일반 사용자
+                }
+            }
+        } else {
+            buyerId = null;
+            wished = false;
+            buyerType = "visit"; // 비로그인 방문자
+        }
 
         System.out.println("seller :" + products.getSeller().getId());
         List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
@@ -125,17 +149,20 @@ public class ProductServiceImpl implements ProductService {
                 .productId(productId)
                 .sellerId(products.getSeller().getId())
                 .seller(products.getSeller())
-                .buyerId(principal.getName())
+                .buyerId(buyerId)
                 .title(products.getTitle())
                 .description(products.getDescription())
                 .price(products.getPrice())
                 .category(products.getCategory().getCategory())
                 .favoriteCnt(favoriteCnt)
                 .viewCnt(products.getViewCnt())
+                .productStat(products.getProductState())
+                .buyerType(buyerType)
                 .wished(wished)
                 .timeAgo(calculateTimeAgo(products.getCreatedAt()))
                 .star(star)
                 .images(getImageUrls(products.getProductImage()))
+                .impUid(impUid) // impUid 추가
                 .build();
 
         if (productDetailDto.getCategory() != null && productDetailDto.getCategory().contains(">")) {

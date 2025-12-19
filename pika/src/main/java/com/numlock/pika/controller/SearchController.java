@@ -2,6 +2,7 @@ package com.numlock.pika.controller;
 
 import com.numlock.pika.domain.Search;
 import com.numlock.pika.dto.ProductDto;
+import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.product.SearchService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/search")
@@ -24,6 +26,7 @@ public class SearchController {
 
     private final ProductService productService;
     private final SearchService searchService;
+    private final CategoryService categoryService;
 
     // 검색용 메소드 수정
     @GetMapping
@@ -33,7 +36,9 @@ public class SearchController {
             Model model,
             @PageableDefault(size = 15) Pageable pageable){ // 기본 사이즈 15개 설정
 
-        // 1. 인기 검색어 처리
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
+
         searchService.processSearch(keyword);
 
         // 2. 서비스 호출 (반환 타입을 Page로 변경)

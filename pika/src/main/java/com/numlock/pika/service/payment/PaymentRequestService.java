@@ -52,6 +52,7 @@ public class PaymentRequestService {
                 .productCategory(products.getCategory().getCategory())
                 .productId(products.getProductId()) // 상품 고유 id
                 .amount(products.getPrice()) // 상품 가격
+                .buyerId(users.getId()) // 사용자의 고유 ID
                 .buyerName(users.getNickname()) // 사용자의 닉네임
                 .buyerTel(users.getPhone()) // 사용자의 전화번호
                 .buyerEmail(users.getEmail()) // 사용자의 이메일

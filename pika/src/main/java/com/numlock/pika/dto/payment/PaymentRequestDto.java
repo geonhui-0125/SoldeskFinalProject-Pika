@@ -23,6 +23,7 @@ public class PaymentRequestDto {
     private BigDecimal amount; //결제금액
 
     //주문자 정보 front단에서 작성 후 바로 전달
+    private String buyerId; //주문자 고유 ID
     private String buyerName; //주문자명 nickname
     private String buyerTel; //주문자 연락처
     private String buyerEmail; //주문자 이메일
