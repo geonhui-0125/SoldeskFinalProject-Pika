@@ -204,7 +204,7 @@ create table reviews (
 create table accounts(
                          account_id number primary key,
                          seller_id varchar2(20) not null,
-                         bank_code number not null,
+                         bank_code varchar2(10) not null,
                          account_number varchar(100),
                          foreign key (seller_id)
                              references users (id) ON DELETE CASCADE

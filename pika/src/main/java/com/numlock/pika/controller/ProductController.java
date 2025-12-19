@@ -7,6 +7,7 @@ import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.CategoryService;
+import com.numlock.pika.domain.Reviews;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -147,6 +148,7 @@ public class ProductController {
         System.out.println("productDetailDto = " + productDetailDto);
 
         model.addAttribute("productDetailDto", productDetailDto);
+        model.addAttribute("review", new Reviews()); // 빈 Reviews 객체 추가
 
         if(principal != null) {
             //로그인한 사용자 아이디 호출

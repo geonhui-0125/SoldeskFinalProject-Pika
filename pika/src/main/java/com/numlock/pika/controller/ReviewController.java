@@ -39,10 +39,7 @@ public class ReviewController {
     // 새 리뷰를 생성하기 위한 양식을 표시합니다.
     @GetMapping("/new/{sellerId}") // 특정 판매자에 대한 리뷰 생성 링크
     public String createReviewForm(@PathVariable String sellerId, Model model) {
-        ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
-        reviewRequestDto.setSellerId(sellerId); // 판매자 ID를 미리 채웁니다.
-        model.addAttribute("review", reviewRequestDto);
-        return "review/form"; // Thymeleaf 템플릿 가정: /templates/review/form.html
+        return "redirect:/"; // 상품정보 페이지 외의 진입점 삭제를 위해 루트 페이지로 리디렉션
     }
 
     // 새 리뷰 양식 제출을 처리합니다.
@@ -69,23 +66,7 @@ public class ReviewController {
     // 리뷰 수정 폼을 표시합니다.
     @GetMapping("/edit/{reviewId}")
     public String editReviewForm(@PathVariable Long reviewId, Principal principal, Model model) {
-        if (principal == null) {
-            model.addAttribute("errorMessage", "로그인이 필요합니다.");
-            return "redirect:/login";
-        }
-        ReviewResponseDto reviewResponse = reviewService.getReviewById(reviewId);
-        
-        // ReviewRequestDto로 변환하여 폼에 전달 (수정 필드만 포함)
-        ReviewRequestDto reviewRequestDto = ReviewRequestDto.builder()
-                .sellerId(reviewResponse.getSellerId()) // productId 대신 sellerId 사용
-                .userId(reviewResponse.getUserId())
-                .score(reviewResponse.getScore())
-                .content(reviewResponse.getContent())
-                .build();
-
-        model.addAttribute("review", reviewRequestDto);
-        model.addAttribute("reviewId", reviewId); // 폼 제출 시 reviewId를 전달하기 위함
-        return "review/form"; // 기존 리뷰 생성 폼 재활용
+        return "redirect:/"; // 상품정보 페이지 외의 진입점 삭제를 위해 루트 페이지로 리다이렉트
     }
 
     // 리뷰 수정 양식 제출을 처리합니다.
