@@ -135,10 +135,7 @@
                 </div>
         </section>
 
-        <!-- 리뷰 폼 (상품 구매 후 표시) -->
-        <th:block th:if="${productDetailDto.productStat == 1 and productDetailDto.buyerType == 'buy'}">
-            <div th:insert="~{review/form :: reviewForm(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}"></div>
-        </th:block>
+
 
     </div>
 </section>
