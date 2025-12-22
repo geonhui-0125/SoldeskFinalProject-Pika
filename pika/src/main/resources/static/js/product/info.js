@@ -121,24 +121,26 @@ document.querySelector(".wish-btn").addEventListener('click', () => {
 
 // 판매자 리뷰 요약 가져오기
 document.addEventListener('DOMContentLoaded', function () {
+    const showReviewSummaryBtn = document.getElementById('showReviewSummaryBtn');
+    const reviewSummaryContent = document.getElementById('reviewSummaryContent');
     const sellerId = document.querySelector('.seller-id').value;
-    const reviewSummaryElement = document.querySelector('.review-summary');
 
-    if (sellerId && reviewSummaryElement) {
-        fetch(`/reviews/summary/${sellerId}`)
-            .then(response => {
+    if (showReviewSummaryBtn && reviewSummaryContent && sellerId) {
+        showReviewSummaryBtn.addEventListener('click', async () => {
+            reviewSummaryContent.textContent = '요약 로딩 중...'; // Show loading state
+            try {
+                const response = await fetch(`/reviews/summary/${sellerId}`);
                 if (!response.ok) {
                     throw new Error('리뷰 요약을 가져오는 데 실패했습니다.');
                 }
-                return response.text();
-            })
-            .then(summary => {
-                reviewSummaryElement.textContent = summary;
-            })
-            .catch(error => {
+                const summary = await response.text();
+                reviewSummaryContent.textContent = summary;
+                showReviewSummaryBtn.style.display = 'none'; // Hide button after summary is loaded
+            } catch (error) {
                 console.error('Error fetching review summary:', error);
-                reviewSummaryElement.textContent = '리뷰 요약 로딩 실패';
-                reviewSummaryElement.style.color = 'red';
-            });
+                reviewSummaryContent.textContent = '리뷰 요약 로딩 실패';
+                reviewSummaryContent.style.color = 'red';
+            }
+        });
     }
 });
