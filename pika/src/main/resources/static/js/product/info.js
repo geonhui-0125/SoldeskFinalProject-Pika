@@ -22,7 +22,11 @@ async function onclickConfirmPayment() {
             throw new Error(data.message || '서버 검증 응답 오류');
         }
         alert("구매 확정 성공!");
-        window.location.reload();
+        // Redirect to the review page after successful payment confirmation
+        const productId = document.querySelector('.product-id').value;
+        const sellerId = document.querySelector('.seller-id').value;
+        const sellerNickname = document.querySelector('.seller-info p:first-of-type').textContent; // Assuming the first <p> in seller-info is the nickname
+        window.location.href = `/reviews/new?productId=${productId}&sellerId=${sellerId}&sellerNickname=${encodeURIComponent(sellerNickname)}`;
     } catch (e) {
         console.error("서버 검증 실패:", e);
         alert('구매 확정 실패: ' + e.message);

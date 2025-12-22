@@ -251,4 +251,15 @@ $(document).ready(function () {
             }
         }
     });
+
+    /*******************************
+     Global Chat Message Listener
+     *******************************/
+    document.addEventListener('chat:message', function(event) {
+        console.log("Global listener received 'chat:message' event. Updating notification count.");
+        // A new message has arrived anywhere in the app.
+        // Let's update the notification count to give a real-time feel.
+        // A more advanced implementation could check if the user is already in the specific chat window.
+        updateNotificationCount();
+    });
 });

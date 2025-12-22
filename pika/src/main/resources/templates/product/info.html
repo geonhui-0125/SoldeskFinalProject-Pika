@@ -67,7 +67,7 @@
             </ul>
 
             <div class="product-actions" th:object="${productDetailDto}">
-                <th:block th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, productId=*{productId}">
+                <th:block th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
 
                     <!-- '찜' button logic -->
                     <th:block th:switch="${type}">
@@ -76,6 +76,14 @@
                         <!-- Explicit cases for 'view' and 'buy' -->
                         <button th:case="'view'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
                         <button th:case="'buy'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
+                    </th:block>
+
+                    <!-- '채팅하기' button logic -->
+                    <th:block th:switch="${type}">
+                        <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
+                        <button th:case="'visit'" class="chat-btn" th:onclick="|location.href='@{/user/login}'|">채팅하기</button>
+                        <button th:case="'view'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
+                        <button th:case="'buy'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
                     </th:block>
 
                     <!-- Main action buttons logic -->
@@ -135,10 +143,7 @@
                 </div>
         </section>
 
-        <!-- 리뷰 폼 (상품 구매 후 표시) -->
-        <th:block th:if="${productDetailDto.productStat == 1 and productDetailDto.buyerType == 'buy'}">
-            <div th:insert="~{review/form :: reviewForm(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}"></div>
-        </th:block>
+
 
     </div>
 </section>

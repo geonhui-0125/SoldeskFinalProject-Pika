@@ -135,6 +135,7 @@ public class ProductController {
     }
 
 
+
     // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
 
     @GetMapping("/info/{id}")

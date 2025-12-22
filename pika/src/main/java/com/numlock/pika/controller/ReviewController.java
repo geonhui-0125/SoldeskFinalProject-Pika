@@ -37,9 +37,26 @@ public class ReviewController {
     }
 
     // 새 리뷰를 생성하기 위한 양식을 표시합니다.
-    @GetMapping("/new/{sellerId}") // 특정 판매자에 대한 리뷰 생성 링크
-    public String createReviewForm(@PathVariable String sellerId, Model model) {
-        return "redirect:/"; // 상품정보 페이지 외의 진입점 삭제를 위해 루트 페이지로 리디렉션
+    @GetMapping("/new") // 특정 판매자에 대한 리뷰 생성 링크
+    public String createReviewForm(@RequestParam("productId") Integer productId,
+                                   @RequestParam("sellerId") String sellerId,
+                                   @RequestParam("sellerNickname") String sellerNickname,
+                                   Principal principal,
+                                   Model model) {
+        if (principal == null) {
+            model.addAttribute("errorMessage", "로그인이 필요합니다.");
+            return "redirect:/user/login";
+        }
+
+        ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
+        reviewRequestDto.setProductId(productId);
+        reviewRequestDto.setSellerId(sellerId);
+        reviewRequestDto.setUserId(principal.getName()); // 리뷰 작성자는 현재 로그인한 사용자
+        
+        model.addAttribute("review", reviewRequestDto);
+        model.addAttribute("sellerNickname", sellerNickname); // 폼에 판매자 닉네임 표시용
+        
+        return "review/form"; // Thymeleaf 템플릿 가정: /templates/review/form.html
     }
 
     // 새 리뷰 양식 제출을 처리합니다.
@@ -56,7 +73,7 @@ public class ReviewController {
 
         try {
             reviewService.createReview(reviewRequestDto);
-            return "redirect:/products/info/" + reviewRequestDto.getProductId(); // 상품 상세 페이지로 리다이렉트
+            return "redirect:/products/info/" + reviewRequestDto.getProductId(); // 상품 정보 페이지로 리다이렉트
         } catch (Exception e) {
             model.addAttribute("errorMessage", "리뷰 작성 중 오류가 발생했습니다: " + e.getMessage());
             return "review/form";
