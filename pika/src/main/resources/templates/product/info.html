@@ -161,7 +161,9 @@
                         <th:block th:if="${productDetailDto.star != 0}">
                             별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span>
                         </th:block>
-                        <span class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
+                        <button id="showReviewSummaryBtn" class="summary-button">리뷰 요약 보기</button>
+                    </p>
+                    <div id="reviewSummaryContent" class="review-summary-display"></div>
                 </div>
             </div>
         </section>
