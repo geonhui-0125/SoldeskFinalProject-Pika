@@ -30,38 +30,18 @@
         }
         .product-card {
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Always column since no image */
             align-items: center;
-            gap: 30px;
+            gap: 20px; /* Reduced gap if no image */
             background: #fff;
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03);
-        }
-        @media (min-width: 768px) {
-            .product-card {
-                flex-direction: row;
-                align-items: flex-start;
-            }
-        }
-        .product-image-wrapper {
-            flex-shrink: 0;
-            width: 100%;
-            max-width: 350px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .product-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+            text-align: left; /* Align text within card */
         }
         .product-info-wrapper {
-            flex-grow: 1;
-            text-align: left;
-            padding: 10px 0;
+            width: 100%; /* Take full width of card */
+            padding: 0; /* No padding needed if no image beside it */
         }
         .product-title {
             font-size: 1.8em;
@@ -144,11 +124,7 @@
     <h1>상품 상세 정보 (관리자용)</h1>
 
     <div class="product-card">
-        <div class="product-image-wrapper">
-            <img th:if="*{productImage}" th:src="*{productImage}" alt="Product Image" class="product-image">
-            <div th:unless="*{productImage}" class="product-image-placeholder">이미지 없음</div>
-            <span style="color: red; font-weight: bold; margin-top: 10px;">Debug Image Path: <span th:text="*{productImage ?: 'N/A'}"></span></span>
-        </div>
+
         <div class="product-info-wrapper">
             <p class="product-title" th:text="*{title}"></p>
             <p class="product-price" th:text="${#numbers.formatDecimal(product.price,0,'COMMA',0,'POINT')} + '원'"></p>
