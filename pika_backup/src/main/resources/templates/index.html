@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>환영합니다!</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        h1, h2 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 미사용 -->
+    <h1>환영합니다!</h1>
+
+    <div sec:authorize="isAuthenticated()" th:if="${user}"> <!-- user 객체가 모델에 있을 때만 이 블록을 보여줍니다 -->
+        <h2 th:text="|${user.nickname}님, 로그인되었습니다.|"></h2>
+        <div th:if="${user.profileImage}">
+            <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 400px; height: 400px; border-radius: 50%; object-fit: cover;">
+        </div>
+        <ul>
+            <li><a href="/user/logout">로그아웃</a></li>
+            <li><a href="/user/delete">회원 탈퇴</a></li>
+            <li><a href="/user/add-info">정보 수정</a> </li>
+        </ul>
+    </div>
+    <div sec:authorize="!isAuthenticated()">
+        <h2>로그인이 필요합니다.</h2>
+        <ul>
+            <li><a href="/user/login">로그인</a></li>
+            <li><a href="/user/join">회원가입</a></li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

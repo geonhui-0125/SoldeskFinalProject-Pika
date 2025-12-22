@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Product</title>
+</head>
+<body>
+    <h1>새 상품 등록</h1>
+    <form th:action="@{/products}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <div>
+            <label>Title(제목):</label>
+            <input type="text" th:field="*{title}" required>
+        </div>
+        <div>
+            <label>Price(가격):</label>
+            <input type="number" th:field="*{price}" required>
+        </div>
+        <div>
+            <label>Category(카테고리):</label>
+            <!-- Check if categories exist to prevent errors -->
+            <select th:field="*{categoryId}" required>
+                <option value="">카테고리를 고르세요</option>
+                <option th:if="${categories != null}" 
+                        th:each="cat : ${categories}" 
+                        th:value="${cat.categoryId}" 
+                        th:text="${cat.category}">카테고리 이름</option>
+            </select>
+            <span th:if="${categories == null or categories.empty}" style="color:red;">카테고리 로딩 실패</span>
+        </div>
+        <div>
+            <label>Description(설명):</label>
+            <textarea th:field="*{description}" required></textarea>
+        </div>
+        <div>
+            <label>Image(이미지):</label>
+            <input type="file" name="imageFile" required>
+        </div>
+        
+        <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
+        <button type="submit">저장</button>
+    </form>
+    <a th:href="@{/products}">리스트로 돌아가기</a>
+</body>
+</html>

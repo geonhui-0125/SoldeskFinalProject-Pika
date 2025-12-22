@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상품 리스트</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .product-image { max-width: 100px; }
+
+        /*******************************
+         페이지네이션 (main.html에서 복사)
+        ********************************/
+        .pagination {
+            text-align: center;
+            margin: 60px 0;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 0 3px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .pagination a.active {
+            background-color: #000;
+            color: #fff;
+            border-color: #000;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>상품 리스트</h1>
+    <a th:href="@{/products/new}">새 상품 등록</a>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Seller</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.productId}">1</td>
+                <td><img th:src="${product.productImage}" alt="Product Image" class="product-image"></td>
+                <td th:text="${product.title}">Product Title</td>
+                <td th:text="${product.price}">10000</td>
+                <td th:text="${product.sellerId}">User1</td>
+                <td th:text="${product.categoryId}">1</td>
+                <td th:text="${product.productState == 0 ? 'Selling' : 'Sold'}">Selling</td>
+                <td><a th:href="@{/products/{id}(id=${product.productId})}">View</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" th:if="${totalPages > 0}">
+        <a th:if="${currentPage > 0}" th:href="@{/products(page=${currentPage - 1}, size=${pageSize})}">&laquo;</a>
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/products(page=${i}, size=${pageSize})}"
+               th:text="${i + 1}"
+               th:classappend="${i == currentPage} ? 'active' : ''"></a>
+        </span>
+        <a th:if="${currentPage < totalPages - 1}" th:href="@{/products(page=${currentPage + 1}, size=${pageSize})}">&raquo;</a>
+    </div>
+</body>
+</html>

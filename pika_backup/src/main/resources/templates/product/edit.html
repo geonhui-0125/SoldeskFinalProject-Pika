@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/new.css}">
+    <title>상품 수정</title>
+</head>
+<body>
+<header th:replace="~{header :: mainHeader}"></header>
+<section id="product-section">
+    <form th:action="@{/products/edit/{id}(id=${product.productId})}" method="post">
+        <!-- 상단 메뉴 바 -->
+        <div class="product-menu-bar">
+            <ul class="product-menu-list">
+                <li class="product-menu-item" onclick="history.back()">뒤로가기</li>
+                <li class="product-menu-item" style="color: #ff4500;">상품 수정</li>
+            </ul>
+        </div>
+
+        <!-- 상품 정보 -->
+        <div class="product-block">
+            <h1 class="product-block-title">상품정보 수정</h1>
+
+            <ul class="product-form-list">
+
+                <!-- 상품명 -->
+                <li class="product-form-item">
+                    <div class="form-label">상품명</div>
+                    <div class="form-content">
+                        <input class="text-input"
+                               type="text"
+                               name="title"
+                               th:value="${product.title}"
+                               placeholder="상품명을 입력해주세요">
+                    </div>
+                </li>
+
+                <!-- 카테고리 -->
+                <li class="product-form-item">
+                    <div class="form-label">카테고리</div>
+
+                    <div class="form-content">
+                        <!-- 선택 박스 -->
+                        <div class="category-select-box" id="categorySelect">
+                            <span class="category-selected-text" th:text="${currentCategory != null ? currentCategory : '카테고리를 선택해주세요'}">카테고리를 선택해주세요</span>
+                            <span class="category-arrow">▼</span>
+                            <input type="hidden" name="category" id="categoryPath" th:value="${currentCategory}">
+                        </div>
+
+                        <!-- 드롭다운 -->
+                        <div class="category-dropdown-box" id="categoryDropdown">
+                            <ul class="category-main-list" th:each="category : ${categoriesMap}">
+                                <li class="category-main-item" th:text="${category.key}"></li>
+                                <ul class="category-sub-list">
+                                    <li class="category-sub-item" th:each="sub : ${category.value}" th:text="${sub}"></li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+
+                <!-- 설명 -->
+                <li class="product-form-item">
+                    <div class="form-label">설명</div>
+                    <div class="form-content">
+                    <textarea class="description-textarea"
+                              name="description"
+                              cols="30"
+                              rows="6"
+                              th:text="${product.description}"
+                              placeholder="설명을 입력해주세요"></textarea>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <!-- 가격 -->
+        <div class="product-block">
+            <h1 class="product-block-title">가격</h1>
+
+            <ul class="product-form-list">
+                <li class="product-form-item">
+                    <div class="form-label">가격</div>
+                    <div class="form-content price-content">
+                        <input class="price-input"
+                               type="text"
+                               name="price"
+                               th:value="${product.price}"
+                               placeholder="가격을 입력해주세요">
+                        <span class="price-unit">원</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="product-submit-bar">
+            <button type="submit" class="product-submit-btn">수정완료</button>
+        </div>
+    </form>
+</section>
+
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/product/new.js}"></script>
+</body>
+</html>

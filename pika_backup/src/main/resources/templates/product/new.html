@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/new.css}">
+    <title>Title</title>
+</head>
+<body>
+<header th:replace="~{header :: mainHeader}"></header>
+<section id="product-section">
+    <form id="productForm" th:action="@{/products/register}" method="post" enctype="multipart/form-data">
+        <div class="product-menu-bar">
+            <ul class="product-menu-list">
+                <li class="product-menu-item">상품 등록</li>
+            </ul>
+        </div>
+
+        <div class="product-block">
+            <h1 class="product-block-title">상품정보</h1>
+            <ul class="product-form-list">
+                <li class="product-form-item">
+                    <div class="form-label">상품이미지</div>
+                    <div class="form-content">
+                        <label class="image-upload-box" id="imageBox">
+                            <input class="image-input" type="file" name="images" accept="image/jpeg, image/png" multiple>
+                            <span class="image-placeholder">이미지 등록</span>
+                            <img class="preview-image" style="display:none;"/>
+                        </label>
+                    </div>
+                </li>
+
+                <li class="product-form-item">
+                    <div class="form-label">상품명</div>
+                    <div class="form-content">
+                        <input class="text-input" type="text" name="title" placeholder="상품명을 입력해주세요">
+                    </div>
+                </li>
+
+                <li class="product-form-item">
+                    <div class="form-label">카테고리</div>
+                    <div class="form-content">
+                        <div class="category-select-box" id="categorySelect">
+                            <span class="category-selected-text">카테고리를 선택해주세요</span>
+                            <span class="category-arrow">▼</span>
+                            <input type="hidden" name="category" id="categoryPath">
+                        </div>
+                        <div class="category-dropdown-box" id="categoryDropdown" style="display:none;">
+                            <ul class="category-main-list" th:each="category : ${categoriesMap}">
+                                <li class="category-main-item" th:text="${category.key}"></li>
+                                <ul class="category-sub-list" style="display:none;">
+                                    <li class="category-sub-item" th:each="sub : ${category.value}" th:text="${sub}"></li>
+                                </ul>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="product-form-item">
+                    <div class="form-label">설명</div>
+                    <div class="form-content">
+                        <textarea class="description-textarea" name="description" rows="6" placeholder="자세한 설명을 작성해주세요."></textarea>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="product-block">
+            <h1 class="product-block-title">가격</h1>
+            <ul class="product-form-list">
+                <li class="product-form-item">
+                    <div class="form-label">가격</div>
+                    <div class="form-content price-content">
+                        <input class="price-input" type="text" name="price" placeholder="가격을 입력해주세요">
+                        <span class="price-unit">원</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="product-submit-bar">
+            <button type="submit" class="product-submit-btn">등록하기</button>
+        </div>
+    </form>
+</section>
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/product/new.js}"></script>
+</body>
+</html>

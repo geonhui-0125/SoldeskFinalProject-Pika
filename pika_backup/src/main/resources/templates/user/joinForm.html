@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
+        h1 { color: #333; text-align: center; margin-bottom: 25px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: bold; }
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        button:hover {
+            background-color: #e74c3c;
+        }
+        .error-message {
+            color: #dc3545;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .link-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .link-container a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .link-container a:hover {
+            text-decoration: underline;
+        }
+        .field-error { /* 필드별 오류 메시지 스타일 추가 */
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>회원가입</h1>
+        <!--/* 디버깅용: errorMessage 변수가 모델에 담겨오는지 확인 */-->
+        <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+        <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="id">아이디:</label>
+                <input type="text" id="id" th:field="*{id}" required/>
+                <span th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="pw">비밀번호:</label>
+                <input type="password" id="pw" th:field="*{pw}" required/>
+                <span th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="nickname">닉네임:</label>
+                <input type="text" id="nickname" th:field="*{nickname}" required/>
+                <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="field-error"></span>
+            </div>
+            <!--<div class="form-group">
+                <label for="profileImageFile">프로필 이미지:</label>
+                <input type="file" id="profileImageFile" name="profileImageFile"/>
+            </div>-->
+            <div class="form-group">
+                <label for="email">이메일:</label>
+                <input type="email" id="email" th:field="*{email}" required/>
+                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
+            </div>
+            <button type="submit">회원가입</button>
+        </form>
+        <div class="link-container">
+            <a href="/user/login">이미 계정이 있으신가요? 로그인</a>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const errorMessage = /*[[${errorMessage}]]*/ null;
+        if(errorMessage){
+            alert(errorMessage);
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

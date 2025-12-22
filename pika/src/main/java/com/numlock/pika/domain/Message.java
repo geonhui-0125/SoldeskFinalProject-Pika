@@ -19,6 +19,10 @@ public class Message {
     @Column(name = "ID")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PRODUCT_ID")
+    private Products product;
+
     @Column(name = "SENDER_ID", nullable = false, length = 50)
     private String senderId;
 
