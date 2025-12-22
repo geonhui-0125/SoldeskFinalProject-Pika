@@ -113,10 +113,17 @@ $(function () {
         return true;
     });
 
-    $(".price-input").on("input", function() {
-        // 숫자 외의 문자는 삭제
-        $(this).val($(this).val().replace(/[^0-9]/g, ""));
-    });
+    $(".price-input").on("input", function () {
+        // 현재 입력값에서 숫자만 남기기
+        let value = $(this).val().replace(/[^0-9]/g, '');
 
+        // 숫자가 있을 경우에만 천단위 콤마 찍기
+        if (value !== "") {
+            value = Number(value).toLocaleString();
+        }
+
+        // 변환된 값을 다시 input에 넣기
+        $(this).val(value);
+    });
 });
 

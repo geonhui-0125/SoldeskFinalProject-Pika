@@ -125,7 +125,7 @@ public class ProductServiceImpl implements ProductService {
                 buyerType = "sell"; // 판매자
             } else {
                 // 특정 상품과 구매자에 대한 결제 정보 확인
-                Optional<Payments> paymentOpt = paymentRepository.findByBuyerIdAndTaskId(buyerId, productId);
+                Optional<Payments> paymentOpt = paymentRepository.findByBuyerAndTask(users, products);
                 if (paymentOpt.isPresent()) {
                     buyerType = "buy"; // 해당 상품을 결제한 구매자
                     impUid = paymentOpt.get().getImpUid();

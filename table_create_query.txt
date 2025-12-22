@@ -174,7 +174,15 @@ create table payments (
                           merchant_uid varchar2(50) not null,
                           task_id NUMBER not null,
                           amount NUMBER not null,
-		 buyer_id varchar2(50) not null
+                          created_at DATE not null,
+                          seller_id varchar2(50),
+                          buyer_id varchar2(50),
+                          foreign key (task_id)
+                              references products (product_id) ON DELETE CASCADE,
+                          foreign key (seller_id)
+                              references users (id) ON DELETE CASCADE,
+                          foreign key (buyer_id)
+                              references users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE favorite_products (
@@ -207,7 +215,7 @@ create table reviews (
 create table accounts(
                          account_id number primary key,
                          seller_id varchar2(20) not null,
-                         bank_code varchar2(10) not null,
+                         bank_code varchar2(50)       not null,
                          account_number varchar(100),
                          foreign key (seller_id)
                              references users (id) ON DELETE CASCADE
