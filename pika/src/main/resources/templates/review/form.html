@@ -1,15 +1,31 @@
-<div class="review-form-container" th:fragment="reviewForm(productId, sellerId)">
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"> <!-- Font Awesome CDN 추가 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/info.css}"> <!-- 메인 페이지와 비슷한 스타일을 위해 포함 -->
+    <link rel="stylesheet" th:href="@{/css/review/form.css}"> <!-- 리뷰 폼 전용 스타일 -->
+    <title>리뷰 작성</title>
+</head>
+<body>
+
+<header th:replace="~{header :: mainHeader}"></header>
+
+<div class="review-form-container">
     <h1>새 리뷰 작성하기</h1>
 
     <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></p>
 
-    <form th:action="${reviewId != null} ? @{/reviews/{reviewId}(reviewId=${reviewId})} : @{/reviews(productId=${productId})}"
+    <form th:action="${reviewId != null} ? @{/reviews/{reviewId}(reviewId=${reviewId})} : @{/reviews}"
           th:object="${review}"
           method="post">
         <input type="hidden" th:if="${reviewId != null}" name="_method" value="put" />
         <input type="hidden" th:if="${reviewId != null}" name="reviewId" th:value="${reviewId}" />
-        <input type="hidden" name="productId" th:value="${productId}" />
-        <input type="hidden" name="sellerId" th:value="${sellerId}" />
+        <input type="hidden" name="productId" th:value="${review.productId}" /> <!-- review.productId 사용 -->
+        <input type="hidden" name="sellerId" th:value="${review.sellerId}" /> <!-- review.sellerId 사용 -->
         <div>
             <label for="sellerNickname">판매자:</label>
             <input type="text" id="sellerNickname" th:value="${sellerNickname}" readonly>
@@ -19,13 +35,14 @@
             <div style="display: flex; align-items: center;">
                 <span>별점 (1-5):</span>
                 <div class="star-rating">
-                                    <input type="radio" id="star1" name="score" value="1" /><label for="star1" title="1점"><i class="fa-solid fa-star"></i></label>
-                                    <input type="radio" id="star2" name="score" value="2" /><label for="star2" title="2점"><i class="fa-solid fa-star"></i></label>
-                                    <input type="radio" id="star3" name="score" value="3" /><label for="star3" title="3점"><i class="fa-solid fa-star"></i></label>
-                                    <input type="radio" id="star4" name="score" value="4" /><label for="star4" title="4점"><i class="fa-solid fa-star"></i></label>
-                                    <input type="radio" id="star5" name="score" value="5" /><label for="star5" title="5점"><i class="fa-solid fa-star"></i></label>                </div>
+                                    <input type="radio" id="star5" name="score" value="5" th:checked="${review.score == 5}" /><label for="star5" title="5점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star4" name="score" value="4" th:checked="${review.score == 4}" /><label for="star4" title="4점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star3" name="score" value="3" th:checked="${review.score == 3}" /><label for="star3" title="3점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star2" name="score" value="2" th:checked="${review.score == 2}" /><label for="star2" title="2점"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" id="star1" name="score" value="1" th:checked="${review.score == 1}" /><label for="star1" title="1점"><i class="fa-solid fa-star"></i></label>
+                </div>
             </div>
-            <input type="hidden" id="scoreValue" th:field="*{score}" />
+
         </div>
         <div>
             <label for="content">리뷰 내용:</label>
@@ -37,7 +54,11 @@
     </form>
 
     <hr/>
-    <a th:href="@{/reviews/seller/{sellerId}(sellerId=${sellerId})}">리뷰 목록으로 돌아가기</a>
+    <a th:href="@{/products/info/{productId}(productId=${review.productId})}">상품 정보로 돌아가기</a>
     <br/>
     <a href="/">홈으로 돌아가기</a>
 </div>
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/review/form.js}"></script>
+</body>
+</html>
