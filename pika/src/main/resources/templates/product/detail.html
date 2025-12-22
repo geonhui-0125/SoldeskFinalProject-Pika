@@ -142,6 +142,7 @@
                 <p class="warning-message">이 상품을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</p>
                 <form id="deleteProductForm" th:action="@{/products/delete/{id}(id=*{productId})}" method="post">
                     <input type="hidden" name="_method" value="DELETE"/>
+                    <input type="hidden" name="redirect" value="productlist"/> <!-- 관리자가 상품 상세(리스트 진입)에서 삭제 시 -->
                     <button type="submit" class="delete-button">상품 삭제 (관리자용)</button>
                 </form>
             </div>
