@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"> <!-- Font Awesome CDN 추가 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/info.css}">
+    <title>Title</title>
+</head>
+<body>
+
+<header th:replace="~{header :: mainHeader}"></header>
+
+<section class="product-section" th:object="${productDetailDto}">
+    <input class="product-id" type="hidden" th:value="*{productId}">
+    <input class="seller-id" type="hidden" th:value="*{seller.id}">
+    <input class="wished" type="hidden" th:value="*{wished}">
+    <!-- breadcrumb -->
+    <nav class="breadcrumb">
+        <ul>
+            <li>홈</li>
+            <li>
+                <span>&gt;</span>
+                <span th:text="*{categoryOne}"></span>
+            </li>
+            <li>
+                <span>&gt;</span>
+                <span th:text="*{categoryTwo}"></span>
+            </li>
+        </ul>
+        <th:block th:if="*{buyerType == 'sell'}">
+            <div id="product-update"
+                 th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">
+                수정
+            </div>
+        </th:block>
+    </nav>
+
+    <!-- 상단 영역 -->
+    <div class="product-top">
+
+        <!-- 이미지 영역 -->
+        <div class="product-images">
+            <div class="thumbnail-list">
+                <img th:each="image : *{images}"
+                     th:src="@{${image}}"
+                     class="thumbnail">
+            </div>
+
+            <div class="main-image">
+                <img th:src="@{${productDetailDto.images[0]}}">
+            </div>
+        </div>
+
+        <!-- 상품 정보 -->
+        <div class="product-info">
+            <h2 th:text="*{title}"></h2>
+            <p class="price"
+               th:text="${#numbers.formatDecimal(productDetailDto.price,0,'COMMA',0,'POINT')} + '원'"></p>
+
+            <ul class="product-stats">
+                <li class="wish-cnt">찜 <span th:text="*{favoriteCnt}"></span></li>
+                <li class="view-cnt">조회수 <span th:text="*{viewCnt}"></span></li>
+                <li class="time-ago">등록 <span th:text="*{timeAgo}"></span></li>
+            </ul>
+
+            <div class="product-actions" th:object="${productDetailDto}">
+                <th:block th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
+
+                    <!-- '찜' button logic -->
+                    <th:block th:switch="${type}">
+                        <button th:case="'sell'" class="like-btn wish-btn" disabled>찜</button>
+                        <button th:case="'visit'" class="like-btn" th:onclick="|location.href='@{/user/login}'|">찜</button>
+                        <!-- Explicit cases for 'view' and 'buy' -->
+                        <button th:case="'view'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
+                        <button th:case="'buy'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
+                    </th:block>
+
+                    <!-- '채팅하기' button logic -->
+                    <th:block th:switch="${type}">
+                        <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
+                        <button th:case="'visit'" class="chat-btn" th:onclick="|location.href='@{/user/login}'|">채팅하기</button>
+                        <button th:case="'view'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
+                        <button th:case="'buy'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
+                    </th:block>
+
+                    <!-- Main action buttons logic -->
+                    <th:block th:switch="${stat}">
+
+                        <!-- Case 0: Selling -->
+                        <th:block th:case="0">
+                            <th:block th:switch="${type}">
+                                <!-- 'view' and 'buy' should have the same behavior here -->
+                                <button th:case="'view'" class="buy-btn" th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제</button>
+                                <button th:case="'buy'" class="buy-btn" th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제</button>
+                                <button th:case="'sell'" class="buy-btn" disabled>상품결제</button>
+                                <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">상품결제</button>
+                            </th:block>
+                        </th:block>
+
+                        <!-- Case 2: Payment Pending -->
+                        <th:block th:case="2">
+                            <th:block th:if="${type == 'buy'}">
+                                <input type="hidden" id="impUid" th:value="*{impUid}" />
+                                <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
+                                <button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>
+                            </th:block>
+                            <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품예약중</button>
+                        </th:block>
+
+                        <!-- Case 1: Sold -->
+                        <th:block th:case="1">
+                            <button class="buy-btn" disabled>판매완료</button>
+                        </th:block>
+                    </th:block>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <!-- 하단 정보 -->
+    <div class="product-bottom">
+
+        <!-- 상품 설명 -->
+        <section class="product-description">
+            <h3>상품정보</h3>
+            <p th:text="*{description}"></p>
+        </section>
+
+        <!-- 판매자 -->
+        <section class="seller-info">
+            <h3>판매자</h3>
+            <div class="seller-box"
+                   style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                    <img th:src="@{${productDetailDto.seller.profileImage}}">
+                    <div>
+                        <p th:text="*{seller.nickname}"></p>
+                        <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span
+                                class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
+                    </div>
+                </div>
+        </section>
+
+        <!-- 리뷰 폼 (상품 구매 후 표시) -->
+        <th:block th:if="${productDetailDto.productStat == 1 and productDetailDto.buyerType == 'buy'}">
+            <div th:insert="~{review/form :: reviewForm(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}"></div>
+        </th:block>
+
+    </div>
+</section>
+
+
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/product/info.js}"></script>
+<script th:src="@{/js/review/form.js}"></script>
+</body>
+</html>

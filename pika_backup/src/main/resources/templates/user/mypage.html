@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이 페이지</title>
+    <!-- product/new.html과 동일한 스타일시트 사용 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/new.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* new.css에 없는 테이블 및 리스트 스타일 보완 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; font-size: 0.95em; }
+        th { background-color: #f9f9f9; font-weight: 600; color: #555; }
+        .product-image { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+        
+        /* 버튼 스타일 */
+        .btn-action { padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.9em; }
+        .btn-action:hover { background: #f5f5f5; }
+        .btn-danger { color: #e74c3c; border-color: #e74c3c; }
+        .btn-danger:hover { background: #e74c3c; color: white; }
+        
+        /* 리뷰 스타일 */
+        .review-list { display: flex; flex-direction: column; gap: 15px; }
+        .review-card { padding: 15px; border: 1px solid #eee; border-radius: 6px; }
+        .review-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9em; color: #666; }
+        .score { color: #ffbf00; font-weight: bold; }
+        
+        /* 링크 스타일 */
+        a { color: #333; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        /* 프로필 영역 */
+        .profile-container { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; }
+        .profile-img-large { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
+        .profile-info h2 { margin: 0 0 5px 0; font-size: 1.3em; }
+        .profile-info p { margin: 0; color: #777; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{header :: mainHeader}"></header>
+
+<section id="product-section">
+    
+    <!-- 상단 메뉴 바 (new.html과 통일성) -->
+    <div class="product-menu-bar">
+        <ul class="product-menu-list">
+            <li class="product-menu-item" style="color: #ff4500;">마이페이지</li>
+            <li class="product-menu-item" onclick="location.href='/products/new'">상품 등록</li>
+            <!-- 필요한 경우 추가 메뉴 -->
+        </ul>
+    </div>
+
+    <!-- 0. 사용자 정보 블록 -->
+    <div class="product-block">
+        <h1 class="product-block-title">내 정보</h1>
+        <div class="profile-container">
+            <!-- 프로필 이미지 -->
+            <img th:if="${user.profileImage != null}" th:src="${user.profileImage}" class="profile-img-large" onerror="this.src='/images/no-image.png'">
+            <img th:unless="${user.profileImage != null}" src="/images/no-image.png" class="profile-img-large">
+            
+            <div class="profile-info">
+                <h2 th:text="${user.nickname}">닉네임</h2>
+                <p th:text="${user.email}">user@example.com</p>
+                <div style="margin-top: 10px;">
+                    <a href="/user/add-info" class="btn-action">정보 수정</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. 등록한 상품 (My Products) -->
+    <div class="product-block">
+        <h1 class="product-block-title">
+            내 상품 관리 <span th:text="'(' + ${#lists.size(myProducts)} + ')'" style="font-size:0.7em; color:#888;"></span>
+        </h1>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(myProducts)}">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 80px;">이미지</th>
+                    <th>상품명</th>
+                    <th>가격</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${myProducts}">
+                    <td><img th:src="${p.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
+                    <td style="text-align: left;">
+                        <a th:href="@{/products/info/{id}(id=${p.productId})}" th:text="${p.title}" style="font-weight: 600;">상품명</a>
+                        <div style="font-size: 0.8em; color: #999; margin-top: 4px;" th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일</div>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${p.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
+                    </td>
+                    <td th:text="${#numbers.formatInteger(p.price, 0, 'COMMA')} + '원'">가격</td>
+                    <td>
+                        <span th:if="${p.productState == 0}" style="color: #2ecc71; font-weight: bold;">판매중</span>
+                        <span th:if="${p.productState == 1}" style="color: #e74c3c; font-weight: bold;">판매완료</span>
+                    </td>
+                    <td>
+                        <button class="btn-action" th:onclick="'location.href=\'/products/info/' + ${p.productId} + '\''">상세</button>
+                        <button class="btn-action" th:onclick="'location.href=\'/products/edit/' + ${p.productId} + '\''">수정</button>
+                        <form th:action="@{/products/delete/{id}(id=${p.productId})}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                            <button type="submit" class="btn-action btn-danger">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(myProducts)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+            등록된 상품이 없습니다.
+        </div>
+    </div>
+
+    <!-- 2. 찜 목록 (Wishlist) -->
+    <div class="product-block">
+        <h1 class="product-block-title">찜한 상품 <span th:text="'(' + ${#lists.size(wishlist)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(wishlist)}">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 80px;">이미지</th>
+                    <th>상품명</th>
+                    <th>가격</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="w : ${wishlist}">
+                    <td><img th:src="${w.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
+                    <td style="text-align: left;">
+                        <a th:href="@{/products/info/{id}(id=${w.productId})}" th:text="${w.title}" style="font-weight: 600;">상품명</a>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${w.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
+                    </td>
+                    <td th:text="${#numbers.formatInteger(w.price, 0, 'COMMA')} + '원'">가격</td>
+                    <td>
+                        <button class="btn-action btn-danger" th:onclick="'deleteWish(' + ${w.productId} + ')'">찜 취소</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${#lists.isEmpty(wishlist)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+            찜한 상품이 없습니다.
+        </div>
+    </div>
+
+    <!-- 3. 상점 후기 (Reviews) -->
+    <div class="product-block">
+        <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(myReviews)}">
+            <div class="review-list">
+                <div th:each="r : ${myReviews}" class="review-card">
+                    <div class="review-header">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <img th:if="${r.profileImage != null}" th:src="${r.profileImage}" style="width: 24px; height: 24px; border-radius: 50%;" onerror="this.src='/images/no-image.png'">
+                            <strong th:text="${r.userId}" style="color: #333;">작성자</strong>
+                        </div>
+                        <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="score">★ <span th:text="${r.score}">5</span></span>
+                    </div>
+                    <p th:text="${r.content}" style="color: #555; line-height: 1.5; margin: 0;">후기 내용</p>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(myReviews)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+            받은 후기가 없습니다.
+        </div>
+    </div>
+
+</section>
+
+<script th:src="@{/js/header.js}"></script>
+<script>
+    function deleteWish(productId) {
+        if(!confirm('정말 찜을 취소하시겠습니까?')) return;
+        
+        fetch('/api/product/' + productId + '/wish', {
+            method: 'DELETE'
+        }).then(response => {
+            if(response.ok) {
+                // 성공 시 현재 페이지 리로드
+                location.reload();
+            } else {
+                alert('취소에 실패했습니다.');
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('오류가 발생했습니다.');
+        });
+    }
+</script>
+</body>
+</html>

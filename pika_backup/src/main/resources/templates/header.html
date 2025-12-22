@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<header th:fragment="mainHeader" id="main-header">
+    <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
+        <div>
+            <!--<div th:if="${user.profileImage}">
+                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+            </div>-->
+            <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
+            <a href="/user/add-info" id="modify" style="width: 100px; height: 50px">정보수정</a>
+        </div>
+    </div>
+    <div sec:authorize="!isAuthenticated()" class="header-auth">
+        <div>
+            <a href="/user/login" id="login">로그인</a>
+            <a href="/user/join" id="join">회원가입</a>
+        </div>
+    </div>
+
+    <div id="header-top">
+        <div id="header-main-content">
+            <a id="logo-link" th:href="@{/}">pika 피카</a>
+
+            <div id="search-bar">
+                <form th:action="@{/search}" method="get">
+                    <!--url에 category 파라미터가 있으면 숨겨진 input에 추가-->
+                   <input th:if="${param.category != null and not #strings.isEmpty(param.category)}" type="hidden"
+                        name="category" th:value="${param.category}"/>
+                    <!--category 파라미터 유무에 따라 placeholder 텍스트 동적으로 설정-->
+                    <th:block th:with="placeholderText=${(param.category != null and not
+                        #strings.isEmpty(param.category)) ? param.category + ' 상품검색' : '검색할 상품을 입력하세요.'}">
+                        <input type="text" name="keyword" th:placeholder="${placeholderText}" class="search-input">
+                    </th:block>
+                    <button type="submit" style="background:none; border:none; padding:0">
+                        <img th:src="@{/icon/search.svg}" alt="검색">
+                    </button>
+                </form>
+                <div id="popular-searches-container" style="display: none;">
+                    <h5>인기 검색어</h5>
+                    <ul id="popular-searches-list">
+                    </ul>
+                </div>
+            </div>
+        </div>
+				<ul id="main-nav-menu">
+					<li sec:authorize="isAuthenticated()" th:if="${user}">
+					<a th:href="@{/chat/list}">채팅</a></li>
+                    <li id="notification-btn" sec:authorize="isAuthenticated()" th:if="${user}">
+                        <a href="#">알림</a>
+                        <span id="notification-count" class="notification-count">0</span>
+                        <div id="notification-list">
+                            <ul id="notification-items">
+                            </ul>
+                            <div id="notification-pagination">
+                                <button id="prev-notification-page">이전</button>
+                                <button id="next-notification-page">다음</button>
+                            </div>
+                        </div>
+                    </li>
+					<li><a th:href="@{/products/new}">판매하기</a></li>
+					<li><a th:href="@{/user/mypage}">마이페이지</a></li>
+				</ul>
+			</div>
+		</div>
+
+    <div id="category-bar">
+        <div id="category-wrapper">
+            <div id="hamburger-icon">
+                <img th:src="@{/icon/hamburger-icon.png}">
+            </div>
+            <div id="category-dropdown">
+                <p>전체 카테고리</p>
+
+                <div class="category-item" th:each="category : ${categoriesMap}">
+                    <a th:href="@{/search(category=${category.key})}"
+                       th:text="${category.key}"></a>
+
+                    <div class="submenu">
+                        <p class="submenu-title" th:text="${category.key}"></p>
+                        <th:block th:each="subCategory : ${category.value}">
+                            <a th:href="@{/search(category=${category.key + '>' + subCategory})}"
+                               th:text="${subCategory}"></a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 상품 리스트 (관리자용) 버튼 - currentUserRole이 ADMIN일 때만 표시 -->
+        <a th:if="${currentUserRole != null and currentUserRole == 'ADMIN'}" th:href="@{/products}" class="nav-link" style="margin-left: auto; align-self: center; padding: 0 15px;">상품 리스트 (관리자용)</a>
+    </div>
+
+    <!-- 오른쪽 고정 메뉴 -->
+    <div id="header-bottom-menu">
+        <div id="favorite-link">
+            <p>찜한 상품</p>
+            <img th:src="@{/icon/heart.png}">
+        </div>
+        <div id="top-link">TOP</div>
+    </div>
+
+    <!-- SockJS and STOMP.js for WebSocket messaging (Moved to end of body) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+    <!-- Global WebSocket Connection Script (for authenticated users) -->
+    <script th:src="@{/js/chat-websocket.js}" sec:authorize="isAuthenticated()"></script>
+</header>
+</body>
+</html>

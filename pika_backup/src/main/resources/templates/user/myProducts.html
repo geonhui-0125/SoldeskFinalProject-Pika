@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 상품 관리</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f9f9f9; font-weight: bold; }
+        .product-image { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; }
+        a { text-decoration: none; color: #3498db; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>내 상품 관리</h1>
+    <p><a th:href="@{/user/mypage}">마이 페이지로 돌아가기</a></p>
+
+    <table th:if="${!#lists.isEmpty(myProducts)}">
+        <thead>
+            <tr>
+                <th>이미지</th>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>상태</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="p : ${myProducts}">
+                <td><img th:src="${p.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
+                <td><a th:href="@{/products/info/{id}(id=${p.productId})}" th:text="${p.title}">상품명</a></td>
+                <td th:text="${#numbers.formatInteger(p.price, 0, 'COMMA')} + '원'">가격</td>
+                <td>
+                    <span th:if="${p.productState == 0}" style="color: green;">판매중</span>
+                    <span th:if="${p.productState == 1}" style="color: red;">판매완료</span>
+                </td>
+                <td>
+                    <a th:href="@{/products/info/{id}(id=${p.productId})}">상세보기</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div th:if="${#lists.isEmpty(myProducts)}" style="text-align: center; padding: 20px;">등록된 상품이 없습니다.</div>
+</div>
+</body>
+</html>

@@ -1,35 +1,45 @@
 package com.numlock.pika.service;
 
+import com.numlock.pika.domain.Message;
+import com.numlock.pika.domain.Products;
+import com.numlock.pika.repository.MessageRepository;
+import com.numlock.pika.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import com.numlock.pika.domain.Message;
-import com.numlock.pika.repository.MessageRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final ProductRepository productRepository; // ProductRepository 주입
 
-    public Message saveMessage(String senderId, String recipientId, String content) {
-        Message message = Message.builder()
+    @Transactional
+    public Message saveMessage(String senderId, String recipientId, String content, Integer productId) {
+        Message.MessageBuilder messageBuilder = Message.builder()
                 .senderId(senderId)
                 .recipientId(recipientId)
                 .content(content)
                 .sentAt(LocalDateTime.now())
-                .isRead(false) // Default to unread
-                .build();
-        return messageRepository.save(message);
+                .isRead(false);
+
+        if (productId != null) {
+            Products product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + productId));
+            messageBuilder.product(product);
+        }
+
+        return messageRepository.save(messageBuilder.build());
     }
 
-    public List<Message> getConversation(String user1Id, String user2Id) {
+    public List<Message> getConversation(String user1Id, String user2Id, Integer productId) {
+        if (productId != null) {
+            return messageRepository.findConversationByProduct(user1Id, user2Id, productId);
+        }
         return messageRepository.findConversationBetweenUsers(user1Id, user2Id);
     }
-
-    // You might also add methods to mark messages as read, etc.
 }

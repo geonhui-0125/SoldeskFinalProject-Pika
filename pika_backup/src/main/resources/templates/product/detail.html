@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Detail</title>
+</head>
+<body>
+    <h1>Product Detail</h1>
+    <div>
+        <img th:src="${product.productImage}" alt="Product Image" style="max-width: 300px;">
+    </div>
+    <div>
+        <label>ID:</label> <span th:text="${product.productId}"></span>
+    </div>
+    <div>
+        <label>Title:</label> <span th:text="${product.title}"></span>
+    </div>
+    <div>
+        <label>Price:</label> <span th:text="${product.price}"></span>
+    </div>
+    <div>
+        <label>Description:</label>
+        <p th:text="${product.description}"></p>
+    </div>
+    <div>
+        <label>Seller:</label> <span th:text="${product.sellerId}"></span>
+    </div>
+    <div>
+        <label>Category:</label> <span th:text="${product.categoryId}"></span>
+    </div>
+    <div>
+        <label>Status:</label> <span th:text="${product.productState == 0 ? 'Selling' : 'Sold'}"></span>
+    </div>
+    <div>
+        <label>Views:</label> <span th:text="${product.viewCnt}"></span>
+    </div>
+    <div>
+        <label>Created At:</label> <span th:text="${product.createdAt}"></span>
+    </div>
+
+    <!-- 관리자용 상품 삭제 버튼 -->
+    <div th:if="${currentUserRole != null and currentUserRole == 'ADMIN'}" style="margin-top: 20px;">
+        <form id="deleteProductForm" th:action="@{/products/delete/{id}(id=${product.productId})}" method="post">
+            <input type="hidden" name="_method" value="DELETE"/>
+            <button type="submit" class="btn btn-danger">상품 삭제 (관리자용)</button>
+        </form>
+    </div>
+
+    <a th:href="@{/products}">Back to List</a>
+</body>
+</html>
