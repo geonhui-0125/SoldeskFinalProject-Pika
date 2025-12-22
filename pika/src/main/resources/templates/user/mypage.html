@@ -7,35 +7,123 @@
     <!-- product/new.html과 동일한 스타일시트 사용 -->
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/product/new.css}">
+    <link rel="stylesheet" th:href="@{/css/user/account.css}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* new.css에 없는 테이블 및 리스트 스타일 보완 */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; font-size: 0.95em; }
-        th { background-color: #f9f9f9; font-weight: 600; color: #555; }
-        .product-image { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
-        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
         /* 버튼 스타일 */
-        .btn-action { padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.9em; }
-        .btn-action:hover { background: #f5f5f5; }
-        .btn-danger { color: #e74c3c; border-color: #e74c3c; }
-        .btn-danger:hover { background: #e74c3c; color: white; }
-        
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .btn-action:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-danger {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
         /* 리뷰 스타일 */
-        .review-list { display: flex; flex-direction: column; gap: 15px; }
-        .review-card { padding: 15px; border: 1px solid #eee; border-radius: 6px; }
-        .review-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9em; color: #666; }
-        .score { color: #ffbf00; font-weight: bold; }
-        
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review-card {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .score {
+            color: #ffbf00;
+            font-weight: bold;
+        }
+
         /* 링크 스타일 */
-        a { color: #333; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        
+        a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
         /* 프로필 영역 */
-        .profile-container { display: flex; align-items: center; gap: 20px; padding-bottom: 20px; }
-        .profile-img-large { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #eee; }
-        .profile-info h2 { margin: 0 0 5px 0; font-size: 1.3em; }
-        .profile-info p { margin: 0; color: #777; font-size: 0.9em; }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 20px;
+        }
+
+        .profile-img-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #eee;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.3em;
+        }
+
+        .profile-info p {
+            margin: 0;
+            color: #777;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -43,7 +131,7 @@
 <header th:replace="~{header :: mainHeader}"></header>
 
 <section id="product-section">
-    
+
     <!-- 상단 메뉴 바 (new.html과 통일성) -->
     <div class="product-menu-bar">
         <ul class="product-menu-list">
@@ -58,14 +146,93 @@
         <h1 class="product-block-title">내 정보</h1>
         <div class="profile-container">
             <!-- 프로필 이미지 -->
-            <img th:if="${user.profileImage != null}" th:src="${user.profileImage}" class="profile-img-large" onerror="this.src='/images/no-image.png'">
+            <img th:if="${user.profileImage != null}" th:src="${user.profileImage}" class="profile-img-large"
+                 onerror="this.src='/images/no-image.png'">
             <img th:unless="${user.profileImage != null}" src="/images/no-image.png" class="profile-img-large">
-            
+
             <div class="profile-info">
                 <h2 th:text="${user.nickname}">닉네임</h2>
                 <p th:text="${user.email}">user@example.com</p>
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 10px; display: flex; gap: 8px;">
                     <a href="/user/add-info" class="btn-action">정보 수정</a>
+                    <button type="button" class="btn-action" onclick="openBankModal()"
+                            style="background-color: #fffaf9; border-color: #ff4500; color: #ff4500;">계좌 관리
+                    </button>
+                </div>
+            </div>
+
+            <div id="bankModal" class="fixed-modal hidden">
+                <div class="modal-overlay" onclick="closeBankModal()"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">정산 계좌 관리</h3>
+                        <button type="button" onclick="closeBankModal()" class="close-icon-btn">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="accountView">
+                            <div class="info-box" style="padding: 20px; text-align: center;">
+                                <div th:if="${accounts.accountNumber != null}">
+                                    <p style="color: #888; margin-bottom: 10px;">현재 등록된 정산 계좌</p>
+                                    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                                        <img th:src="@{'/icon/' + ${accounts.bankCode} + '.png'}"
+                                             style="width: 30px; height: 30px;">
+                                        <span style="font-size: 1.2em; font-weight: bold;"
+                                              th:with="accLen=${#strings.length(accounts.accountNumber)}"
+                                              th:text="${#strings.substring(accounts.accountNumber, 0, 4)} + ${#strings.repeat('*', accLen - 4)}"></span>
+                                    </div>
+                                    <button type="button" onclick="showEditForm()" class="btn-submit-full">정보 변경하기
+                                    </button>
+                                </div>
+
+                                <div th:unless="${accounts.accountNumber != null}">
+                                    <p style="color: #999; margin: 30px 0;">등록된 계좌 정보가 없습니다.</p>
+                                    <button type="button" onclick="showEditForm()" class="btn-submit-full">계좌 등록하기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="accountEditForm" th:action="@{/accounts/save}" th:object="${accounts}" method="post"
+                              class="hidden">
+                            <div class="bank-grid">
+                                <div th:each="bank : ${bankList}" class="bank-item"
+                                     th:attr="data-code=${bank.code}, data-name=${bank.name}, data-len=${bank.len}"
+                                     onclick="selectBank(this)">
+                                    <img th:src="@{'/icon/' + ${bank.code} + '.png'}" class="bank-icon">
+                                    <span th:text="${bank.name}">은행명</span>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>선택된 은행</label>
+                                <div id="selected-bank-name" class="selected-bank-box">은행을 선택하세요</div>
+                                <input type="hidden" th:field="*{bankCode}" id="bankCode">
+                            </div>
+
+                            <div class="input-group">
+                                <label>계좌번호</label>
+                                <div class="flex-row">
+                                    <input type="text" th:field="*{accountNumber}" id="accountNumber"
+                                           class="styled-input" placeholder="'-' 없이 숫자만 입력">
+                                    <button type="button" class="btn-verify" onclick="verifyAccount()">조회</button>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <label>예금주 확인</label>
+                                <input type="text" id="accountHolderDisplay" class="styled-input readonly" readonly
+                                       placeholder="조회 버튼을 눌러주세요">
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" onclick="showView()" class="btn-action" style="flex: 1;">돌아가기
+                                </button>
+                                <button type="submit" class="btn-submit-full" style="flex: 2; margin-top: 0;">저장하기
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,11 +257,16 @@
                 </thead>
                 <tbody>
                 <tr th:each="p : ${myProducts}">
-                    <td><img th:src="${p.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
+                    <td><img th:src="${p.productImage}" class="product-image" onerror="this.src='/images/no-image.png'">
+                    </td>
                     <td style="text-align: left;">
-                        <a th:href="@{/products/info/{id}(id=${p.productId})}" th:text="${p.title}" style="font-weight: 600;">상품명</a>
-                        <div style="font-size: 0.8em; color: #999; margin-top: 4px;" th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일</div>
-                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${p.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
+                        <a th:href="@{/products/info/{id}(id=${p.productId})}" th:text="${p.title}"
+                           style="font-weight: 600;">상품명</a>
+                        <div style="font-size: 0.8em; color: #999; margin-top: 4px;"
+                             th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일
+                        </div>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${p.sellerId})}"
+                           style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
                     </td>
                     <td th:text="${#numbers.formatInteger(p.price, 0, 'COMMA')} + '원'">가격</td>
                     <td>
@@ -102,9 +274,14 @@
                         <span th:if="${p.productState == 1}" style="color: #e74c3c; font-weight: bold;">판매완료</span>
                     </td>
                     <td>
-                        <button class="btn-action" th:onclick="'location.href=\'/products/info/' + ${p.productId} + '\''">상세</button>
-                        <button class="btn-action" th:onclick="'location.href=\'/products/edit/' + ${p.productId} + '\''">수정</button>
-                        <form th:action="@{/products/delete/{id}(id=${p.productId})}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <button class="btn-action"
+                                th:onclick="'location.href=\'/products/info/' + ${p.productId} + '\''">상세
+                        </button>
+                        <button class="btn-action"
+                                th:onclick="'location.href=\'/products/edit/' + ${p.productId} + '\''">수정
+                        </button>
+                        <form th:action="@{/products/delete/{id}(id=${p.productId})}" method="post"
+                              style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
                             <button type="submit" class="btn-action btn-danger">삭제</button>
                         </form>
                     </td>
@@ -112,14 +289,16 @@
                 </tbody>
             </table>
         </div>
-        <div th:if="${#lists.isEmpty(myProducts)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+        <div th:if="${#lists.isEmpty(myProducts)}" class="empty-msg"
+             style="text-align: center; padding: 30px; color: #999;">
             등록된 상품이 없습니다.
         </div>
     </div>
 
     <!-- 2. 찜 목록 (Wishlist) -->
     <div class="product-block">
-        <h1 class="product-block-title">찜한 상품 <span th:text="'(' + ${#lists.size(wishlist)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
+        <h1 class="product-block-title">찜한 상품 <span th:text="'(' + ${#lists.size(wishlist)} + ')'"
+                                                    style="font-size:0.7em; color:#888;"></span></h1>
 
         <div class="scroll-container" th:if="${!#lists.isEmpty(wishlist)}">
             <table>
@@ -133,34 +312,42 @@
                 </thead>
                 <tbody>
                 <tr th:each="w : ${wishlist}">
-                    <td><img th:src="${w.productImage}" class="product-image" onerror="this.src='/images/no-image.png'"></td>
+                    <td><img th:src="${w.productImage}" class="product-image" onerror="this.src='/images/no-image.png'">
+                    </td>
                     <td style="text-align: left;">
-                        <a th:href="@{/products/info/{id}(id=${w.productId})}" th:text="${w.title}" style="font-weight: 600;">상품명</a>
-                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${w.sellerId})}" style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
+                        <a th:href="@{/products/info/{id}(id=${w.productId})}" th:text="${w.title}"
+                           style="font-weight: 600;">상품명</a>
+                        <a th:href="@{/reviews/seller/{sellerId}(sellerId=${w.sellerId})}"
+                           style="font-size: 0.8em; color: #007bff; margin-top: 5px; display: block;">판매자 리뷰 보기</a>
                     </td>
                     <td th:text="${#numbers.formatInteger(w.price, 0, 'COMMA')} + '원'">가격</td>
                     <td>
-                        <button class="btn-action btn-danger" th:onclick="'deleteWish(' + ${w.productId} + ')'">찜 취소</button>
+                        <button class="btn-action btn-danger" th:onclick="'deleteWish(' + ${w.productId} + ')'">찜 취소
+                        </button>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div th:if="${#lists.isEmpty(wishlist)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+        <div th:if="${#lists.isEmpty(wishlist)}" class="empty-msg"
+             style="text-align: center; padding: 30px; color: #999;">
             찜한 상품이 없습니다.
         </div>
     </div>
 
     <!-- 3. 상점 후기 (Reviews) -->
     <div class="product-block">
-        <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'" style="font-size:0.7em; color:#888;"></span></h1>
+        <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'"
+                                                       style="font-size:0.7em; color:#888;"></span></h1>
 
         <div class="scroll-container" th:if="${!#lists.isEmpty(myReviews)}">
             <div class="review-list">
                 <div th:each="r : ${myReviews}" class="review-card">
                     <div class="review-header">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <img th:if="${r.profileImage != null}" th:src="${r.profileImage}" style="width: 24px; height: 24px; border-radius: 50%;" onerror="this.src='/images/no-image.png'">
+                            <img th:if="${r.profileImage != null}" th:src="${r.profileImage}"
+                                 style="width: 24px; height: 24px; border-radius: 50%;"
+                                 onerror="this.src='/images/no-image.png'">
                             <strong th:text="${r.userId}" style="color: #333;">작성자</strong>
                         </div>
                         <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
@@ -172,7 +359,8 @@
                 </div>
             </div>
         </div>
-        <div th:if="${#lists.isEmpty(myReviews)}" class="empty-msg" style="text-align: center; padding: 30px; color: #999;">
+        <div th:if="${#lists.isEmpty(myReviews)}" class="empty-msg"
+             style="text-align: center; padding: 30px; color: #999;">
             받은 후기가 없습니다.
         </div>
     </div>
@@ -182,12 +370,12 @@
 <script th:src="@{/js/header.js}"></script>
 <script>
     function deleteWish(productId) {
-        if(!confirm('정말 찜을 취소하시겠습니까?')) return;
-        
+        if (!confirm('정말 찜을 취소하시겠습니까?')) return;
+
         fetch('/api/product/' + productId + '/wish', {
             method: 'DELETE'
         }).then(response => {
-            if(response.ok) {
+            if (response.ok) {
                 // 성공 시 현재 페이지 리로드
                 location.reload();
             } else {
@@ -199,5 +387,6 @@
         });
     }
 </script>
+<script src="/js/user/account.js"></script>
 </body>
 </html>

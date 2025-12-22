@@ -135,10 +135,13 @@ public class ProductController {
     }
 
 
+
     // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
 
     @GetMapping("/info/{id}")
     public String detail2(@PathVariable("id") int id, Principal principal, Model model) {
+
+        productService.upView(id);
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
         model.addAttribute("categoriesMap", categoriesMap);

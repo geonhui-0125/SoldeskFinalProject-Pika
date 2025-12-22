@@ -3,10 +3,12 @@ package com.numlock.pika.service.payment;
 import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.domain.Payments;
 import com.numlock.pika.domain.Products;
+import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.payment.PaymentResDto;
 import com.numlock.pika.repository.AccountRepository;
 import com.numlock.pika.repository.PaymentRepository;
 import com.numlock.pika.repository.ProductRepository;
+import com.numlock.pika.repository.UserRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
@@ -34,6 +36,9 @@ public class PaymentApiService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private SmsService smsService;
@@ -103,12 +108,20 @@ public class PaymentApiService {
 
     @Transactional
     public void savePaymentInfo(PaymentResDto paymentResDto) {
+
+        Products products = productRepository.findById(paymentResDto.getTaskId())
+                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다"));
+
+        Users buyer = userRepository.findById(paymentResDto.getBuyerId())
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다"));
+
         Payments payment = Payments.builder()
                 .impUid(paymentResDto.getImpUid())
                 .merchantUid(paymentResDto.getMerchantUid())
-                .taskId(paymentResDto.getTaskId())
+                .task(products)
                 .amount(paymentResDto.getAmount())
-                .buyerId(paymentResDto.getBuyerId())
+                .seller(products.getSeller())
+                .buyer(buyer)
                 .build();
 
         paymentRepository.save(payment);
@@ -129,8 +142,8 @@ public class PaymentApiService {
                 .orElseThrow(() -> new RuntimeException("결제 정보를 찾을 수 없습니다."));
 
         // 상품 상태를 '판매완료'(1)로 변경
-        Products product = productRepository.findById(payments.getTaskId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTaskId()));
+        Products product = productRepository.findById(payments.getTask().getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTask()));
         product.setProductState(1);
         productRepository.save(product);
 
@@ -164,8 +177,9 @@ public class PaymentApiService {
 
         System.out.println("payments : " + payments);
 
-        Products product = productRepository.findById(payments.getTaskId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTaskId()));
+        Products product = productRepository.findById(payments.getTask().getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + payments.getTask()));
+
         product.setProductState(0);
         productRepository.save(product);
 
