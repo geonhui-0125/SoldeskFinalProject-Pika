@@ -72,7 +72,7 @@ public class NotificationService {
         Payments payments = paymentRepository.findById(impUid)
                 .orElseThrow(() -> new RuntimeException("해당 결제 내역을 찾을 수 없습니다"));
 
-        Products product = productRepository.findById(payments.getTaskId())
+        Products product = productRepository.findById(payments.getTask().getProductId())
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
         String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -134,7 +134,7 @@ public class NotificationService {
         Payments payments = paymentRepository.findById(impUid)
                 .orElseThrow(() -> new RuntimeException("해당 결제 내역을 찾을 수 없습니다"));
 
-        Products product = productRepository.findById(payments.getTaskId())
+        Products product = productRepository.findById(payments.getTask().getProductId())
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
 
         String productName = product.getTitle();

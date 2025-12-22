@@ -1,0 +1,170 @@
+/* 모달 레이아웃 */
+.fixed-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    width: 92%;
+    max-width: 420px;
+    border-radius: 24px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+}
+
+/* 헤더: 제목 옆 닫기 버튼 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.close-icon-btn {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #999;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+
+.close-icon-btn:hover {
+    color: #333;
+}
+
+/* 은행 그리드 */
+.bank-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 25px;
+    padding-right: 5px;
+}
+
+.bank-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 5px;
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+.bank-item:hover {
+    background: #f8f9fa;
+}
+
+.bank-icon {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.bank-item span {
+    font-size: 13px;
+    color: #555;
+}
+
+/* 입력창 Padding 및 스타일 강화 */
+.input-group {
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.styled-input {
+    width: 100%;
+    padding: 14px 16px; /* 넉넉한 여백 */
+    border: 1.5px solid #eaeaea;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.styled-input:focus {
+    border-color: #ff4500;
+}
+
+.styled-input.readonly {
+    background-color: #fcfcfc;
+    color: #888;
+    border-color: #f0f0f0;
+}
+
+.selected-bank-box {
+    padding: 14px 16px;
+    background: #fff9f7;
+    border: 1.5px solid #ffe4db;
+    border-radius: 12px;
+    font-weight: 700;
+    color: #ff4500;
+}
+
+/* 버튼들 */
+.flex-row {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-verify {
+    padding: 0 18px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.btn-submit-full {
+    width: 100%;
+    padding: 18px;
+    background: #ff4500;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.2);
+}
+
+.hidden {
+    display: none !important;
+}

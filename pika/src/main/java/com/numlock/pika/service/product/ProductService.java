@@ -14,6 +14,7 @@ public interface ProductService {
 
     List<ProductDto> getAllProducts();
 
+    void upView(int productId);
 
     ProductDto getProductById(int productId);
 

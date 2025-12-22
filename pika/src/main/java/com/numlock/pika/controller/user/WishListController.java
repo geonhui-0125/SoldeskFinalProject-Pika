@@ -1,5 +1,6 @@
 package com.numlock.pika.controller.user;
 
+import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.ReviewService;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.numlock.pika.service.user.AccountService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +35,7 @@ public class WishListController {
 	private final ProductService productService;
 	private final ReviewService reviewService;
 	private final CategoryService categoryService;
+	private final AccountService accountService;
 
 	@GetMapping("wishlist")
 	public String wishlist(Principal principal, Model model) {
@@ -83,6 +86,12 @@ public class WishListController {
 		Users user = userRepository.findById(userId).orElse(null);
 		if(user == null) return "redirect:/";
 		model.addAttribute("user", user);
+
+		// 계좌 정보 조회/생성
+		Accounts account = accountService.getOrCreateAccount(user);
+		model.addAttribute("accounts", account);
+
+		model.addAttribute("bankList", accountService.getBankList());
 
 		// My Products
 		List<ProductDto> myProducts = productService.getProductsBySeller(userId);

@@ -2,6 +2,7 @@ package com.numlock.pika.repository;
 
 import com.numlock.pika.domain.Accounts;
 import com.numlock.pika.domain.Products;
+import com.numlock.pika.domain.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +16,5 @@ public interface AccountRepository extends JpaRepository<Accounts, Integer> {
     @Query(value = "SELECT a FROM Accounts a WHERE a.seller.id = :sellerId")
     Optional<Accounts> findByUserId(@Param("sellerId") String sellerId);
 
+    Optional<Accounts> findBySeller(Users seller);
 }
