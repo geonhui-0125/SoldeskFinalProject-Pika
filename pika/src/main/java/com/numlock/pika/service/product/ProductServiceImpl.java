@@ -84,6 +84,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    public void upView(int productId) {
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + productId));
+        product.setViewCnt(product.getViewCnt() + 1);
+        productRepository.save(product);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ProductDto getProductById(int productId) {
         // Repository의 findById가 int를 받도록 가정
@@ -116,7 +125,7 @@ public class ProductServiceImpl implements ProductService {
                 buyerType = "sell"; // 판매자
             } else {
                 // 특정 상품과 구매자에 대한 결제 정보 확인
-                Optional<Payments> paymentOpt = paymentRepository.findByBuyerIdAndTaskId(buyerId, productId);
+                Optional<Payments> paymentOpt = paymentRepository.findByBuyerAndTask(users, products);
                 if (paymentOpt.isPresent()) {
                     buyerType = "buy"; // 해당 상품을 결제한 구매자
                     impUid = paymentOpt.get().getImpUid();

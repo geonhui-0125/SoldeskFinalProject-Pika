@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"> <!-- Font Awesome CDN 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Font Awesome CDN 추가 -->
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/product/info.css}">
     <title>Title</title>
@@ -67,23 +68,36 @@
             </ul>
 
             <div class="product-actions" th:object="${productDetailDto}">
-                <th:block th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
+                <th:block
+                        th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
 
                     <!-- '찜' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="like-btn wish-btn" disabled>찜</button>
-                        <button th:case="'visit'" class="like-btn" th:onclick="|location.href='@{/user/login}'|">찜</button>
+                        <button th:case="'visit'" class="like-btn" th:onclick="|location.href='@{/user/login}'|">찜
+                        </button>
                         <!-- Explicit cases for 'view' and 'buy' -->
-                        <button th:case="'view'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
-                        <button th:case="'buy'" class="like-btn wish-btn" th:classappend="${wished} ? 'wished-active' : ''">찜</button>
+                        <button th:case="'view'" class="like-btn wish-btn"
+                                th:classappend="${wished} ? 'wished-active' : ''">찜
+                        </button>
+                        <button th:case="'buy'" class="like-btn wish-btn"
+                                th:classappend="${wished} ? 'wished-active' : ''">찜
+                        </button>
                     </th:block>
 
                     <!-- '채팅하기' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
-                        <button th:case="'visit'" class="chat-btn" th:onclick="|location.href='@{/user/login}'|">채팅하기</button>
-                        <button th:case="'view'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
-                        <button th:case="'buy'" class="chat-btn" th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">채팅하기</button>
+                        <button th:case="'visit'" class="chat-btn" th:onclick="|location.href='@{/user/login}'|">채팅하기
+                        </button>
+                        <button th:case="'view'" class="chat-btn"
+                                th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">
+                            채팅하기
+                        </button>
+                        <button th:case="'buy'" class="chat-btn"
+                                th:onclick="|location.href='@{/chat/dm(recipientId=${sellerId}, productId=${productId})}'|">
+                            채팅하기
+                        </button>
                     </th:block>
 
                     <!-- Main action buttons logic -->
@@ -93,17 +107,23 @@
                         <th:block th:case="0">
                             <th:block th:switch="${type}">
                                 <!-- 'view' and 'buy' should have the same behavior here -->
-                                <button th:case="'view'" class="buy-btn" th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제</button>
-                                <button th:case="'buy'" class="buy-btn" th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제</button>
+                                <button th:case="'view'" class="buy-btn"
+                                        th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제
+                                </button>
+                                <button th:case="'buy'" class="buy-btn"
+                                        th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제
+                                </button>
                                 <button th:case="'sell'" class="buy-btn" disabled>상품결제</button>
-                                <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">상품결제</button>
+                                <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">
+                                    상품결제
+                                </button>
                             </th:block>
                         </th:block>
 
                         <!-- Case 2: Payment Pending -->
                         <th:block th:case="2">
                             <th:block th:if="${type == 'buy'}">
-                                <input type="hidden" id="impUid" th:value="*{impUid}" />
+                                <input type="hidden" id="impUid" th:value="*{impUid}"/>
                                 <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
                                 <button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>
                             </th:block>
@@ -133,16 +153,18 @@
         <section class="seller-info">
             <h3>판매자</h3>
             <div class="seller-box"
-                   style="text-decoration: none; color: inherit; display: flex; align-items: center;">
-                    <img th:src="@{${productDetailDto.seller.profileImage}}">
-                    <div>
-                        <p th:text="*{seller.nickname}"></p>
-                        <p>별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span> <span
-                                class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
-                    </div>
+                 style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+                <img th:src="@{${productDetailDto.seller.profileImage}}">
+                <div>
+                    <p th:text="*{seller.nickname}"></p>
+                    <p>
+                        <th:block th:if="${productDetailDto.star != 0}">
+                            별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span>
+                        </th:block>
+                        <span class="review-summary">요약 로딩 중...</span></p> <!--별 모양 icon 생기면 수정 -->
                 </div>
+            </div>
         </section>
-
 
 
     </div>
