@@ -2,6 +2,7 @@ package com.numlock.pika.controller;
 
 import com.numlock.pika.domain.Search;
 import com.numlock.pika.dto.ProductDto;
+import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.product.SearchService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -27,13 +29,14 @@ public class SearchController {
     private final ProductService productService;
     private final SearchService searchService;
     private final CategoryService categoryService;
+    private final UserRepository userRepository;
 
     // 검색용 메소드 수정
     @GetMapping
     public String searchProducts (
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "category", required = false) String categoryName,
-            Model model,
+            Model model, Principal principal,
             @PageableDefault(size = 15) Pageable pageable){ // 기본 사이즈 15개 설정
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
@@ -63,6 +66,13 @@ public class SearchController {
 
         model.addAttribute("keyword", keyword);
         model.addAttribute("activeCategory", categoryName);
+
+        if (principal != null) {
+
+            userRepository.findById(principal.getName()).ifPresent(user -> {
+                model.addAttribute("user", user);
+            });
+        }
 
         return "product/search";
     }
