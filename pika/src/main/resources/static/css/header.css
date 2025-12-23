@@ -76,7 +76,7 @@ ul {
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
     flex-grow: 1;
 }
 
@@ -123,6 +123,7 @@ ul {
     border-radius: 25px;
     padding: 10px 16px;
     width: 420px;
+    margin: 0 auto;
 }
 
 #search-bar input {
