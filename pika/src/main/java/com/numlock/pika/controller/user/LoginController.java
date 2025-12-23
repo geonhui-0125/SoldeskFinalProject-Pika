@@ -2,7 +2,7 @@ package com.numlock.pika.controller.user;
 
 import com.numlock.pika.domain.Users;
 
-import com.numlock.pika.dto.UserDto;
+import com.numlock.pika.dto.user.UserDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.user.LoginService;
@@ -19,10 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import java.security.Principal;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Controller
@@ -55,6 +51,15 @@ public class LoginController {
             return "user/joinForm";
         }
 
+        //비밀번호와 비밀번호 확인 일치 여부 검사
+        if(!userDto.getPw().equals(userDto.getConfirmPw())){
+            bindingResult.rejectValue("confirmPw", "passwordMismatch", "비밀번호가 일치하지 않습니다.");
+            log.error("---Password Mismatch");
+            log.error("패스워드와 패스워드 확인이 일치하지 않습니다. 유저ID: {}", userDto.getId());
+            model.addAttribute("errorMessage", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            return "user/joinForm";
+        }
+
         try {
             //DTO -> Entity변환
             Users user = new Users();
@@ -63,31 +68,14 @@ public class LoginController {
             user.setNickname(userDto.getNickname());
             user.setEmail(userDto.getEmail());
 
-            /*
-            String profileImagePath = null;
-            // 1. 프로필 이미지 비어있이 않으면 저장
-            if(profileImageFile != null && !profileImageFile.isEmpty()) {
-                profileImagePath = fileUploadService.storeImg(profileImageFile);
-            }
-            // 2. 프로필 이미지 업로드가 없거나 저장 실패시 기본이미지 설정
-            if (profileImagePath == null) {
-                profileImagePath = "/profile/default-profile.jpg"; // 기본 이미지 경로
-            }
-            */
             String profileImagePath = "/profile/default-profile.jpg";
             user.setProfileImage(profileImagePath);
-            // 3. 사용자 정보 저장
+            // 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
             System.out.println("회원가입 완료 ID: " +  user.getId() + ", 닉네임: " + user.getNickname());
             loginService.joinUser(user);
             log.info("User {} joined successfully.", user.getId());
 
-        /*} catch (IOException e) {
-            log.error("--- IOException Occurred ---", e);
-            log.error("File upload failed for user {}: {}", userDto.getId(), e.toString());
-            model.addAttribute("errorMessage", "프로필 이미지 업로드에 실패했습니다.");
-            model.addAttribute("user", userDto);
-            return "user/joinForm";*/
         } catch (Exception e) {
             log.error("--- Exception Occurred ---", e);
             model.addAttribute("errorMessage", "입력된 정보가 올바르지 않습니다. " + e.getMessage()); // 오류 메시지 복원

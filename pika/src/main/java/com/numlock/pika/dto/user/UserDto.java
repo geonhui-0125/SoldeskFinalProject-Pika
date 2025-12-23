@@ -1,10 +1,9 @@
-package com.numlock.pika.dto;
+package com.numlock.pika.dto.user;
 
 import java.util.Date;
 
 import com.numlock.pika.domain.Users;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -30,6 +29,10 @@ public class UserDto {
     @Pattern(regexp = "^[a-zA-Z0-9]{4,20}$", message = "비밀번호는 4~20자의 알파벳과 숫자만 사용 가능합니다.")
 	private String pw;
 
+	@NotBlank(message = "비밀번호를 다시 한 번 입력하세요.")
+	@Pattern(regexp = "^[a-zA-Z0-9]{4,20}$", message = "비밀번호는 4~20자의 알파벳과 숫자만 사용 가능합니다.")
+	private String confirmPw;
+
     @NotBlank(message = "닉네임을 입력하세요.")
 	private String nickname;
 
@@ -38,7 +41,7 @@ public class UserDto {
 	private String email;
 
 	private String profileImage;
-	private String adress;
+	private String address;
 	private String phone;
 	private Date birth;
 	private String role;
@@ -50,7 +53,7 @@ public class UserDto {
 				.nickname(user.getNickname())
 				.email(user.getEmail())
 				.profileImage(user.getProfileImage())
-				.adress(user.getAddress())
+				.address(user.getAddress())
 				.phone(user.getPhone())
 				.birth(user.getBirth())
 				.role(user.getRole())

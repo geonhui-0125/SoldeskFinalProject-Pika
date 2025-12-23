@@ -1,6 +1,6 @@
 package com.numlock.pika.controller.user;
 
-import com.numlock.pika.dto.AdditionalUserInfoDto;
+import com.numlock.pika.dto.user.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.user.LoginService;
 import com.numlock.pika.service.user.UserService;
