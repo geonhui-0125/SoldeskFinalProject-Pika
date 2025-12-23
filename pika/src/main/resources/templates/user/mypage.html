@@ -365,6 +365,18 @@
         </div>
     </div>
 
+    <!--내 알림 보기 (동적 로딩)-->
+    <div class="product-block">
+        <h1 class="product-block-title">
+            내 알림 <span id="mypage-notification-count" style="font-size:0.7em; color:#888;"></span>
+            <button type="button" class="btn-action" style="float: right; font-size: 0.7em;" onclick="deleteAllNotifications()">전체 삭제</button>
+        </h1>
+
+        <div id="mypage-notification-list-container" class="scroll-container">
+            <!-- 알림이 동적으로 여기에 추가됩니다. -->
+        </div>
+    </div>
+
 </section>
 
 <script th:src="@{/js/header.js}"></script>
@@ -376,7 +388,6 @@
             method: 'DELETE'
         }).then(response => {
             if (response.ok) {
-                // 성공 시 현재 페이지 리로드
                 location.reload();
             } else {
                 alert('취소에 실패했습니다.');
@@ -386,6 +397,162 @@
             alert('오류가 발생했습니다.');
         });
     }
+
+    // --- 알림 관련 함수 ---
+
+    function deleteAllNotifications() {
+        if (!confirm('모든 알림을 삭제하시겠습니까?')) return;
+        fetch('/notifications/delete/all', { method: 'DELETE' }) // API 경로 수정 가능성 고려
+            .then(handleResponse).catch(handleError);
+    }
+
+    function readNotification(notificationId) {
+        fetch('/notifications/read/' + notificationId, { method: 'PUT' })
+             .then(handleResponse).catch(handleError);
+    }
+
+    function deleteNotification(notificationId) {
+        if (!confirm('이 알림을 삭제하시겠습니까?')) return;
+        fetch('/notifications/delete/' + notificationId, { method: 'DELETE' })
+            .then(handleResponse).catch(handleError);
+    }
+
+    function handleResponse(response) {
+        if (response.ok) {
+            // 성공 시 알림 목록을 다시 로드
+            loadNotifications();
+            // 헤더의 알림 수를 업데이트하기 위해 이벤트를 발생시킴
+            document.dispatchEvent(new CustomEvent('notifications-updated'));
+        } else {
+            alert('요청 처리에 실패했습니다.');
+        }
+    }
+
+    function handleError(err) {
+        console.error('오류가 발생했습니다.', err);
+        alert('오류가 발생했습니다.');
+    }
+
+    function readNotificationAndGo(event, notificationId, url) {
+        event.preventDefault();
+        fetch('/notifications/read/' + notificationId, { method: 'PUT' })
+            .then(() => { window.location.href = url; })
+            .catch(() => { window.location.href = url; }); // 실패 시에도 이동
+    }
+
+
+    // --- 페이지 로드 시 내 알림 목록 동적 로딩 함수 ---
+
+    function loadNotifications() {
+        const listContainer = document.getElementById('mypage-notification-list-container');
+        const countSpan = document.getElementById('mypage-notification-count');
+
+        fetch('/notifications/all')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(notifications => {
+                listContainer.innerHTML = ''; // 컨테이너 초기화
+                countSpan.textContent = `(${notifications.length})`;
+
+                if (notifications.length === 0) {
+                    listContainer.innerHTML = `<div class="empty-msg" style="text-align: center; padding: 40px; color: #999;">알림 내역이 없습니다.</div>`;
+                    return;
+                }
+
+                const newNotifications = notifications.filter(n => n.isRead === 0);
+                const readNotifications = notifications.filter(n => n.isRead === 1);
+
+                const fragment = document.createDocumentFragment();
+
+                // 신규 알림 섹션
+                if (newNotifications.length > 0) {
+                    fragment.appendChild(createNotificationGroup('신규 알림', '#ff4500', newNotifications));
+                    const hr = document.createElement('hr');
+                    hr.style.cssText = "border: 0; border-top: 1px dashed #eee; margin: 25px 0;";
+                    fragment.appendChild(hr);
+                }
+                
+                // 이전 알림 섹션
+                fragment.appendChild(createNotificationGroup('이전 알림', '#888', readNotifications));
+                
+                listContainer.appendChild(fragment);
+
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
+                listContainer.innerHTML = '<div class="empty-msg" style="text-align: center; padding: 40px; color: #999;">알림을 불러오는 중 오류가 발생했습니다.</div>';
+            });
+    }
+
+    function createNotificationGroup(title, titleColor, items) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'notification-group';
+
+        const titleH3 = document.createElement('h3');
+        titleH3.style.cssText = `font-size: 0.9em; color: ${titleColor}; margin: 15px 0 10px 5px;`;
+        titleH3.textContent = title;
+        groupDiv.appendChild(titleH3);
+
+        const reviewListDiv = document.createElement('div');
+        reviewListDiv.className = 'review-list';
+
+        if (items.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.style.cssText = "padding: 20px; text-align: center; color: #ccc; font-size: 0.9em;";
+            emptyMsg.textContent = title === '신규 알림' ? '새로운 알림이 없습니다.' : '확인한 알림이 없습니다.';
+            reviewListDiv.appendChild(emptyMsg);
+        } else {
+            items.forEach(n => {
+                reviewListDiv.appendChild(createNotificationCard(n));
+            });
+        }
+        groupDiv.appendChild(reviewListDiv);
+        return groupDiv;
+    }
+
+    function createNotificationCard(n) {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'review-card';
+
+        const isNew = n.isRead === 0;
+
+        if (isNew) {
+            cardDiv.style.borderLeft = '4px solid #ff4500';
+        } else {
+            cardDiv.style.backgroundColor = '#fcfcfc';
+            cardDiv.style.opacity = '0.7';
+        }
+
+        const actionUrlLink = n.actionUrl ? `<a href="${n.actionUrl}" style="font-size: 0.85em; color: #007bff;" onclick="readNotificationAndGo(event, ${n.notificationId}, '${n.actionUrl}')">상세보기 이동</a>` : '';
+
+        cardDiv.innerHTML = `
+            <div class="review-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    ${isNew ? '<span style="color: #ff4500; font-size: 0.8em;">●</span>' : ''}
+                    <strong style="color: ${isNew ? '#333' : '#666'};">${n.title}</strong>
+                    ${n.type ? `<span style="font-size: 0.7em; color: #999; border: 1px solid #eee; padding: 2px 5px; border-radius: 3px;">${n.type}</span>` : ''}
+                </div>
+                <span style="font-size: 0.85em;">${n.timeAgo}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <p style="color: ${isNew ? '#555' : '#888'}; line-height: 1.4; margin-bottom: 5px;">${n.content}</p>
+                    ${isNew ? actionUrlLink : ''}
+                </div>
+                <div style="display: flex; gap: 5px; margin-left: 10px;">
+                    ${isNew ? `<button class="btn-action" onclick="readNotification(${n.notificationId})">읽음</button>` : ''}
+                    <button class="btn-action btn-danger" onclick="deleteNotification(${n.notificationId})">삭제</button>
+                </div>
+            </div>
+        `;
+        return cardDiv;
+    }
+
+    // --- DOMContentLoaded 이벤트 리스너 ---
+    document.addEventListener('DOMContentLoaded', loadNotifications);
+
 </script>
 <script src="/js/user/account.js"></script>
 </body>

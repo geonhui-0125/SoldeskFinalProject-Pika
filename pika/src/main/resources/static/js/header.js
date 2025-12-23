@@ -262,4 +262,10 @@ $(document).ready(function () {
         // A more advanced implementation could check if the user is already in the specific chat window.
         updateNotificationCount();
     });
+
+    // mypage.html 등 다른 페이지에서 알림 상태가 변경되었을 때 헤더 카운트를 업데이트하기 위한 리스너
+    document.addEventListener('notifications-updated', function() {
+        console.log("Global listener received 'notifications-updated' event. Updating notification count.");
+        updateNotificationCount();
+    });
 });
