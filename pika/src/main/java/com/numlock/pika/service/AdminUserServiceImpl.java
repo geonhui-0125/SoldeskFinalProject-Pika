@@ -1,7 +1,7 @@
 package com.numlock.pika.service;
 
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.AdminUserDto;
+import com.numlock.pika.dto.user.AdminUserDto;
 import com.numlock.pika.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

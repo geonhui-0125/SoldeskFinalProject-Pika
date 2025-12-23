@@ -6,19 +6,24 @@
 </head>
 <body>
 <header th:fragment="mainHeader" id="main-header">
-    <div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
+    <div class="header-auth">
         <div>
-            <!--<div th:if="${user.profileImage}">
-                <img th:src="${user.profileImage}" alt="프로필 이미지" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-            </div>-->
+    <!--<div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
+        <div>
             <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
             <a href="/user/add-info" id="modify" style="width: 100px; height: 50px">정보수정</a>
         </div>
     </div>
     <div sec:authorize="!isAuthenticated()" class="header-auth">
-        <div>
-            <a href="/user/login" id="login">로그인</a>
-            <a href="/user/join" id="join">회원가입</a>
+        <div>-->
+            <span sec:authorize="!isAuthenticated()">
+                <a href="/user/login" id="login">로그인</a>
+                <a href="/user/join" id="join">회원가입</a>
+            </span>
+            <span sec:authorize="isAuthenticated()">
+                <a href="/user/logout" id="logout">로그아웃</a>
+                <a href="/user/add-info" id="modify">정보수정</a>
+            </span>
         </div>
     </div>
 
@@ -48,9 +53,9 @@
             </div>
         </div>
 				<ul id="main-nav-menu">
-					<li sec:authorize="isAuthenticated()" th:if="${user}">
+					<li th:style="${#authorization.expression('!isAuthenticated')} ? 'visibility: hidden; pointer-event: none;' : ''">
 					<a th:href="@{/chat/list}">채팅</a></li>
-                    <li id="notification-btn" sec:authorize="isAuthenticated()" th:if="${user}">
+                    <li id="notification-btn" th:style="${#authorization.expression('!isAuthenticated')} ? 'visibility: hidden; pointer-event: none;' : ''">
                         <a href="#">알림</a>
                         <span id="notification-count" class="notification-count"></span>
                         <div id="notification-list">

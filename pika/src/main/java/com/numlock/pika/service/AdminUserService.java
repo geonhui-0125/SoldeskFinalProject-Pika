@@ -1,6 +1,6 @@
 package com.numlock.pika.service;
 
-import com.numlock.pika.dto.AdminUserDto; // AdminUserDto 사용
+import com.numlock.pika.dto.user.AdminUserDto; // AdminUserDto 사용
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -5,11 +5,13 @@ import com.numlock.pika.dto.PasswordResetDto;
 import com.numlock.pika.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/user/password")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class PasswordResetController {
 
     private final UserService userService;
@@ -31,7 +34,7 @@ public class PasswordResetController {
     //2. 아이디/이메일 확인 후 인증번호 입력창 활성화
     @PostMapping("/find")
     public String requestPasswordReset(@RequestParam String id,
-                                       @RequestParam String email,
+                                       @Email(message = "올바른 형식의 이메일을 입력해주세요.") String email,
                                        HttpServletRequest request,
                                        RedirectAttributes redirectAttributes) {
        try{
