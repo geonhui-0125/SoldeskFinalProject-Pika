@@ -90,14 +90,14 @@ CREATE TABLE MESSAGES (
                           RECIPIENT_ID VARCHAR2(50) NOT NULL,
                           CONTENT VARCHAR2(1000) NOT NULL,
                           SENT_AT TIMESTAMP(6) NOT NULL,
-		  PRODUCT_ID NUMBER,
-		  foreign key (PRODUCT_ID)
-                              references products (product_id) ON DELETE CASCADE,
                           IS_READ NUMBER(1,0) DEFAULT 0 NOT NULL,
                           foreign key (SENDER_ID)
                               references users (id) ON DELETE CASCADE,
                           foreign key (RECIPIENT_ID)
-                              references users (id) ON DELETE CASCADE
+                              references users (id) ON DELETE CASCADE,
+                        product_id number,
+                        foreign key (product_id)
+                            REFERENCES products (product_id) on delete cascade
 );
 
 CREATE TABLE categories (
