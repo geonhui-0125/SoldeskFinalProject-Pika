@@ -42,7 +42,7 @@ public class UserService {
             user.setProfileImage(profileImagePath);
         }else if(dto.getProfileImage() != null && dto.getProfileImage().equals("default")){
             //"default" 가 DTO에서 넘어오면 기본이미지로 설정(ex. 사용자가 기존 이미지 삭제)
-            user.setProfileImage("/profile/default-profile.jpg");
+            user.setProfileImage("/profile/default-profile.png");
         }
 
         //주소 업데이트
@@ -107,8 +107,8 @@ public class UserService {
     }*/
 
     //비밀번호 재설정 이메일 처리 (JWT 토큰 발송)
-    public void handlePasswordResetRequest(String email, HttpServletRequest request){
-        Optional<Users> userOptional = userRepository.findByEmail(email);
+    public boolean handlePasswordResetRequest(String id, String email, HttpServletRequest request){
+        Optional<Users> userOptional = userRepository.findByIdAndEmail(id, email);
         if(userOptional.isPresent()){
             Users user = userOptional.get();
             String token = jwtUtil.generateToken(user.getId());
@@ -122,11 +122,13 @@ public class UserService {
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
-            message.setSubject("[PIKA] 비밀전호 재설정 인증 메일입니다.");
+            message.setSubject("[PIKA] 비밀번호 재설정 인증 메일입니다.");
             message.setText("pika 비밀번호 재설정 안내 메일입니다. 아래 링크를 클릭하세요 \n\n"+
                     resetLink + "\n\n이 링크는"+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );
             mailSender.send(message);
+            return true;
         }
+        return false;
     }
 
     public boolean resetPassword(String token, String newPassword){

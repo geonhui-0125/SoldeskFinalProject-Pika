@@ -30,12 +30,17 @@ public class PasswordResetController {
 
     //2. 아이디/이메일 확인 후 인증번호 입력창 활성화
     @PostMapping("/find")
-    public String requestPasswordReset(@RequestParam String email,
+    public String requestPasswordReset(@RequestParam String id,
+                                       @RequestParam String email,
                                        HttpServletRequest request,
                                        RedirectAttributes redirectAttributes) {
        try{
-           userService.handlePasswordResetRequest(email, request);
-           redirectAttributes.addFlashAttribute("successMessage", "비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.");
+           boolean success = userService.handlePasswordResetRequest(id, email, request);
+           if(success) {
+               redirectAttributes.addFlashAttribute("successMessage", "비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.");
+           } else {
+               redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 이메일이 일치하는 사용자가 없습니다. 다시 확인해주세요..");
+           }
        } catch (Exception e){
            log.error("비밀번호 재설정 이메일 발송 중 오류 발생: {}", e.getMessage());
            redirectAttributes.addFlashAttribute("errorMessage", "이메일 발송 중 오류가 발생했습니다. 다시 시도해주세요.");
