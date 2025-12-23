@@ -31,7 +31,7 @@ public class Payments {
     private BigDecimal amount; // 포트원에서 보낸 결제 가격
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now(); // 생성일시
+    private LocalDateTime createdAt; // 생성일시
 
     @ManyToOne
     @JoinColumn(name = "seller_id")

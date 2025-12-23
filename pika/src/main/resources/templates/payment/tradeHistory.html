@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이 페이지</title>
+    <!-- product/new.html과 동일한 스타일시트 사용 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/product/new.css}">
+    <link rel="stylesheet" th:href="@{/css/payment/tradeHistory.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* new.css에 없는 테이블 및 리스트 스타일 보완 */
+
+        .menu-select {
+            color: #ff4500;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border-bottom: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.95em;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #555;
+        }
+
+        /* 링크 스타일 */
+        a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 1.3em;
+        }
+
+        .profile-info p {
+            margin: 0;
+            color: #777;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<header th:replace="~{header :: mainHeader}"></header>
+
+<section id="product-section">
+
+    <!-- 상단 메뉴 바 (new.html과 통일성) -->
+    <div class="product-menu-bar">
+        <ul class="product-menu-list">
+            <li class="product-menu-item" onclick="location.href='/user/mypage'">마이페이지</li>
+            <li class="product-menu-item menu-select" onclick="location.href='/trade/history'">구매/판매내역</li>
+            <!-- 필요한 경우 추가 메뉴 -->
+        </ul>
+    </div>
+    <div class="trade-tabs">
+        <div class="tab-btn active" onclick="showTab('purchase')">구매 내역</div>
+        <div class="tab-btn" onclick="showTab('sales')">판매 내역</div>
+    </div>
+
+    <div id="purchase-list" class="history-container active">
+        <div th:if="${#lists.isEmpty(myTradeHistoryDTO.purchases)}" style="text-align: center; padding: 50px; color: #bbb;">
+            구매한 내역이 없습니다.
+        </div>
+        <div class="trade-card" th:each="buy : ${myTradeHistoryDTO.purchases}"
+             th:onclick="openDetail('구매', [[${buy.title}]], [[${buy.amount}]], [[${buy.statusText}]], [[${buy.sellerNickname}]], [[${buy.impUid}]], [[${#temporals.format(buy.purchasedAt, 'yyyy-MM-dd HH:mm')}]])">
+            <img th:src="${buy.productImage}" alt="상품이미지" class="product-img">
+            <div class="trade-info">
+                <div class="title" th:text="${buy.title}">상품 제목</div>
+                <div>
+                    <span class="price" th:text="${#numbers.formatDecimal(buy.amount, 0, 'COMMA', 0, 'POINT')} + '원'">10,000원</span>
+                    <span class="date" th:text="${#temporals.format(buy.purchasedAt, 'yyyy-MM-dd')}">2025-12-22</span>
+                </div>
+            </div>
+            <div th:class="'trade-status status-' + ${buy.productState}" th:text="${buy.statusText}">거래중</div>
+        </div>
+    </div>
+
+    <div id="sales-list" class="history-container">
+        <div th:if="${#lists.isEmpty(myTradeHistoryDTO.sales)}" style="text-align: center; padding: 50px; color: #bbb;">
+            판매한 내역이 없습니다.
+        </div>
+        <div class="trade-card" th:each="sale : ${myTradeHistoryDTO.sales}"
+             th:onclick="openDetail('판매', [[${sale.title}]], [[${sale.amount}]], [[${sale.statusText}]], [[${sale.buyerNickname}]], [[${sale.impUid}]], [[${#temporals.format(sale.soldAt, 'yyyy-MM-dd HH:mm')}]])">
+            <img th:src="${sale.productImage}" alt="상품이미지" class="product-img">
+            <div class="trade-info">
+                <div class="title" th:text="${sale.title}">상품 제목</div>
+                <div>
+                    <span class="price" th:text="${#numbers.formatDecimal(sale.amount, 0, 'COMMA', 0, 'POINT')} + '원'">10,000원</span>
+                    <span class="date" th:text="${#temporals.format(sale.soldAt, 'yyyy-MM-dd')}">2025-12-22</span>
+                </div>
+            </div>
+            <div th:class="'trade-status status-' + ${sale.productState}" th:text="${sale.statusText}">판매완료</div>
+        </div>
+    </div>
+</section>
+
+<div id="detailModal" class="detail-modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-modal" onclick="document.getElementById('detailModal').style.display='none'">&times;</span>
+        <h3 id="m-type" style="margin-top: 0; color: #ff4500;">거래 상세 내역</h3>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <div class="modal-item"><label>상품명</label><span id="m-title"></span></div>
+        <div class="modal-item"><label>거래 금액</label><span id="m-amount" style="font-weight: bold;"></span></div>
+        <div class="modal-item"><label>거래 상태</label><span id="m-status"></span></div>
+        <div class="modal-item"><label id="m-opp-label">상대방</label><span id="m-opponent"></span></div>
+        <div class="modal-item"><label>거래 일시</label><span id="m-date"></span></div>
+        <div class="modal-item"><label>결제 고유번호</label><span id="m-uid" style="font-size: 0.8em; color: #666;"></span></div>
+
+        <button onclick="document.getElementById('detailModal').style.display='none'"
+                style="width: 100%; padding: 12px; background: #333; color: #fff; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer;">닫기</button>
+    </div>
+</div>
+
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/payment/tradeHistory.js}"></script>
+</body>
+</html>
