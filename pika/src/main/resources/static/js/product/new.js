@@ -113,7 +113,7 @@ $(function () {
         return true;
     });
 
-    $(".price-input").on("input", function () {
+    /*$(".price-input").on("input", function () {
         // 현재 입력값에서 숫자만 남기기
         let value = $(this).val().replace(/[^0-9]/g, '');
 
@@ -124,6 +124,6 @@ $(function () {
 
         // 변환된 값을 다시 input에 넣기
         $(this).val(value);
-    });
+    });*/
 });
 

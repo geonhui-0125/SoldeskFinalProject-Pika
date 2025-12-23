@@ -101,6 +101,10 @@ public class WishListController {
 		List<ReviewResponseDto> myReviews = reviewService.getReviewsBySellerId(userId);
 		model.addAttribute("myReviews", myReviews);
 
+		// Reviews Written by Me
+		List<ReviewResponseDto> writtenReviews = reviewService.getReviewsByWriterId(userId);
+		model.addAttribute("writtenReviews", writtenReviews);
+
 		// Wishlist
 		List<ProductDto> wishlist = favoriteProductService.findFavoriteByUser(user);
 		model.addAttribute("wishlist", wishlist);

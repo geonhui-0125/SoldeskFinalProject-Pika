@@ -23,19 +23,6 @@ public class ReviewController {
     private final ReviewService reviewService;
     private final GeminiService geminiService; // GeminiService 주입
 
-    // 특정 판매자에 대한 리뷰 목록을 표시합니다.
-    @GetMapping("/seller/{sellerId}")
-    public String listReviewsBySellerId(@PathVariable String sellerId, Principal principal, Model model) {
-        System.out.println("Principal object in controller: " + principal); // 이 라인을 추가
-        model.addAttribute("principal", principal); // principal 객체를 명시적으로 모델에 추가
-        List<ReviewResponseDto> reviews = reviewService.getReviewsBySellerId(sellerId);
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("sellerId", sellerId); // 판매자 ID를 뷰로 전달
-        SellerStatsDto sellerStats = reviewService.getSellerStats(sellerId); // 판매자 통계 정보 가져오기
-        model.addAttribute("sellerStats", sellerStats); // 모델에 판매자 통계 객체 추가
-        return "review/list"; // Thymeleaf 템플릿 가정: /templates/review/list.html
-    }
-
     // 새 리뷰를 생성하기 위한 양식을 표시합니다.
     @GetMapping("/new") // 특정 판매자에 대한 리뷰 생성 링크
     public String createReviewForm(@RequestParam("productId") Integer productId,
@@ -82,8 +69,37 @@ public class ReviewController {
 
     // 리뷰 수정 폼을 표시합니다.
     @GetMapping("/edit/{reviewId}")
-    public String editReviewForm(@PathVariable Long reviewId, Principal principal, Model model) {
-        return "redirect:/"; // 상품정보 페이지 외의 진입점 삭제를 위해 루트 페이지로 리다이렉트
+    public String editReviewForm(@PathVariable("reviewId") Long reviewId, Principal principal, Model model) {
+        if (principal == null) {
+            return "redirect:/user/login";
+        }
+        String currentUserId = principal.getName();
+
+        try {
+            ReviewResponseDto review = reviewService.getReviewById(reviewId);
+
+            // Check if the current user is the author of the review
+            if (!review.getUserId().equals(currentUserId)) {
+                // If not authorized, throw AccessDeniedException which will be caught below
+                throw new AccessDeniedException("이 리뷰를 수정할 권한이 없습니다.");
+            }
+
+            model.addAttribute("review", review);
+            // Assuming review/form.html can be reused for editing
+            return "review/form";
+        } catch (IllegalArgumentException e) {
+            // Review not found
+            model.addAttribute("errorMessage", "해당 리뷰를 찾을 수 없습니다.");
+            return "error/404"; // Or redirect to a suitable error page
+        } catch (AccessDeniedException e) {
+            // User not authorized to edit this review
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/user/mypage"; // Redirect back to mypage with an error message
+        } catch (Exception e) {
+            // General error
+            model.addAttribute("errorMessage", "리뷰 수정 중 오류가 발생했습니다.");
+            return "redirect:/user/mypage"; // Redirect back to mypage with an error message
+        }
     }
 
     // 리뷰 수정 양식 제출을 처리합니다.
@@ -98,7 +114,7 @@ public class ReviewController {
         }
         try {
             reviewService.updateReview(reviewId, reviewRequestDto, principal.getName());
-            return "redirect:/reviews/seller/" + reviewRequestDto.getSellerId(); // sellerId로 리다이렉트
+            return "redirect:/user/mypage"; // 업데이트 후 마이페이지로 리다이렉트
         } catch (AccessDeniedException e) {
             model.addAttribute("errorMessage", "리뷰 수정 권한이 없습니다.");
             model.addAttribute("review", reviewRequestDto); // 수정 폼에 데이터 유지
@@ -128,7 +144,7 @@ public class ReviewController {
             // 삭제 후 리디렉션할 sellerId를 얻기 위해 리뷰를 조회
             ReviewResponseDto reviewToDelete = reviewService.getReviewById(reviewId);
             reviewService.deleteReview(reviewId, principal.getName());
-            return "redirect:/reviews/seller/" + reviewToDelete.getSellerId(); // sellerId로 리다이렉트
+            return "redirect:/user/mypage"; // 삭제 후 마이페이지로 리다이렉트
         } catch (AccessDeniedException e) {
             model.addAttribute("errorMessage", "리뷰 삭제 권한이 없습니다.");
             return "redirect:/reviews/" + reviewId; // 삭제 실패 시 해당 리뷰 상세 페이지로 돌아감
