@@ -67,6 +67,7 @@ public class PaymentApiController {
         try {
             notificationService.sendSoldOut(impUid);
             notificationService.sendSellerSoldOut(impUid);
+            notificationService.sendBuyerProductReview(impUid);
 
             String resultMessage = paymentApiService.confirmPayment(impUid);
 

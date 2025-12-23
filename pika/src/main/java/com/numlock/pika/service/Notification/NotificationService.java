@@ -116,10 +116,17 @@ public class NotificationService {
      * 상황: 판매자 구매자 양쪽 거래 전 상황에서
      */
     @Transactional
-    public void sendChatNoti(Users receiver, String senderNick, String msg, int chatRoomId) {
+    public void sendChatNoti(String senderId, String recipientId, String msg, Integer productId) {
+
+        Users receiver = userRepository.findById(recipientId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
+        Users sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
         String title = "채팅 알림";
-        String content = String.format("%s님: %s", senderNick, msg);
-        String actionUrl = "/chat/room?id=" + chatRoomId;
+        String content = String.format("%s님으로 부터 채팅이 왔습니다.", sender.getNickname());
+        String actionUrl = "/chat/dm?recipientId=" + recipientId + "&productId=" + productId ;
 
         save(receiver, "CHAT", title, content, actionUrl);
     }
@@ -224,6 +231,36 @@ public class NotificationService {
         String actionUrl = "/products/info/" + productId;
 
         save(product.getSeller(), "PRODUCT_WISHED", title, content, actionUrl);
+    }
+
+    /**
+     * 8. 구매자가 구매 확정 후 리뷰페이지로 이동 (구매자용)
+     * 상황: 구매자 구매 확정 버튼을 눌렀을 때
+     */
+    @Transactional
+    public void sendBuyerProductReview(String impUid) {
+
+        Payments payments = paymentRepository.findById(impUid)
+                .orElseThrow(() -> new RuntimeException("해당 결제 내역을 찾을 수 없습니다"));
+
+        Products product = productRepository.findById(payments.getTask().getProductId())
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+        String productName = product.getTitle();
+
+        String buyerId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        Users users = userRepository.findById(buyerId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
+        String title = "상품 리뷰 작성 알림";
+        String content = String.format("'%s' 상품 거래는 어떠셨나요? \n거래 후기 작성해주세요!",
+                productName);
+
+        // 상품 상세 페이지로 이동해서 찜 개수 확인
+        String actionUrl = "/reviews/new?productId=" + product.getProductId() + "&sellerId=" + product.getSeller().getId() + "&sellerNickname=" + product.getSeller().getNickname();
+
+        save(users, "PRODUCT_REVIEW", title, content, actionUrl);
     }
 
     /**
