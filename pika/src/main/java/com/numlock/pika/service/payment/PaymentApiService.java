@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -122,6 +123,7 @@ public class PaymentApiService {
                 .amount(paymentResDto.getAmount())
                 .seller(products.getSeller())
                 .buyer(buyer)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         paymentRepository.save(payment);

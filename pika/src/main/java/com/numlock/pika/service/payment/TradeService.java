@@ -5,6 +5,7 @@ import com.numlock.pika.dto.payment.MyTradeHistoryDTO;
 import com.numlock.pika.dto.payment.PurchaseResponseDTO;
 import com.numlock.pika.dto.payment.SalesResponseDTO;
 import com.numlock.pika.repository.PaymentRepository;
+import com.numlock.pika.service.product.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TradeService {
     private final PaymentRepository paymentRepository;
+    private final ProductServiceImpl proImpl;
 
     public MyTradeHistoryDTO getMyTradeHistory(Users user) {
         // 판매 내역 가져오기 및 변환
@@ -24,7 +26,7 @@ public class TradeService {
                         .soldAt(p.getCreatedAt())
                         .productId(p.getTask().getProductId())
                         .title(p.getTask().getTitle())
-                        .productImage(p.getTask().getProductImage())
+                        .productImage(proImpl.getImageUrls(p.getTask().getProductImage()).get(0))
                         .productState(p.getTask().getProductState())
                         .statusText(convertState(p.getTask().getProductState()))
                         .buyerNickname(p.getBuyer().getNickname())
@@ -40,7 +42,7 @@ public class TradeService {
                         .purchasedAt(p.getCreatedAt())
                         .productId(p.getTask().getProductId())
                         .title(p.getTask().getTitle())
-                        .productImage(p.getTask().getProductImage())
+                        .productImage(proImpl.getImageUrls(p.getTask().getProductImage()).get(0))
                         .productState(p.getTask().getProductState())
                         .statusText(convertState(p.getTask().getProductState()))
                         .sellerNickname(p.getSeller().getNickname())
