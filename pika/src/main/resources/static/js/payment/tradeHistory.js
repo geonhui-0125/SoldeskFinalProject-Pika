@@ -18,7 +18,7 @@ function showTab(type) {
 /**
  * 상세 모달 열기 및 데이터 바인딩
  */
-function openDetail(type, title, amount, status, opponent, uid, date) {
+function openDetail(type, title, amount, status, opponent, uid, date, productId) {
     $('#m-type').text(type + " 상세 내역");
     $('#m-title').text(title);
     $('#m-amount').text(Number(amount).toLocaleString() + "원");
@@ -28,11 +28,14 @@ function openDetail(type, title, amount, status, opponent, uid, date) {
     $('#m-date').text(date);
     $('#m-uid').text(uid);
 
+    // [변경] 기존 닫기 버튼 기능을 상품 상세 페이지 이동으로 변경
+    $('#m-action-btn').attr('onclick', `location.href='/products/info/${productId}'`);
+
     $('#detailModal').css('display', 'flex').hide().fadeIn(200);
 }
 
 /**
- * 모달 닫기
+ * 모달 닫기 (X 버튼이나 외부 클릭 시 사용)
  */
 function closeModal() {
     $('#detailModal').fadeOut(200);

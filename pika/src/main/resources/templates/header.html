@@ -49,10 +49,10 @@
         </div>
 				<ul id="main-nav-menu">
 					<li sec:authorize="isAuthenticated()" th:if="${user}">
-					<a th:href="@{/chat/userList}">채팅</a></li>
+					<a th:href="@{/chat/list}">채팅</a></li>
                     <li id="notification-btn" sec:authorize="isAuthenticated()" th:if="${user}">
                         <a href="#">알림</a>
-                        <span id="notification-count" class="notification-count">0</span>
+                        <span id="notification-count" class="notification-count"></span>
                         <div id="notification-list">
                             <ul id="notification-items">
                             </ul>
@@ -221,7 +221,7 @@
             messagesArea.scrollTop = messagesArea.scrollHeight;
         }
     </script>
-
+    <script th:src="@{/js/chat-websocket.js}" sec:authorize="isAuthenticated()"></script>
 </header>
 </body>
 </html>

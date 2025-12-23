@@ -144,3 +144,45 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+async function analyzePrice() {
+    const productId = document.querySelector('.product-id').value;
+
+    // 1. 채팅창 열기 (header.html에 있는 요소 및 함수 활용)
+    const chatWindow = document.getElementById('ai-chat-window');
+    if(chatWindow) {
+        chatWindow.style.display = 'flex';
+    }
+
+    // 2. 로딩 메시지 표시 (header.html에 정의된 함수 사용)
+    if (typeof appendMessage === 'function') {
+        const loadingId = 'loading-analyze-' + Date.now();
+        appendMessage('🔍 현재 상품의 시세를 분석 중입니다... 잠시만 기다려주세요.', 'ai', loadingId);
+
+        try {
+            // 3. API 호출
+            const response = await fetch(`/api/chat/analyze/${productId}`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            const data = await response.json();
+
+            // 4. 로딩 제거 및 결과 표시
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) loadingElement.remove();
+
+            appendMessage(data.response, 'ai');
+
+        } catch (error) {
+            console.error('Analysis Error:', error);
+            const loadingElement = document.getElementById(loadingId);
+            if (loadingElement) loadingElement.remove();
+            appendMessage('시세 분석 중 오류가 발생했습니다. 관리자에게 문의해주세요.', 'ai');
+        }
+    } else {
+        console.error("appendMessage function not found");
+        alert("AI 챗봇 기능이 아직 로드되지 않았습니다. 새로고침 후 다시 시도해주세요.");
+    }
+}

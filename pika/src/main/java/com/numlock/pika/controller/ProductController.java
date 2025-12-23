@@ -57,7 +57,7 @@ public class ProductController {
         int totalPages = productPage.getTotalPages();
         int currentPage = productPage.getNumber();
 
-        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
+        int startPage = (((int) (Math.ceil((double) (currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
         int endPage = Math.min((startPage + blockLimit - 1), totalPages);
 
         if (totalPages == 0) endPage = startPage;
@@ -86,6 +86,7 @@ public class ProductController {
         return "product/search";
     }
 
+
     /**
      * 관리자용 상품 목록 조회
      */
@@ -105,7 +106,7 @@ public class ProductController {
         int currentPage = productPage.getNumber(); // 0부터 시작
 
         // 현재 페이지가 속한 블록의 시작 번호 (1, 11, 21...)
-        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
+        int startPage = (((int) (Math.ceil((double) (currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
 
         // 현재 페이지가 속한 블록의 끝 번호 (10, 20, 30...)
         int endPage = Math.min((startPage + blockLimit - 1), totalPages);
@@ -135,7 +136,6 @@ public class ProductController {
     }
 
 
-
     // ... (나머지 create, newProduct, registerProduct 메서드는 기존과 동일) ...
 
     @GetMapping("/info/{id}")
@@ -153,9 +153,9 @@ public class ProductController {
         model.addAttribute("productDetailDto", productDetailDto);
         model.addAttribute("review", new Reviews()); // 빈 Reviews 객체 추가
 
-        if(principal != null) {
+        if (principal != null) {
             //로그인한 사용자 아이디 호출
-            String userId =  principal.getName();
+            String userId = principal.getName();
 
             System.out.println("login한 사용자 : " + userId);
 
@@ -195,9 +195,9 @@ public class ProductController {
 
         model.addAttribute("categoriesMap", categoriesMap);
 
-        if(principal != null) {
+        if (principal != null) {
             //로그인한 사용자 아이디 호출
-            String userId =  principal.getName();
+            String userId = principal.getName();
 
             System.out.println("login한 사용자 : " + userId);
 

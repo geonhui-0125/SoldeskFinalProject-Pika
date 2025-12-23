@@ -31,4 +31,14 @@ public class AiChatController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/analyze/{productId}")
+    public ResponseEntity<Map<String, String>> analyzeProduct(@PathVariable int productId) {
+        String analysisResult = geminiService.analyzeProductPrice(productId);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("response", analysisResult);
+
+        return ResponseEntity.ok(response);
+    }
 }

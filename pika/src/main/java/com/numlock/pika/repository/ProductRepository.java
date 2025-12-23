@@ -24,4 +24,7 @@ public interface ProductRepository extends JpaRepository<Products, Integer>, Jpa
     Page<Products> searchByFilters(@Param("keyword") String keyword,
                                    @Param("categoryName") String categoryName,
                                    Pageable pageable);
+
+    @Query("SELECT AVG(p.price) FROM Products p WHERE p.title LIKE %:keyword% AND p.category.categoryId = :categoryId")
+    Double findAveragePriceByTitleAndCategory(@Param("keyword") String keyword, @Param("categoryId") int categoryId);
 }

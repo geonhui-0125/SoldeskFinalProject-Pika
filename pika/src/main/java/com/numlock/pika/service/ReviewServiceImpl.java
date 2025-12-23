@@ -83,6 +83,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public List<ReviewResponseDto> getReviewsByWriterId(String writerId) {
+        List<Reviews> reviews = reviewRepository.findByReviewer_Id(writerId);
+        return reviews.stream()
+                .map(this::mapToReviewResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto reviewRequestDto, String currentUserId) {
         Reviews review = reviewRepository.findById(reviewId)
@@ -157,6 +165,7 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewResponseDto dto = ReviewResponseDto.builder()
                 .reviewId(review.getReviewId())
                 .productId(review.getProduct().getProductId()) // productId 추가
+                .productName(review.getProduct().getTitle()) // productName 추가
                 .sellerId(review.getSeller().getId())
                 .userId(freshReviewer.getId())
                 .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.jpg")
