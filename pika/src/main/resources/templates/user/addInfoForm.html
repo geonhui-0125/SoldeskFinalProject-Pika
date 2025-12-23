@@ -111,9 +111,9 @@
                 <label>현재 프로필 이미지:</label>
                 <div style="display: flex; align-items: center; margin-bottom: 10px;">
                     <img th:src="@{${user.profileImage}}" alt="프로필 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 15px;"/>
-                    <span th:if="${user.profileImage == '/profile/default-profile.jpg'}" style="color: #6c757d;">기본 이미지 사용 중</span>
+                    <span th:if="${user.profileImage == '/profile/default-profile.png'}" style="color: #6c757d;">기본 이미지 사용 중</span>
                     <button type="button" id="deleteImageBtn" class="btn btn-danger" style="margin-left: 15px; padding: 8px 15px; background-color: #dc3545;"
-                            th:if="${user.profileImage != null and user.profileImage != '/profile/default-profile.jpg'}">이미지 삭제</button>
+                            th:if="${user.profileImage != null and user.profileImage != '/profile/default-profile.png'}">이미지 삭제</button>
                 </div>
             </div>
             <div class="form-group">

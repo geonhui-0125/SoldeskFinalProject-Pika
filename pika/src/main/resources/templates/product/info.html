@@ -68,6 +68,11 @@
             </ul>
 
             <div class="product-actions" th:object="${productDetailDto}">
+                <!-- AI 시세 분석 버튼 추가 -->
+                <button type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
+                    💰 시세 분석
+                </button>
+
                 <th:block
                         th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
 

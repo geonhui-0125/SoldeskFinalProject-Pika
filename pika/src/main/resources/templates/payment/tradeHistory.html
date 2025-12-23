@@ -81,7 +81,7 @@
             구매한 내역이 없습니다.
         </div>
         <div class="trade-card" th:each="buy : ${myTradeHistoryDTO.purchases}"
-             th:onclick="openDetail('구매', [[${buy.title}]], [[${buy.amount}]], [[${buy.statusText}]], [[${buy.sellerNickname}]], [[${buy.impUid}]], [[${#temporals.format(buy.purchasedAt, 'yyyy-MM-dd HH:mm')}]])">
+             th:onclick="openDetail('구매', [[${buy.title}]], [[${buy.amount}]], [[${buy.statusText}]], [[${buy.sellerNickname}]], [[${buy.impUid}]], [[${#temporals.format(buy.purchasedAt, 'yyyy-MM-dd HH:mm')}]], [[${buy.productId}]])">
             <img th:src="${buy.productImage}" alt="상품이미지" class="product-img">
             <div class="trade-info">
                 <div class="title" th:text="${buy.title}">상품 제목</div>
@@ -99,7 +99,7 @@
             판매한 내역이 없습니다.
         </div>
         <div class="trade-card" th:each="sale : ${myTradeHistoryDTO.sales}"
-             th:onclick="openDetail('판매', [[${sale.title}]], [[${sale.amount}]], [[${sale.statusText}]], [[${sale.buyerNickname}]], [[${sale.impUid}]], [[${#temporals.format(sale.soldAt, 'yyyy-MM-dd HH:mm')}]])">
+             th:onclick="openDetail('판매', [[${sale.title}]], [[${sale.amount}]], [[${sale.statusText}]], [[${sale.buyerNickname}]], [[${sale.impUid}]], [[${#temporals.format(sale.soldAt, 'yyyy-MM-dd HH:mm')}]], [[${sale.productId}]])">
             <img th:src="${sale.productImage}" alt="상품이미지" class="product-img">
             <div class="trade-info">
                 <div class="title" th:text="${sale.title}">상품 제목</div>
@@ -126,8 +126,10 @@
         <div class="modal-item"><label>거래 일시</label><span id="m-date"></span></div>
         <div class="modal-item"><label>결제 고유번호</label><span id="m-uid" style="font-size: 0.8em; color: #666;"></span></div>
 
-        <button onclick="document.getElementById('detailModal').style.display='none'"
-                style="width: 100%; padding: 12px; background: #333; color: #fff; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer;">닫기</button>
+        <button id="m-action-btn" class="modal-close-btn"
+                style="width: 100%; padding: 12px; background: #ff4500; color: #fff; border: none; border-radius: 8px; margin-top: 20px; cursor: pointer; font-weight: bold;">
+            상품 상세보기
+        </button>
     </div>
 </div>
 
