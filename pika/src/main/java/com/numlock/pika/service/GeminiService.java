@@ -110,7 +110,7 @@ public class GeminiService {
 
             // 6. Gemini 호출
             GenerateContentResponse response = geminiClient.models.generateContent(
-                    "models/gemini-2.0-flash", // Search 기능을 위해 최신 모델 권장 (2.0-flash 등)
+                    "models/gemini-2.5-flash", // Search 기능을 위해 최신 모델 권장 (2.0-flash 등)
                     Content.builder().parts(Collections.singletonList(Part.builder().text(prompt).build())).build(),
                     config
             );
