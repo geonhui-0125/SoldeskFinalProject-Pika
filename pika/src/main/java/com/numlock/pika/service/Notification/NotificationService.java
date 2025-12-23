@@ -321,9 +321,32 @@ public class NotificationService {
         return notificationRepository.countByReceiverAndIsRead(user, 0);
     }
 
+    @Transactional(readOnly = true)
+    public List<NotificationDto> getAllNotifications(String username) {
+        Users user = userRepository.findById(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        return notificationRepository.findByReceiverOrderByCreatedAtDesc(user)
+                .stream()
+                .map(NotificationDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public void markAsRead(Long notificationId) {
         notificationRepository.markAsRead(notificationId);
+    }
+
+    @Transactional
+    public void deleteNotification(Long notificationId) {
+        notificationRepository.deleteByNotificationId(notificationId);
+    }
+
+    @Transactional
+    public void deleteAllNotifications(String username) {
+        Users user = userRepository.findById(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        notificationRepository.deleteByReceiver(user);
     }
 
 }
