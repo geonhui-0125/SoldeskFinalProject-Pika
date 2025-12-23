@@ -15,10 +15,13 @@ import java.time.LocalDateTime;
 public class NotificationDto {
 
     private Long notificationId;
+    private String receiverId;
+    private String type;
     private String title;
     private String content;
     private String actionUrl;
     private Integer isRead;
+    private LocalDateTime createdAt;
     private String timeAgo;
 
     public static NotificationDto fromEntity(Notifications notification) {
@@ -28,6 +31,7 @@ public class NotificationDto {
                 .content(notification.getContent())
                 .actionUrl(notification.getActionUrl())
                 .isRead(notification.getIsRead())
+                .createdAt(notification.getCreatedAt())
                 .timeAgo(calculateTimeAgo(notification.getCreatedAt()))
                 .build();
     }
