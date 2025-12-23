@@ -11,6 +11,8 @@ public interface ReviewService {
     ReviewResponseDto getReviewById(Long reviewId);
     List<ReviewResponseDto> getReviewsBySellerId(String sellerId);
 
+    List<ReviewResponseDto> getReviewsByWriterId(String writerId);
+
     ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto reviewRequestDto, String currentUserId);
     void deleteReview(Long reviewId, String currentUserId);
     SellerStatsDto getSellerStats(String sellerId);
