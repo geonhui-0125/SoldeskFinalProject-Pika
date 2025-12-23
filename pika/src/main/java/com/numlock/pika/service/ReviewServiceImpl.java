@@ -149,6 +149,13 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasUserReviewedProduct(String userId, int productId) {
+        return reviewRepository.existsByReviewer_IdAndProduct_ProductId(userId, productId);
+    }
+
+
     private ReviewResponseDto mapToReviewResponseDto(Reviews review) {
         Users reviewer = review.getReviewer();
         // Detach the potentially stale reviewer entity from the persistence context
