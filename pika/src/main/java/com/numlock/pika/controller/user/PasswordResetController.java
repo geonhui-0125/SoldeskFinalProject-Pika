@@ -1,7 +1,9 @@
 package com.numlock.pika.controller.user;
 
+import com.numlock.pika.config.JwtUtil;
 import com.numlock.pika.dto.PasswordResetDto;
 import com.numlock.pika.service.user.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,84 +20,86 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class PasswordResetController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     //1. 아이디/이메일 입력 폼 보여주기
     @GetMapping("/find")
-    public String showFindPasswordForm(){
+    public String showFindPasswordForm() {
         return "user/findPasswordForm";
     }
 
     //2. 아이디/이메일 확인 후 인증번호 입력창 활성화
-    @PostMapping("/send-code")
-    public String sendVerificationCode(@RequestParam String id,
-                                       @RequestParam String email, Model model) {
-        boolean userExists = userService.checkUserByIdAndEmail(id, email);
-
-        if (userExists) {
-            model.addAttribute("id", id);
-            model.addAttribute("email", email);
-            model.addAttribute("isCodeSent", true);
-            model.addAttribute("successMessage", "인증번호를 확인하세요.(123456 입력)");
-        } else {
-            model.addAttribute("errorMessage", "입력하신 사용자를 확인할 수 없습니다.");
-        }
-        return "user/findPasswordForm";
+    @PostMapping("/find")
+    public String requestPasswordReset(@RequestParam String id,
+                                       @RequestParam String email,
+                                       HttpServletRequest request,
+                                       RedirectAttributes redirectAttributes) {
+       try{
+           boolean success = userService.handlePasswordResetRequest(id, email, request);
+           if(success) {
+               redirectAttributes.addFlashAttribute("successMessage", "비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.");
+           } else {
+               redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 이메일이 일치하는 사용자가 없습니다. 다시 확인해주세요..");
+           }
+       } catch (Exception e){
+           log.error("비밀번호 재설정 이메일 발송 중 오류 발생: {}", e.getMessage());
+           redirectAttributes.addFlashAttribute("errorMessage", "이메일 발송 중 오류가 발생했습니다. 다시 시도해주세요.");
+       }
+        return "redirect:/user/password/find";
     }
 
-    //3. 인증번호 확인 후 비밀번호 재설정 페이지로 이동
-    @PostMapping("/verify-code")
-    public String verifyCode(@RequestParam String id, @RequestParam String email, @RequestParam String verificationCode,
-                              RedirectAttributes  redirectAttributes, Model model) {
-        if("123456".equals(verificationCode)){
-            redirectAttributes.addAttribute("userId", id);
-            return "redirect:/user/password/reset";
-        } else {
-            model.addAttribute("id", id);
-            model.addAttribute("email", email);
-            model.addAttribute("isCodeSent", true);
-            model.addAttribute("errorMessage", "인증번호가 올바르지 않습니다.");
-            return "user/findPasswordForm";
+    //3. 이메일 링크를 통해 새 비밀번호 입력폼으로 이동
+    @GetMapping("/reset-form")
+    public String showResetPasswordForm(@RequestParam String token, Model model, RedirectAttributes redirectAttributes) {
+        if (!jwtUtil.validateToken(token)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "유효하지 않거나 만료된 링크입니다.");
+            return "redirect:/user/password/find";
         }
-    }
+        //DTO에 토큰을 담아 뷰로 전달
+        PasswordResetDto passwordResetDto = new PasswordResetDto();
+        passwordResetDto.setToken(token);
+        model.addAttribute("passwordResetDto", passwordResetDto);
 
-    //4. 새 비밀번호 입력 폼으로 이동
-    @GetMapping("/reset")
-    public String showPasswordResetForm(@RequestParam String userId,
-            @ModelAttribute("passwordResetDto") PasswordResetDto passwordResetDto,
-            Model model) {
-        passwordResetDto.setUserId(userId);
-        model.addAttribute("userId", userId);
         return "user/resetPasswordForm";
     }
 
-    //5. 새 비밀번호 최종 업데이트
-    @PostMapping("/reset")
-    public String processResetPassword(@Valid PasswordResetDto resetDto, BindingResult bindingResult,
+    //4. 새 비밀번호 최종 업데이트 메서드
+    @PostMapping("/reset-form")
+    public String processResetPassword(@Valid @ModelAttribute("passwordResetDto") PasswordResetDto resetDto,
+                                       BindingResult bindingResult,
                                        RedirectAttributes redirectAttributes, Model model) {
-        //Dto유효성 검사
-        if(bindingResult.hasErrors()){
-            redirectAttributes.addAttribute("userId", resetDto.getUserId());
-            bindingResult.getAllErrors().forEach((error) -> {
-                redirectAttributes.addFlashAttribute("errorMessage", error.getDefaultMessage());
-            });
-            return "redirect:/user/password/reset";
+        //DTO 유효성 검사
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("passwordResetDto", resetDto);
+            return "user/resetPasswordForm";
         }
-
-        //비밀번호 일치 여부 검사
-        if (resetDto.getNewPw() == null || !resetDto.getNewPw().equals(resetDto.getConfirmNewPw())) {
-            redirectAttributes.addAttribute("userId", resetDto.getUserId());
-            redirectAttributes.addFlashAttribute("errorMessage", "새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-            return "redirect:/user/password/reset";
+        //새 비밀번호와 비밀번호 확인 일치 여부 검사
+        if (!resetDto.getNewPw().equals(resetDto.getConfirmNewPw())) {
+            model.addAttribute("passwordResetDto", resetDto);
+            model.addAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
+            return "user/resetPasswordForm";
         }
-        try{
-            userService.passwordReset(resetDto.getUserId(), resetDto.getNewPw());
-            redirectAttributes.addFlashAttribute("successMessage", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인 해주세요.");
-            return "redirect:/user/login";
-        }catch (Exception e){
-            log.error("비밀번호 재설정 중 오류 발생: {}", e.getMessage());
-            redirectAttributes.addAttribute("userId", resetDto.getUserId());
-            redirectAttributes.addFlashAttribute("errorMessage", "비밀번호 재설정 중 오류가 발생했습니다.");
-            return "redirect:/user/password/reset";
+            //서비스 레이어에서 비밀번호 재설정 처리
+        try {
+                boolean result = userService.resetPassword(resetDto.getToken(), resetDto.getNewPw());
+                if (result) {
+                    redirectAttributes.addFlashAttribute("successMessage", "비밀번호가 변경되었습니다.");
+                    return "redirect:/user/login";
+                } else {
+                    redirectAttributes.addFlashAttribute("errorMessage", "유효하지 않거나 만료된 링크입니다.");
+                    return "redirect:/user/password/find";
+                }
+        } catch (IllegalArgumentException e) {
+                log.warn("비밀번호 재설정 실패: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+                return "redirect:/user/password/find";
+        } catch (Exception e) {
+                log.error("비밀번호 재설정 중 오류 발생: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("errorMessage", "비밀번호 재설정 중 오류가 발생했습니다.");
+                return "redirect:/user/password/find";
         }
     }
 }
+
+
+
