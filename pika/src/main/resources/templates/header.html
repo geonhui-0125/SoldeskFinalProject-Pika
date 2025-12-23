@@ -52,7 +52,7 @@
 					<a th:href="@{/chat/userList}">채팅</a></li>
                     <li id="notification-btn" sec:authorize="isAuthenticated()" th:if="${user}">
                         <a href="#">알림</a>
-                        <span id="notification-count" class="notification-count">0</span>
+                        <span id="notification-count" class="notification-count"></span>
                         <div id="notification-list">
                             <ul id="notification-items">
                             </ul>
