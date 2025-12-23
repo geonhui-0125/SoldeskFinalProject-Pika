@@ -1,9 +1,8 @@
-package com.numlock.pika.dto;
+package com.numlock.pika.dto.user;
 
 import com.numlock.pika.domain.Users;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
