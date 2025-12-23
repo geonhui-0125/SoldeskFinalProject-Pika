@@ -36,57 +36,6 @@ public class ProductController {
     private final NotificationService notificationService;
 
     /**
-     * [추가] 상품 검색 및 카테고리 필터링
-     * 경로: GET /products/search
-     */
-    @GetMapping("/search")
-    public String searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
-                                 @RequestParam(value = "category", required = false) String category,
-                                 @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "15") int size,
-                                 Model model, Principal principal) {
-
-        // 1. 페이징 설정 (한 페이지 15개)
-        Pageable pageable = PageRequest.of(page, size);
-
-        // 2. 검색 로직 수행 (Service 메서드가 Page<ProductDto>를 반환하도록 수정되어야 함)
-        Page<ProductDto> productPage = productService.searchProducts(keyword, category, pageable);
-
-        // 3. 페이징 블록 계산 (10개 단위)
-        int blockLimit = 10;
-        int totalPages = productPage.getTotalPages();
-        int currentPage = productPage.getNumber();
-
-        int startPage = (((int)(Math.ceil((double)(currentPage + 1) / blockLimit))) - 1) * blockLimit + 1;
-        int endPage = Math.min((startPage + blockLimit - 1), totalPages);
-
-        if (totalPages == 0) endPage = startPage;
-
-        // 4. 모델 데이터 추가
-        model.addAttribute("products", productPage.getContent()); // 실제 상품 리스트
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-        model.addAttribute("pageSize", size);
-
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("activeCategory", category);
-
-        // 헤더 및 사용자 정보 (기존 로직 유지)
-        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
-        model.addAttribute("categoriesMap", categoriesMap);
-
-        if (principal != null) {
-            userRepository.findById(principal.getName()).ifPresent(user -> {
-                model.addAttribute("user", user);
-            });
-        }
-
-        return "product/search";
-    }
-
-    /**
      * 관리자용 상품 목록 조회
      */
     @GetMapping
