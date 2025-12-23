@@ -17,4 +17,6 @@ public interface AccountRepository extends JpaRepository<Accounts, Integer> {
     Optional<Accounts> findByUserId(@Param("sellerId") String sellerId);
 
     Optional<Accounts> findBySeller(Users seller);
+
+    boolean existsAccountsBySeller(Users seller);
 }

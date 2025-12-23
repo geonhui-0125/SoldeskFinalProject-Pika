@@ -10,7 +10,7 @@ import java.security.Principal;
 
 @RequiredArgsConstructor
 @Service
-public class AccountService {
+public class AccountApiService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
