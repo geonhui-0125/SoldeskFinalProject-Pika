@@ -335,7 +335,36 @@
         </div>
     </div>
 
-    <!-- 3. 상점 후기 (Reviews) -->
+    <!-- 3. 내가 쓴 리뷰 (Reviews Written by Me) -->
+    <div class="product-block">
+        <h1 class="product-block-title">내가 쓴 리뷰 <span th:text="'(' + ${#lists.size(writtenReviews)} + ')'"
+                                                      style="font-size:0.7em; color:#888;"></span></h1>
+
+        <div class="scroll-container" th:if="${!#lists.isEmpty(writtenReviews)}">
+            <div class="review-list">
+                <div th:each="r : ${writtenReviews}" class="review-card">
+                    <div class="review-header" style="justify-content: start; gap: 15px;">
+                        <span th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</span>
+                        <strong th:text="${r.productName}" style="color: #333;">상품명</strong>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span class="score">★ <span th:text="${r.score}">5</span></span>
+                    </div>
+                    <p th:text="${r.content}" style="color: #555; line-height: 1.5; margin: 0;">리뷰 내용</p>
+                    <div style="margin-top: 10px; text-align: right;">
+                        <a th:href="@{/reviews/edit/{id}(id=${r.reviewId})}" class="btn-action">수정</a>
+                        <button type="button" class="btn-action btn-danger" th:onclick="'deleteReview(' + ${r.reviewId} + ')'">삭제</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(writtenReviews)}" class="empty-msg"
+             style="text-align: center; padding: 30px; color: #999;">
+            작성한 리뷰가 없습니다.
+        </div>
+    </div>
+
+    <!-- 4. 상점 후기 (Reviews) -->
     <div class="product-block">
         <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'"
                                                        style="font-size:0.7em; color:#888;"></span></h1>
@@ -386,6 +415,26 @@
             alert('오류가 발생했습니다.');
         });
     }
+
+    function deleteReview(reviewId) {
+        if (!confirm('정말 이 리뷰를 삭제하시겠습니까?')) return;
+
+        fetch('/api/reviews/' + reviewId, {
+            method: 'DELETE'
+        }).then(response => {
+            if (response.ok) {
+                alert('리뷰가 삭제되었습니다.');
+                location.reload();
+            } else {
+                // 서버에서 보낸 에러 메시지를 받아서 표시할 수 있도록
+                return response.json().then(err => { throw new Error(err.message || '리뷰 삭제에 실패했습니다.'); });
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('오류가 발생했습니다: ' + err.message);
+        });
+    }
+
 </script>
 <script src="/js/user/account.js"></script>
 </body>
