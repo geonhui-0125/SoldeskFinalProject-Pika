@@ -42,11 +42,39 @@ public class NotificationController {
         return ResponseEntity.ok(0L);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<java.util.List<NotificationDto>> getAllNotifications(Principal principal) {
+        if (principal != null) {
+            String username = principal.getName();
+            java.util.List<NotificationDto> notifications = notificationService.getAllNotifications(username);
+            return ResponseEntity.ok(notifications);
+        }
+        return ResponseEntity.ok(java.util.Collections.emptyList());
+    }
+
     @PutMapping("/read/{id}")
     public ResponseEntity<Void> markAsRead(@PathVariable Long id, Principal principal) {
-        System.out.println("읽음 업데이트 시작");
         if (principal != null) {
             notificationService.markAsRead(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteNotification(@PathVariable Long id, Principal principal) {
+        if (principal != null) {
+            // Optional: Add logic to verify that the notification belongs to the user
+            notificationService.deleteNotification(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    @DeleteMapping("/delete/all")
+    public ResponseEntity<Void> deleteAllNotifications(Principal principal) {
+        if (principal != null) {
+            notificationService.deleteAllNotifications(principal.getName());
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(401).build();
