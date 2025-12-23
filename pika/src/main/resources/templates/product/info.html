@@ -130,9 +130,24 @@
                             <th:block th:if="${type == 'buy'}">
                                 <input type="hidden" id="impUid" th:value="*{impUid}"/>
                                 <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
-                                <button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>
+                                <!--<button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>-->
                             </th:block>
-                            <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품예약중</button>
+                            <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품거래중</button>
+                        </th:block>
+
+                        <th:block th:case="3"> <!-- 해당 상태를 결제 후 예약 중인 상태로 생각 -->
+                            <th:block th:switch="${type}">
+                                <button th:case="'view'" class="buy-btn" disabled>상품예약중 <!--상품상태를 2 거래중을 변경 -->
+                                </button>
+                                <button th:case="'buy'" class="buy-btn"
+                                        onclick="onclickCancelPayment()">결제취소/환불
+                                </button>
+                                <button th:case="'sell'" class="buy-btn"
+                                        onclick="onclickApprovePayment()">판매승인</button> <!--상품상태를 2 거래중을 변경 -->
+                                <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">
+                                    상품예약중
+                                </button>
+                            </th:block>
                         </th:block>
 
                         <!-- Case 1: Sold -->

@@ -15,4 +15,6 @@ public interface PaymentRepository extends JpaRepository<Payments, String> {
     List<Payments> findByBuyerOrderByCreatedAtDesc(Users buyer);
 
     Optional<Payments> findByBuyerAndTask(Users buyer, Products task);
+
+    Optional<Payments> findByTask(Products task);
 }

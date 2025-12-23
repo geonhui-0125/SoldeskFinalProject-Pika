@@ -64,6 +64,33 @@ async function onclickCancelPayment() {
     }
 }
 
+async function onclickApprovePayment() {
+    const productId = document.querySelector('.product-id').value;
+
+    try {
+        const resp = await fetch(`/api/payments/approve`, {
+            method: "PUT", // 컨트롤러 @PutMapping과 일치시킴
+            headers: {
+                "Content-Type": "application/json" // JSON 전송 명시
+            },
+            body: JSON.stringify({ taskId: productId }) // 데이터를 JSON 문자열로 변환
+        });
+
+        if (resp.ok) {
+            const result = await resp.text(); // 서버에서 리턴한 숫자 '3'을 가져옴
+            console.log("결과 코드:", result);
+            alert("결제 승인 완료");
+            window.location.reload();
+        } else {
+            console.error('서버 오류: ' + resp.status);
+            alert("승인 처리 중 오류가 발생했습니다.");
+        }
+    } catch (error) {
+        console.error('네트워크 에러:', error);
+        alert('결제 승인 실패');
+    }
+}
+
 document.querySelector(".wish-btn").addEventListener('click', () => {
 
     const likeButton = document.querySelector(".wish-btn");
