@@ -45,6 +45,10 @@ dependencies {
     implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
     implementation 'net.nurigo:sdk:4.2.7'
     implementation 'com.google.genai:google-genai:1.21.0'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
 }
 
 tasks.named('test') {

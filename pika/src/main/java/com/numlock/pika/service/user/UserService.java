@@ -1,13 +1,18 @@
 package com.numlock.pika.service.user;
 
+import com.numlock.pika.config.JwtUtil;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -23,6 +28,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final FileUploadService fileUploadService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final JavaMailSenderImpl mailSender;
 
     //정보 수정 처리
     public Users updateAddlInfo(String userId, AdditionalUserInfoDto dto, MultipartFile profileImage) throws IOException {
@@ -92,11 +99,45 @@ public class UserService {
     }
 
     //비밀번호 재설정 메소드
-    public void passwordReset(String userId, String newPw){
+    /*public void passwordReset(String userId, String newPw){
         Users user = userRepository.findById(userId)
                 .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         user.setPw(passwordEncoder.encode(newPw));
         userRepository.save(user);
+    }*/
+
+    //비밀번호 재설정 이메일 처리 (JWT 토큰 발송)
+    public void handlePasswordResetRequest(String email, HttpServletRequest request){
+        Optional<Users> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent()){
+            Users user = userOptional.get();
+            String token = jwtUtil.generateToken(user.getId());
+
+            String baseUrl = ServletUriComponentsBuilder.fromRequestUri(request)
+                    .replacePath(null)
+                    .build()
+                    .toUriString();
+
+            String resetLink = baseUrl + "/user/password/reset-form?token=" + token;
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("[PIKA] 비밀전호 재설정 인증 메일입니다.");
+            message.setText("pika 비밀번호 재설정 안내 메일입니다. 아래 링크를 클릭하세요 \n\n"+
+                    resetLink + "\n\n이 링크는"+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );
+            mailSender.send(message);
+        }
     }
 
+    public boolean resetPassword(String token, String newPassword){
+        if(jwtUtil.validateToken(token)){
+            String userId = jwtUtil.getUserIdFromToken(token);
+            Users user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            user.setPw(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
 }
