@@ -64,7 +64,7 @@ public class UserService {
                 sdf.setLenient(false);
                 user.setBirth(sdf.parse(dto.getBirth()));
             } catch (java.text.ParseException e) {
-                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다. (yyyMMdd");
+                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다.");
             }
         }else{
             user.setBirth(null);
