@@ -1,6 +1,9 @@
 package com.numlock.pika.service;
 
 import com.google.genai.Client;
+import com.google.genai.types.GenerateContentConfig;
+import com.google.genai.types.GoogleSearch;
+import com.google.genai.types.Tool;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.HttpOptions; // HttpOptions 임포트 추가
@@ -9,6 +12,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +45,86 @@ public class GeminiService {
         }
         this.geminiClient = Client.builder()
                 .apiKey(geminiApiKey)
-                .httpOptions(HttpOptions.builder().apiVersion("v1").build()) // API 버전을 v1으로 설정
+                .httpOptions(HttpOptions.builder().apiVersion("v1beta").build()) // API 버전을 v1beta로 설정 (Tools 사용 위해)
                 .build();
+    }
+
+    /**
+     * 상품 시세 분석 (RAG + Google Search Grounding)
+     * @param productId 분석할 상품 ID
+     * @return 분석 결과 텍스트
+     */
+    public String analyzeProductPrice(int productId) {
+        // 1. 상품 정보 조회
+        com.numlock.pika.domain.Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+
+        // 2. 상품명에서 핵심 키워드 추출 (AI)
+        String refinedKeyword = extractSearchKeyword(product.getTitle());
+        if ("NONE".equals(refinedKeyword)) {
+            refinedKeyword = product.getTitle(); // 추출 실패 시 원본 제목 사용
+        }
+
+        // 3. 내부 평균 시세 조회 (정제된 키워드 + 카테고리 기준)
+        Double internalAvg = productRepository.findAveragePriceByTitleAndCategory(
+                refinedKeyword,
+                product.getCategory().getCategoryId()
+        );
+        
+        String internalInfo = (internalAvg != null)
+                ? String.format("%,.0f원", internalAvg)
+                : "정보 없음";
+
+        // 4. 프롬프트 구성
+        String prompt = String.format(
+                "다음 상품에 대한 시세 분석을 해줘.\n\n" +
+                        "1. 원본 게시글 제목: %s\n" +
+                        "2. 분석된 핵심 상품명: %s\n" +
+                        "3. 현재 판매가: %,.0f원\n" +
+                        "4. 우리 마켓(Pika) 내 '%s' 평균 거래가: %s\n\n" +
+                        "지시사항:\n" +
+                        "- 구글 검색을 통해 '%s'의 '정가(발매가)'와 '현재 온라인 중고 시세'를 찾아줘.\n" +
+                        "- 답변 형식의 첫 줄은 반드시 아래와 같이 시작해줘:\n" +
+                        "  '[%s]의 가격 : (검색된 평균 시세)'\n" +
+                        "- 그 후 현재 판매가가 적정한지 분석해주고 조언을 한 마디 덧붙여줘.\n" +
+                        "- 답변은 친절하게 존댓말로 해줘.",
+                product.getTitle(),
+                refinedKeyword,
+                product.getPrice(),
+                refinedKeyword,
+                internalInfo,
+                refinedKeyword,
+                refinedKeyword
+        );
+
+        try {
+            // 5. Google Search 도구 설정
+            Tool googleSearchTool = Tool.builder()
+                    .googleSearch(GoogleSearch.builder().build())
+                    .build();
+
+            GenerateContentConfig config = GenerateContentConfig.builder()
+                    .tools(Arrays.asList(googleSearchTool))
+                    .temperature(0.2f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
+                    .build();
+
+            // 6. Gemini 호출
+            GenerateContentResponse response = geminiClient.models.generateContent(
+                    "models/gemini-2.5-flash", // Search 기능을 위해 최신 모델 권장 (2.0-flash 등)
+                    Content.builder().parts(Collections.singletonList(Part.builder().text(prompt).build())).build(),
+                    config
+            );
+
+            if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
+                return response.text();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Gemini Analysis 오류: " + e.getMessage());
+            return "죄송합니다. 시세 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        }
+
+        return "시세 정보를 가져오지 못했습니다.";
     }
 
     /**
