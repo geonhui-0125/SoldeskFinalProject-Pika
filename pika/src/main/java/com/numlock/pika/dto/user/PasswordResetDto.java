@@ -1,4 +1,4 @@
-package com.numlock.pika.dto;
+package com.numlock.pika.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

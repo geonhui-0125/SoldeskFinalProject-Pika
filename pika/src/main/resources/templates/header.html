@@ -8,14 +8,6 @@
 <header th:fragment="mainHeader" id="main-header">
     <div class="header-auth">
         <div>
-    <!--<div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
-        <div>
-            <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
-            <a href="/user/add-info" id="modify" style="width: 100px; height: 50px">정보수정</a>
-        </div>
-    </div>
-    <div sec:authorize="!isAuthenticated()" class="header-auth">
-        <div>-->
             <span sec:authorize="!isAuthenticated()">
                 <a href="/user/login" id="login">로그인</a>
                 <a href="/user/join" id="join">회원가입</a>
