@@ -47,7 +47,21 @@ public class LoginController {
         if(bindingResult.hasErrors()) { //유효성 검사 실패 처리 로직/DTO유효성 검사
             log.error("--- Validation Failed ---");
             log.error("Validation errors for user join: {}", bindingResult.getAllErrors());
-            model.addAttribute("errorMessage", "회원가입 중 오류가 발생했습니다.");
+            //model.addAttribute("errorMessage", "회원가입 중 오류가 발생했습니다.");
+            return "user/joinForm";
+        }
+
+        //아이디, 닉네임, 이메일 중복체크
+        if(userRepository.existsById(userDto.getId())){
+            bindingResult.rejectValue("id", "duplicated", "이미 사용중인 아이디 입니다.");
+            return "user/joinForm";
+        }
+        if(userRepository.existsByNickname(userDto.getNickname())){
+            bindingResult.rejectValue("nickname", "duplicated", "이미 사용중인 닉네임 입니다.");
+            return "user/joinForm";
+        }
+        if(userRepository.existsByEmail(userDto.getEmail())){
+            bindingResult.rejectValue("email", "duplicated", "이미 사용중인 이메일 입니다.");
             return "user/joinForm";
         }
 
@@ -56,9 +70,11 @@ public class LoginController {
             bindingResult.rejectValue("confirmPw", "passwordMismatch", "비밀번호가 일치하지 않습니다.");
             log.error("---Password Mismatch");
             log.error("패스워드와 패스워드 확인이 일치하지 않습니다. 유저ID: {}", userDto.getId());
-            model.addAttribute("errorMessage", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            //model.addAttribute("errorMessage", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
             return "user/joinForm";
         }
+
+
 
         try {
             //DTO -> Entity변환
