@@ -53,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 특정 상품에 대해 동일한 사용자가 이미 리뷰를 작성했는지 확인
         if (reviewRepository.existsByProductAndReviewer(product, reviewer)) {
-            throw new IllegalArgumentException("You have already reviewed this product.");
+            throw new DuplicateReviewException("이미 리뷰를 작성하였어요.");
         }
 
         Reviews review = Reviews.builder()
@@ -149,6 +149,13 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasUserReviewedProduct(String userId, int productId) {
+        return reviewRepository.existsByReviewer_IdAndProduct_ProductId(userId, productId);
+    }
+
+
     private ReviewResponseDto mapToReviewResponseDto(Reviews review) {
         Users reviewer = review.getReviewer();
         // Detach the potentially stale reviewer entity from the persistence context
@@ -168,7 +175,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .productName(review.getProduct().getTitle()) // productName 추가
                 .sellerId(review.getSeller().getId())
                 .userId(freshReviewer.getId())
-                .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.jpg")
+                .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.png")
                 .score(review.getScore())
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())

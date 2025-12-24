@@ -45,7 +45,13 @@ public class UserService {
 
         //주소 업데이트
         if(dto.getAddress() != null && !dto.getAddress().trim().isEmpty()){
-            user.setAddress(dto.getAddress());
+            String fullAddress = dto.getAddress().trim();
+            if(dto.getDetailAddress() != null && !dto.getDetailAddress().trim().isEmpty()){
+                fullAddress += " " + dto.getDetailAddress().trim();
+            }
+            user.setAddress(fullAddress);
+        } else {
+            user.setAddress(null);
         }
 
         //전화번호 업데이트

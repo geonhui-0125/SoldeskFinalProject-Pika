@@ -68,7 +68,7 @@ public class LoginController {
             user.setNickname(userDto.getNickname());
             user.setEmail(userDto.getEmail());
 
-            String profileImagePath = "/profile/default-profile.jpg";
+            String profileImagePath = "/profile/default-profile.png";
             user.setProfileImage(profileImagePath);
             // 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
@@ -78,7 +78,7 @@ public class LoginController {
 
         } catch (Exception e) {
             log.error("--- Exception Occurred ---", e);
-            model.addAttribute("errorMessage", "입력된 정보가 올바르지 않습니다. " + e.getMessage()); // 오류 메시지 복원
+            model.addAttribute("errorMessage", " " + e.getMessage()); // 오류 메시지 복원
             log.error("Error joining user {}: {}", userDto.getId(), e.toString());
             model.addAttribute("user", userDto);
             return "user/joinForm";

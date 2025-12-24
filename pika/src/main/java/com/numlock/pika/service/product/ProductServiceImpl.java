@@ -47,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final FavoriteProductRepository  favoriteProductRepository;
     private final ReviewRepository reviewRepository;
     private final PaymentRepository paymentRepository;
+    private final com.numlock.pika.service.ReviewService reviewService; // ReviewService 주입
 
     @Override
     @Transactional(readOnly = true)
@@ -139,6 +140,13 @@ public class ProductServiceImpl implements ProductService {
             buyerType = "visit"; // 비로그인 방문자
         }
 
+        // 사용자가 로그인한 경우에만 hasReviewed 플래그를 확인합니다.
+        boolean hasReviewed = false;
+        if (principal != null) {
+            hasReviewed = reviewService.hasUserReviewedProduct(principal.getName(), productId);
+        }
+
+
         System.out.println("seller :" + products.getSeller().getId());
         List<Reviews> reviewsList = reviewRepository.findBySeller_Id(products.getSeller().getId());
 
@@ -172,6 +180,7 @@ public class ProductServiceImpl implements ProductService {
                 .star(star)
                 .images(getImageUrls(products.getProductImage()))
                 .impUid(impUid) // impUid 추가
+                .hasReviewed(hasReviewed) // hasReviewed 필드 추가
                 .build();
 
         if (productDetailDto.getCategory() != null && productDetailDto.getCategory().contains(">")) {
@@ -297,6 +306,7 @@ public class ProductServiceImpl implements ProductService {
             dto.setProductId(product.getProductId());
             dto.setTitle(product.getTitle());
             dto.setPrice(product.getPrice());
+            dto.setProductState(product.getProductState());
             dto.setCreatedAt(product.getCreatedAt());
 
             // 이미지 처리

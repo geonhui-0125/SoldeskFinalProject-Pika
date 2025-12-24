@@ -49,6 +49,14 @@ public class UserController {
             //미로그인 오류 처리
             return "redirect:/";
         }
+        //상세주소 조건부 유효성 검사
+        if (dto.getAddress() != null && !dto.getAddress().isBlank()
+                && (dto.getDetailAddress() == null || dto.getDetailAddress().isBlank())){
+            redirectAttributes.addFlashAttribute("errorMessage", "상세 주소를 입력하세요.");
+            redirectAttributes.addFlashAttribute("userAddInfo", dto);
+            return "redirect:/user/add-info";
+        }
+
         //유효성 검사
         if(result.hasErrors()){
             log.error("--Additional User Info Validation Failed--");
