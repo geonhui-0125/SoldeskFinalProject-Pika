@@ -62,6 +62,17 @@
             color: white;
         }
 
+        .btn-outline {
+            background-color: #ffffff;
+            border: 1px solid #ff4500;
+            color: #ff4500;
+        }
+        
+        .btn-outline:hover {
+            background-color: #ff4500;
+            color: #ffffff;
+        }
+
         /* 리뷰 스타일 */
         .review-list {
             display: flex;
@@ -92,10 +103,6 @@
         a {
             color: #333;
             text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
         }
 
         /* 프로필 영역 */
@@ -155,9 +162,7 @@
                 <p th:text="${user.email}">user@example.com</p>
                 <div style="margin-top: 10px; display: flex; gap: 8px;">
                     <a href="/user/add-info" class="btn-action">정보 수정</a>
-                    <button type="button" class="btn-action" onclick="openBankModal()"
-                            style="background-color: #fffaf9; border-color: #ff4500; color: #ff4500;">계좌 관리
-                    </button>
+                    <button type="button" class="btn-action btn-outline" onclick="openBankModal()">계좌 관리</button>
                 </div>
             </div>
 
