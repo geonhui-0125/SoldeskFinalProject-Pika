@@ -28,7 +28,7 @@
         <img th:src="@{${review.profileImage}}"
              alt="프로필 이미지"
              style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;"
-             th:onerror="this.onerror=null;this.src='/profile/default-profile.jpg';"/>
+             th:onerror="this.onerror=null;this.src='/profile/default-profile.png';"/>
         <p><strong>리뷰 ID:</strong> <span th:text="${review.reviewId}">1</span></p>
         <p><strong>판매자 ID:</strong> <span th:text="${review.sellerId}">seller1</span></p>
         <p><strong>사용자 ID:</strong> <span th:text="${review.userId}">testUser</span></p>

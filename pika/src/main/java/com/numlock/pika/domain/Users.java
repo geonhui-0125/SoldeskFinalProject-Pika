@@ -42,6 +42,8 @@ public class Users {
 
     private String address;
 
+    //private String detailAddress;
+
     private String phone;
 
     @DateTimeFormat(pattern = "yyyyMMdd")

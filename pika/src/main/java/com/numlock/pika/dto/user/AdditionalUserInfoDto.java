@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class AdditionalUserInfoDto {
     private String profileImage;
     private String address;
+    private String detailAddress;
     private String phone;
 
 
