@@ -65,6 +65,18 @@ async function onclickCancelPayment() {
 }
 
 async function onclickApprovePayment() {
+
+    //계좌가 존재하는지 확인하는 api
+    const checkResp = await fetch(`/api/accounts/exists`);
+    const hasAccount = await checkResp.json(); // 서버에서 boolean(true/false) 반환
+
+    if (!hasAccount) {
+        // 계좌가 없으면(false) 알림 후 마이페이지로 이동
+        alert("계좌 등록을 해야 합니다. \n마이페이지 - 계좌 관리");
+        window.location.href = "/user/mypage";
+        return;
+    }
+
     const productId = document.querySelector('.product-id').value;
 
     try {

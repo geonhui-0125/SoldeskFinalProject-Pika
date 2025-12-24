@@ -158,7 +158,7 @@ public class NotificationService {
                 productName, buyerNick);
 
         // 상품 상세 페이지로 연결
-        String actionUrl = "/trade/history/";
+        String actionUrl = "/trade/history";
 
         save(product.getSeller(), "SELL_DONE", title, content, actionUrl);
     }
