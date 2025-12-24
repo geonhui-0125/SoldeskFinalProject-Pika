@@ -106,7 +106,7 @@ public class GeminiService {
             GenerateContentConfig config = GenerateContentConfig.builder()
                     .tools(Arrays.asList(googleSearchTool))
                     .temperature(0.2f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
-                    .maxOutputTokens(1000)
+                    .maxOutputTokens(4000)
                     .build();
 
             // 6. Gemini 호출
