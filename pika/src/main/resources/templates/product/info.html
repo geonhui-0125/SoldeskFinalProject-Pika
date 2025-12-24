@@ -69,13 +69,14 @@
 
             <div class="product-actions" th:object="${productDetailDto}">
                 <!-- AI 시세 분석 버튼 추가 -->
-                <button type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
+                <button th:if="${productDetailDto.productStat != 1}" type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
                     💰 시세 분석
                 </button>
 
                 <th:block
                         th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
 
+                <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '찜' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="like-btn wish-btn" disabled>찜</button>
@@ -89,7 +90,9 @@
                                 th:classappend="${wished} ? 'wished-active' : ''">찜
                         </button>
                     </th:block>
+                </th:block>
 
+                <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '채팅하기' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
@@ -104,6 +107,7 @@
                             채팅하기
                         </button>
                     </th:block>
+                </th:block>
 
                     <!-- Main action buttons logic -->
                     <th:block th:switch="${stat}">
