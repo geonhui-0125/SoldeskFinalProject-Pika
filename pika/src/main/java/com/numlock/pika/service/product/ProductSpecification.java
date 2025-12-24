@@ -25,7 +25,7 @@ public class ProductSpecification {
               predicates.add(criteriaBuilder.equal(categoryJoin.get("category"), categoryName));
           }
           //판매중인 상품만 조회
-          predicates.add(criteriaBuilder.equal(root.get("productState"),0));
+          // predicates.add(criteriaBuilder.equal(root.get("productState"),0));
           //최신순 정렬
           query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
 
