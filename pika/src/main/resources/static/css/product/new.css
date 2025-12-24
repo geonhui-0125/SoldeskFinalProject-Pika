@@ -68,14 +68,19 @@
     flex: 1;
 }
 
-/* 텍스트 입력 */
-.text-input,
+.text-input{
+    width: 500px;
+    padding: 12px;
+    font-size: 15px;
+    outline: none;
+}
+
 .price-input {
     width: 500px;
     padding: 12px;
     font-size: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border: none;
+    outline: none;
 }
 
 /* 이미지 업로드 */
@@ -175,6 +180,7 @@
     border-radius: 4px;
     border: 1px solid #ddd;
     resize: none;
+    outline: none;
 }
 
 /* 가격 */
@@ -182,6 +188,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 550px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 .price-unit {
@@ -225,7 +234,6 @@
 
 .invalid {
     border: 2px solid #ff4d4f !important;
-    background-color: #fff2f0 !important;
 }
 
 /* 선택 사항: 입력창 아래 에러 메시지를 띄우고 싶을 때 */

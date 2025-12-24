@@ -306,6 +306,7 @@ public class ProductServiceImpl implements ProductService {
             dto.setProductId(product.getProductId());
             dto.setTitle(product.getTitle());
             dto.setPrice(product.getPrice());
+            dto.setProductState(product.getProductState());
             dto.setCreatedAt(product.getCreatedAt());
 
             // 이미지 처리

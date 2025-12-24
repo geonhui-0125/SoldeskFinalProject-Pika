@@ -43,6 +43,8 @@ $(function () {
 
     $(".image-input").on("change", function (e) {
 
+        $(".image-upload-box").removeClass("invalid");
+
         const file = e.target.files[0];
         if (!file) return;
 
@@ -102,10 +104,12 @@ $(function () {
         }
 
         // 6. 가격 체크
+        const priceWrap = $(".price-content");
         const price = $("input[name='price']");
+
         if (price.val().trim() === "") {
             alert("가격을 입력해주세요.");
-            price.addClass("invalid").focus();
+            priceWrap.addClass("invalid").focus();
             e.preventDefault();
             return false;
         }
@@ -113,17 +117,21 @@ $(function () {
         return true;
     });
 
-    /*$(".price-input").on("input", function () {
-        // 현재 입력값에서 숫자만 남기기
-        let value = $(this).val().replace(/[^0-9]/g, '');
+    $(".price-input").on("input", function () {
 
-        // 숫자가 있을 경우에만 천단위 콤마 찍기
-        if (value !== "") {
-            value = Number(value).toLocaleString();
+        let originalValue = $(this).val();
+        let numericValue = originalValue.replace(/[^0-9]/g, '');
+
+        // 원본값과 숫자만 추출한 값이 다르면 = 숫자가 아닌 문자가 섞여있음
+        if (originalValue !== numericValue) {
+            alert("숫자만 입력 가능합니다.");
+            $(this).val(numericValue); // 문자는 지워버림
         }
+    });
 
-        // 변환된 값을 다시 input에 넣기
-        $(this).val(value);
-    });*/
+    $("input, textarea, #categorySelect, .image-input").on("click", function() {
+        $(this).removeClass("invalid");
+        $(this).closest(".price-content").removeClass("invalid");
+    });
 });
 
