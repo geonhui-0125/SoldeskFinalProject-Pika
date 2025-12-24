@@ -184,7 +184,17 @@
                         <th:block th:if="${productDetailDto.star != 0}">
                             별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span>
                         </th:block>
-                        <button id="showReviewSummaryBtn" class="summary-button">리뷰 요약 보기</button>
+                        <button id="showReviewSummaryBtn" class="buy-btn">리뷰 보기</button>
+
+                        <!-- 리뷰 쓰러 가기 버튼 추가 -->
+                        <th:block sec:authorize="isAuthenticated()">
+                            <button th:if="${productDetailDto.buyerType == 'buy' and productDetailDto.productStat == 1 and !productDetailDto.hasReviewed}"
+                                    class="buy-btn"
+                                    th:onclick="|location.href='@{/reviews/new(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}'|"
+                                    style="margin-left: 10px;">
+                                리뷰 쓰러 가기
+                            </button>
+                        </th:block>
                     </p>
                     <div id="reviewSummaryContent" class="review-summary-display"></div>
                 </div>
