@@ -81,7 +81,10 @@
             <div id="category-dropdown">
                 <p>전체 카테고리</p>
 
-                <div class="category-item" th:each="category : ${categoriesMap}">
+                <div class="category-item"
+                     th:each="category : ${categoriesMap}"
+                     th:if="${category.key != '서적' and category.key != '의류'}">
+
                     <a th:href="@{/search(category=${category.key})}"
                        th:text="${category.key}"></a>
 
