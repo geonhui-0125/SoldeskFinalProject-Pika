@@ -35,6 +35,7 @@ public class ProductDetailDto {
     private List<String> images;
     private String timeAgo;
     private String impUid;
+    private boolean hasReviewed;
 
     public static String calculateTimeAgo(LocalDateTime createdAt) {
 

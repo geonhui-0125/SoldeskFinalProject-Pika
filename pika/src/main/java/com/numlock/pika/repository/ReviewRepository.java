@@ -20,4 +20,7 @@ public interface ReviewRepository extends JpaRepository<Reviews, Long> {
 
     // 상품 하나에 대해 한 명의 작성자가 한 개의 리뷰만 작성할 수 있도록 확인하는 메서드
     boolean existsByProductAndReviewer(Products product, Users reviewer);
+
+    // 특정 사용자가 특정 상품에 대해 리뷰를 작성했는지 확인하는 메서드 (ID 기반)
+    boolean existsByReviewer_IdAndProduct_ProductId(String reviewerId, int productId);
 }
