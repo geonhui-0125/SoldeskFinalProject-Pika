@@ -69,13 +69,14 @@
 
             <div class="product-actions" th:object="${productDetailDto}">
                 <!-- AI 시세 분석 버튼 추가 -->
-                <button type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
+                <button th:if="${productDetailDto.productStat != 1}" type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
                     💰 시세 분석
                 </button>
 
                 <th:block
                         th:with="stat=*{productStat}, type=*{buyerType}, wished=*{wished}, sellerId=*{seller.id}, productId=*{productId}">
 
+                <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '찜' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="like-btn wish-btn" disabled>찜</button>
@@ -89,7 +90,9 @@
                                 th:classappend="${wished} ? 'wished-active' : ''">찜
                         </button>
                     </th:block>
+                </th:block>
 
+                <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '채팅하기' button logic -->
                     <th:block th:switch="${type}">
                         <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
@@ -104,11 +107,12 @@
                             채팅하기
                         </button>
                     </th:block>
+                </th:block>
 
-                    <!-- Main action buttons logic -->
+                    <!-- 버튼 로직 -->
                     <th:block th:switch="${stat}">
 
-                        <!-- Case 0: Selling -->
+                        <!-- 판매 중인 상품일 경우 -->
                         <th:block th:case="0">
                             <th:block th:switch="${type}">
                                 <!-- 'view' and 'buy' should have the same behavior here -->
@@ -125,32 +129,31 @@
                             </th:block>
                         </th:block>
 
-                        <!-- Case 2: Payment Pending -->
+                        <!-- 구매확정, 거래중 -->
                         <th:block th:case="2">
                             <th:block th:if="${type == 'buy'}">
                                 <input type="hidden" id="impUid" th:value="*{impUid}"/>
                                 <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
-                                <!--<button class="buy-btn" onclick="onclickCancelPayment()">결제취소/환불</button>-->
                             </th:block>
                             <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품거래중</button>
                         </th:block>
 
-                        <th:block th:case="3"> <!-- 해당 상태를 결제 후 예약 중인 상태로 생각 -->
+                        <th:block th:case="3">
                             <th:block th:switch="${type}">
-                                <button th:case="'view'" class="buy-btn" disabled>상품예약중 <!--상품상태를 2 거래중을 변경 -->
+                                <button th:case="'view'" class="buy-btn" disabled>상품예약중
                                 </button>
                                 <button th:case="'buy'" class="buy-btn"
                                         onclick="onclickCancelPayment()">결제취소/환불
                                 </button>
                                 <button th:case="'sell'" class="buy-btn"
-                                        onclick="onclickApprovePayment()">판매승인</button> <!--상품상태를 2 거래중을 변경 -->
+                                        onclick="onclickApprovePayment()">판매승인</button>
                                 <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">
                                     상품예약중
                                 </button>
                             </th:block>
                         </th:block>
 
-                        <!-- Case 1: Sold -->
+                        <!-- 판매완료일 경우 -->
                         <th:block th:case="1">
                             <button class="buy-btn" disabled>판매완료</button>
                         </th:block>
