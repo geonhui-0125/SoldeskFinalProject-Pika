@@ -91,10 +91,11 @@
                 <input type="email" id="email" th:field="*{email}" placeholder="비밀번호 찾기에 사용할 이메일을 입력하세요." required/>
                 <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
             </div>
+            <br />
             <button type="submit">회원가입</button>
         </form>
         <div class="link-container">
-            <a href="/user/login">이미 계정이 있으신가요? 로그인</a>
+            <a href="/user/login">로그인 페이지로 돌아가기</a>
         </div>
     </div>
 
