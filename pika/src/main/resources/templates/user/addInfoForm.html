@@ -145,6 +145,7 @@
                 <input type="text" id="detailAddress" placeholder="상세주소를 입력하세요">
                  <!-- 최종 주소값을 서버로 보내기 위한 숨겨진 필드 -->
                 <input type="hidden" id="fullAddress" th:field="*{address}" />
+                <input type="hidden" id="hiddenDetailAddress" th:field="*{detailAddress}" />
             </div>
 
             <div class="form-group">
@@ -210,11 +211,26 @@
         if (addInfoForm) {
             addInfoForm.addEventListener('submit', function(event) {
                 // 주소 합치기
-                const address = document.getElementById('address').value;
+                const addressInput = document.getElementById('address');
+                const detailAddressInput = document.getElementById('detailAddress');
+                const fullAddressHidden = document.getElementById('fullAddress');
+                const hiddenDetailAddressHidden = document.getElementById('hiddenDetailAddress');
+
+                if(addressInput.value.trim() !== '' && detailAddressInput.value.trim() === ''){
+                    alert('상세 주소를 입력하세요.');
+                    detailAddressInput.focus();
+                    event.preventDefault();
+                    return;
+                }
+
+                fullAddressHidden.value = addressInput.value.trim();
+                hiddenDetailAddressHidden.value = detailAddressInput.value.trim()
+
+               /* const address = document.getElementById('address').value;
                 const detailAddress = document.getElementById('detailAddress').value;
                 if (address) { // 주소가 있는 경우에만 상세주소 합치기
                     document.getElementById('fullAddress').value = (address + ' ' + detailAddress).trim();
-                }
+                }*/
 
                 // 전화번호 합치기
                 if (phone1.value && phone2.value && phone3.value) {

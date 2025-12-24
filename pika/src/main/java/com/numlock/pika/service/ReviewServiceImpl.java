@@ -175,7 +175,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .productName(review.getProduct().getTitle()) // productName 추가
                 .sellerId(review.getSeller().getId())
                 .userId(freshReviewer.getId())
-                .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.jpg")
+                .profileImage(freshReviewer.getProfileImage() != null ? freshReviewer.getProfileImage() : "/profile/default-profile.png")
                 .score(review.getScore())
                 .content(review.getContent())
                 .createdAt(review.getCreatedAt())

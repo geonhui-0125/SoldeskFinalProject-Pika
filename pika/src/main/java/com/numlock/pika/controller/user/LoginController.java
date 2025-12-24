@@ -68,7 +68,7 @@ public class LoginController {
             user.setNickname(userDto.getNickname());
             user.setEmail(userDto.getEmail());
 
-            String profileImagePath = "/profile/default-profile.jpg";
+            String profileImagePath = "/profile/default-profile.png";
             user.setProfileImage(profileImagePath);
             // 사용자 정보 저장
             user.setRole("GUEST"); // 일반 회원가입 시 GUEST 역할 부여
