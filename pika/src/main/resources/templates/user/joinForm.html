@@ -23,7 +23,7 @@
         button {
             width: 100%;
             padding: 12px;
-            background-color: #e74c3c;
+            background-color: #f5ae07;
             color: white;
             border: none;
             border-radius: 4px;
@@ -32,7 +32,7 @@
             transition: background-color 0.2s ease;
         }
         button:hover {
-            background-color: #e74c3c;
+            background-color: #de9e09;
         }
         .error-message {
             color: #dc3545;
@@ -67,31 +67,27 @@
         <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
         <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="id">아이디:</label>
+                <label for="id">아이디 </label>
                 <input type="text" id="id" th:field="*{id}" required/>
                 <span th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="pw">비밀번호:</label>
+                <label for="pw">비밀번호 </label>
                 <input type="password" id="pw" th:field="*{pw}" required/>
                 <span th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="confirmPw">비밀번호 확인:</label>
+                <label for="confirmPw">비밀번호 확인 </label>
                 <input type="password" id="confirmPw" th:field="*{confirmPw}" required/>
                 <span th:if="${#fields.hasErrors('confirmPw')}" th:errors="*{confirmPw}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="nickname">닉네임:</label>
+                <label for="nickname">닉네임 </label>
                 <input type="text" id="nickname" th:field="*{nickname}" required/>
                 <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="field-error"></span>
             </div>
-            <!--<div class="form-group">
-                <label for="profileImageFile">프로필 이미지:</label>
-                <input type="file" id="profileImageFile" name="profileImageFile"/>
-            </div>-->
             <div class="form-group">
-                <label for="email">이메일:</label>
+                <label for="email">이메일 </label>
                 <input type="email" id="email" th:field="*{email}" required/>
                 <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
             </div>

@@ -110,14 +110,6 @@ public class UserService {
         return StreamSupport.stream(iterable.spliterator(), false).toList();
     }
 
-    //비밀번호 재설정 메소드
-    /*public void passwordReset(String userId, String newPw){
-        Users user = userRepository.findById(userId)
-                .orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        user.setPw(passwordEncoder.encode(newPw));
-        userRepository.save(user);
-    }*/
-
     //비밀번호 재설정 이메일 처리 (JWT 토큰 발송)
     public boolean handlePasswordResetRequest(String id, String email, HttpServletRequest request){
         Optional<Users> userOptional = userRepository.findByIdAndEmail(id, email);
@@ -135,8 +127,8 @@ public class UserService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
             message.setSubject("[PIKA] 비밀번호 재설정 인증 메일입니다.");
-            message.setText("pika 비밀번호 재설정 안내 메일입니다. 아래 링크를 클릭하세요 \n\n"+
-                    resetLink + "\n\n이 링크는"+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );
+            message.setText("pika 비밀번호 재설정 안내 메일입니다. \n\n 유효시간 내에 아래 링크로 접속해주세요. \n\n"+
+                    resetLink + "\n\n이 링크는 "+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );
             mailSender.send(message);
             return true;
         }

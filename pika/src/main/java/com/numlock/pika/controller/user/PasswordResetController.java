@@ -1,7 +1,7 @@
 package com.numlock.pika.controller.user;
 
 import com.numlock.pika.config.JwtUtil;
-import com.numlock.pika.dto.PasswordResetDto;
+import com.numlock.pika.dto.user.PasswordResetDto;
 import com.numlock.pika.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -40,9 +40,9 @@ public class PasswordResetController {
        try{
            boolean success = userService.handlePasswordResetRequest(id, email, request);
            if(success) {
-               redirectAttributes.addFlashAttribute("successMessage", "비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.");
+               redirectAttributes.addFlashAttribute("successMessage", "비밀번호 재설정 이메일이 발송되었습니다. \n이메일을 확인해주세요.");
            } else {
-               redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 이메일이 일치하는 사용자가 없습니다. 다시 확인해주세요..");
+               redirectAttributes.addFlashAttribute("errorMessage", "아이디 또는 이메일이 일치하는 사용자가 없습니다. \n다시 확인해주세요..");
            }
        } catch (Exception e){
            log.error("비밀번호 재설정 이메일 발송 중 오류 발생: {}", e.getMessage());
