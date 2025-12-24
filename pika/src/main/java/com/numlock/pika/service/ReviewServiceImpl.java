@@ -53,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 특정 상품에 대해 동일한 사용자가 이미 리뷰를 작성했는지 확인
         if (reviewRepository.existsByProductAndReviewer(product, reviewer)) {
-            throw new IllegalArgumentException("You have already reviewed this product.");
+            throw new DuplicateReviewException("이미 리뷰를 작성하였어요.");
         }
 
         Reviews review = Reviews.builder()

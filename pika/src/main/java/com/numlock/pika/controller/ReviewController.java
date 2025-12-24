@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.numlock.pika.service.DuplicateReviewException;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors; // Collectors 임포트 추가
@@ -50,7 +52,8 @@ public class ReviewController {
     @PostMapping
     public String createReview(@ModelAttribute("review") ReviewRequestDto reviewRequestDto,
                                Principal principal, // 로그인한 사용자 정보를 가져오기 위해
-                               Model model) {
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
         if (principal != null) {
             reviewRequestDto.setUserId(principal.getName());
         } else {
@@ -61,6 +64,9 @@ public class ReviewController {
         try {
             reviewService.createReview(reviewRequestDto);
             return "redirect:/products/info/" + reviewRequestDto.getProductId(); // 상품 정보 페이지로 리다이렉트
+        } catch (DuplicateReviewException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/"; // 메인 페이지로 리다이렉트
         } catch (Exception e) {
             model.addAttribute("errorMessage", "리뷰 작성 중 오류가 발생했습니다: " + e.getMessage());
             return "review/form";
