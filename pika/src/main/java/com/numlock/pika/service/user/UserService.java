@@ -2,7 +2,7 @@ package com.numlock.pika.service.user;
 
 import com.numlock.pika.config.JwtUtil;
 import com.numlock.pika.domain.Users;
-import com.numlock.pika.dto.AdditionalUserInfoDto;
+import com.numlock.pika.dto.user.AdditionalUserInfoDto;
 import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.file.FileUploadService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,8 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -60,8 +58,16 @@ public class UserService {
         }
 
         //생년월일 업데이트
-        if(dto.getBirth() != null ){
-            user.setBirth(dto.getBirth());
+        if(dto.getBirth() != null && !dto.getBirth().isEmpty()){
+            try {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
+                sdf.setLenient(false);
+                user.setBirth(sdf.parse(dto.getBirth()));
+            } catch (java.text.ParseException e) {
+                throw new IllegalArgumentException("생년월일 형식이 올바르지 않습니다.");
+            }
+        }else{
+            user.setBirth(null);
         }
 
         //모든 추가정보 입력시 role 변경

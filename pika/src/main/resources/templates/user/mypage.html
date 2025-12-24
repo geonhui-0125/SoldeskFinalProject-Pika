@@ -270,6 +270,8 @@
                     <td>
                         <span th:if="${p.productState == 0}" style="color: #2ecc71; font-weight: bold;">판매중</span>
                         <span th:if="${p.productState == 1}" style="color: #e74c3c; font-weight: bold;">판매완료</span>
+                        <span th:if="${p.productState == 2}" style="color: #f39c12; font-weight: bold;">거래중</span>
+                        <span th:if="${p.productState == 3}" style="color: #9b59b6; font-weight: bold;">승인대기</span>
                     </td>
                     <td>
                         <button class="btn-action"

@@ -28,18 +28,27 @@ function openDetail(type, title, amount, status, opponent, uid, date, productId)
     $('#m-date').text(date);
     $('#m-uid').text(uid);
 
-    // [변경] 기존 닫기 버튼 기능을 상품 상세 페이지 이동으로 변경
+    // 상세보기 버튼: 어떤 상태에서든 상세 페이지로 이동
     $('#m-action-btn').attr('onclick', `location.href='/products/info/${productId}'`);
 
     $('#detailModal').css('display', 'flex').hide().fadeIn(200);
 }
 
 /**
- * 모달 닫기 (X 버튼이나 외부 클릭 시 사용)
+ * 모달 닫기
  */
 function closeModal() {
     $('#detailModal').fadeOut(200);
 }
+
+// 외부 영역 클릭 시 닫기
+$(document).ready(function() {
+    $(window).on('click', function(event) {
+        if ($(event.target).is('#detailModal')) {
+            closeModal();
+        }
+    });
+});
 
 // 외부 영역 클릭 시 닫기 처리
 $(document).ready(function() {

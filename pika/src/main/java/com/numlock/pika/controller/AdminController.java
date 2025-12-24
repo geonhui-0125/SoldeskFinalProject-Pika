@@ -1,6 +1,6 @@
 package com.numlock.pika.controller;
 
-import com.numlock.pika.dto.AdminUserDto;
+import com.numlock.pika.dto.user.AdminUserDto;
 import com.numlock.pika.dto.ProductDto; // ProductDto 임포트 추가
 import com.numlock.pika.service.AdminProductService; // AdminProductService 임포트 추가
 import com.numlock.pika.service.AdminUserService;

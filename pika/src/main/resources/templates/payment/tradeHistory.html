@@ -104,11 +104,11 @@
             <div class="trade-info">
                 <div class="title" th:text="${sale.title}">상품 제목</div>
                 <div>
-                    <span class="price" th:text="${#numbers.formatDecimal(sale.amount, 0, 'COMMA', 0, 'POINT')} + '원'">10,000원</span>
-                    <span class="date" th:text="${#temporals.format(sale.soldAt, 'yyyy-MM-dd')}">2025-12-22</span>
+                    <span class="price" th:text="${#numbers.formatDecimal(sale.amount, 0, 'COMMA', 0, 'POINT')} + '원'"></span>
+                    <span class="date" th:text="${#temporals.format(sale.soldAt, 'yyyy-MM-dd')}"></span>
                 </div>
             </div>
-            <div th:class="'trade-status status-' + ${sale.productState}" th:text="${sale.statusText}">판매완료</div>
+            <div th:class="'trade-status status-' + ${sale.productState}" th:text="${sale.statusText}">승인대기</div>
         </div>
     </div>
 </section>

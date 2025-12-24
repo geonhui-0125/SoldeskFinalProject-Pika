@@ -61,6 +61,7 @@ public class TradeService {
             case 0 -> "판매중";
             case 1 -> "판매완료";
             case 2 -> "거래중(확정대기)";
+            case 3 -> "승인대기"; // 판매자와 구매자 모두에게 동일하게 표시
             default -> "상태미정";
         };
     }

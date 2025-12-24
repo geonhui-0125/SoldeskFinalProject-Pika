@@ -131,7 +131,7 @@ public class PaymentApiService {
         // 상품 상태를 '결제 진행중'(2)으로 변경
         Products product = productRepository.findById(paymentResDto.getTaskId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + paymentResDto.getTaskId()));
-        product.setProductState(2);
+        product.setProductState(3);
         productRepository.save(product);
     }
 
@@ -186,6 +186,17 @@ public class PaymentApiService {
         productRepository.save(product);
 
         paymentRepository.delete(payments);
+
+        return product.getProductId();
+    }
+
+    public int approvePayment(int productId) {
+
+        Products product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품은 존재하지 않습니다. ID: " + productId));
+
+        product.setProductState(2);
+        productRepository.save(product);
 
         return product.getProductId();
     }

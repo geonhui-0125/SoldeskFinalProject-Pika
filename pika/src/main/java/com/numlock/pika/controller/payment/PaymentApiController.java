@@ -41,7 +41,7 @@ public class PaymentApiController {
             //Paid : 결제 완료 상태
             System.out.println("결제 검증 성공! Paid 상태 : " + paymentData.getStatus());
 
-            notificationService.sendSellerDealing(paymentResDto);
+            notificationService.sendSellerApproval(paymentResDto);
 
             return ResponseEntity.ok(iamportResponse);
 
@@ -67,6 +67,7 @@ public class PaymentApiController {
         try {
             notificationService.sendSoldOut(impUid);
             notificationService.sendSellerSoldOut(impUid);
+            notificationService.sendBuyerProductReview(impUid);
 
             String resultMessage = paymentApiService.confirmPayment(impUid);
 
@@ -102,33 +103,17 @@ public class PaymentApiController {
         return "forward:/products/info/" + productId;
     }
 
+    @PutMapping("api/payments/approve")
+    public  String approvePayment(@RequestBody PaymentResDto paymentResDto) {
 
+        notificationService.sendBuyerDealing(paymentResDto);
 
-    /*//결제 취소 로직
-    @PostMapping("api/payment/cancel/{impUid}")
-    public ResponseEntity<?> cancelPayment(@PathVariable String impUid) {
+        System.out.println("승인할 결제 - impUid : " + paymentResDto.getTaskId());
 
-        try {
-            IamportResponse<Payment> iamportResponse = paymentApiService.cancelPayment(impUid);
+        int productId = paymentApiService.approvePayment(paymentResDto.getTaskId());
 
-            return ResponseEntity.ok(iamportResponse); //추후 수정
-
-        } catch (IamportResponseException e) {
-            System.out.println("PortOne API 통신 오류 : " + e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-
-        } catch (IOException e) {
-            System.out.println("IO 오류 : " + e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-
-        } catch (RuntimeException e) {
-            // 주로 PaymentService에서 금액 불일치 시 던지는 예외
-            System.out.println("결제 취소 실패 : " + e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-
-        }
-
-    }*/
+        return "forward:/products/info/" + productId;
+    }
 
 
 
