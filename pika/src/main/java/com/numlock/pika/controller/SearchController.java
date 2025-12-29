@@ -37,7 +37,7 @@ public class SearchController {
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "category", required = false) String categoryName,
             Model model, Principal principal,
-            @PageableDefault(size = 15) Pageable pageable){ // 기본 사이즈 15개 설정
+            @PageableDefault(size = 20) Pageable pageable){ // 기본 사이즈 15개 설정
 
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
         model.addAttribute("categoriesMap", categoriesMap);

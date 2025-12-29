@@ -48,7 +48,8 @@
                             <input type="hidden" name="category" id="categoryPath">
                         </div>
                         <div class="category-dropdown-box" id="categoryDropdown" style="display:none;">
-                            <ul class="category-main-list" th:each="category : ${categoriesMap}">
+                            <ul class="category-main-list" th:each="category : ${categoriesMap}"
+                                th:if="${category.key != '서적' and category.key != '의류'}">
                                 <li class="category-main-item" th:text="${category.key}"></li>
                                 <ul class="category-sub-list" style="display:none;">
                                     <li class="category-sub-item" th:each="sub : ${category.value}" th:text="${sub}"></li>

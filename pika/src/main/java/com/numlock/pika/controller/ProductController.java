@@ -43,7 +43,7 @@ public class ProductController {
     public String searchProducts(@RequestParam(value = "keyword", required = false) String keyword,
                                  @RequestParam(value = "category", required = false) String category,
                                  @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "15") int size,
+                                 @RequestParam(defaultValue = "20") int size,
                                  Model model, Principal principal) {
 
         // 1. 페이징 설정 (한 페이지 15개)
