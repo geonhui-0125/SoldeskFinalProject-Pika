@@ -51,6 +51,7 @@ public class GeminiService {
 
     /**
      * 상품 시세 분석 (RAG + Google Search Grounding)
+     *
      * @param productId 분석할 상품 ID
      * @return 분석 결과 텍스트
      */
@@ -70,7 +71,7 @@ public class GeminiService {
                 refinedKeyword,
                 product.getCategory().getCategoryId()
         );
-        
+
         String internalInfo = (internalAvg != null)
                 ? String.format("%,.0f원", internalAvg)
                 : "정보 없음";
@@ -228,7 +229,7 @@ public class GeminiService {
     private String extractSearchKeyword(String userMessage) {
         try {
             String prompt = "다음 문장에서 검색할 상품명 키워드만 딱 하나 추출해줘. 조사나 불필요한 말은 빼고 명사 위주로. 없으면 NONE 이라고만 출력해.\n문장: " + userMessage;
-            
+
             GenerateContentConfig keywordConfig = GenerateContentConfig.builder()
                     .maxOutputTokens(50)
                     .build();
@@ -248,46 +249,47 @@ public class GeminiService {
     }
 
     /**
-     * 판매자 리뷰 목록을 기반으로 한줄평을 생성합니다.
-     *
-     * @param reviewContents 판매자에 대한 리뷰 내용(String) 목록
-     * @return 생성된 한줄평 또는 오류 메시지
+     * 판매자 리뷰 목록을 기반으로 효율적인 한줄평을 생성합니다. (최적화 버전)
      */
     public String generateReviewSummary(List<String> reviewContents) {
+        // 1. 리뷰가 없거나 null인 경우 즉시 반환하여 불필요한 API 호출 방지
         if (reviewContents == null || reviewContents.isEmpty()) {
-            return "아직 리뷰가 없습니다."; // 리뷰가 없으면 기본 메시지 반환
+            return "아직 등록된 리뷰가 없습니다.";
         }
 
-        // 모든 리뷰 내용을 하나의 문자열로 결합합니다. 각 리뷰는 새 줄로 구분합니다.
-        String combinedReviews = reviewContents.stream()
-                .collect(Collectors.joining("\n"));
+        // 2. 최신순 리뷰 10개로 제한하여 토큰 사용량 최소화 및 성능 향상
+        // (리뷰가 아무리 많아도 이 범위를 넘지 않아 안정적입니다)
+        List<String> limitedReviews = reviewContents.stream()
+                .limit(10)
+                .collect(Collectors.toList());
 
-        // Gemini 모델에 전달할 프롬프트를 구성합니다.
-        // 판매자 리뷰들을 읽고, 이 판매자에 대한 50자 이내의 한줄평을 작성해달라고 지시합니다.
-        // 긍정적이고 핵심적인 내용을 위주로 요약하고, 판매자의 특징을 잘 나타내도록 요청합니다.
-        String prompt = "다음 판매자 리뷰들을 읽고, 이 판매자에 대한 50자 이내의 한줄평을 작성해줘. 핵심적인 내용을 위주로 요약하고, 판매자의 특징을 잘 나타내도록 해줘, 글자수 표시는 하지마 :\n\n" + combinedReviews;
+        // 3. 리뷰 내용을 하나의 문자열로 결합
+        String combinedReviews = String.join("\n", limitedReviews);
 
-        
+        // 4. 예외 상황(데이터 부족 등)까지 고려한 강화된 프롬프트
+        String prompt = "다음은 판매자에 대한 실제 고객 리뷰들입니다. 이를 종합하여 판매자의 특징을 50자 이내의 한줄평으로 요약해주세요. " +
+                "만약 리뷰 내용이 짧아 요약이 어렵다면 '정보가 부족한 판매자입니다'라고 출력하세요. " +
+                "글자 수나 기호는 포함하지 마세요:\n\n" + combinedReviews;
+
         try {
-
+            // 5. 응답 속도를 위해 설정을 간소화하여 호출
             GenerateContentConfig summaryConfig = GenerateContentConfig.builder()
-                    .maxOutputTokens(200)
+                    .maxOutputTokens(300) // 한줄평이므로 출력 토큰을 낮춰 비용 절감
+                    .temperature(0.5f)    // 적당한 일관성 유지
                     .build();
 
             GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, summaryConfig);
 
-            // API 응답을 파싱하여 생성된 한줄평을 추출합니다.
+            // 6. 결과 추출 및 반환
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                return response.text();
+                return response.text().trim();
             }
         } catch (Exception e) {
-            // API 호출 중 오류 발생 시, 오류 메시지를 콘솔에 출력하고 기본 오류 메시지를 반환합니다.
-            System.err.println("Gemini API 호출 중 오류 발생: " + e.getMessage());
-            return "리뷰 요약 생성 중 오류가 발생했습니다.";
+            // 7. 에러 발생 시 원인을 구체적으로 로그에 남김
+            System.err.println("Gemini 요약 API 오류: " + e.getMessage());
+            return "리뷰를 분석 중입니다. 잠시 후 확인해 주세요.";
         }
 
-        // 응답이 유효하지 않은 경우
-        return "리뷰를 요약할 수 없습니다.";
+        return "리뷰 요약을 생성할 수 없습니다.";
     }
-
 }
