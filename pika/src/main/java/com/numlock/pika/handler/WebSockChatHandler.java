@@ -12,6 +12,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.numlock.pika.dto.ChatMessage;
 import com.numlock.pika.service.MessageService;
+import com.numlock.pika.service.Notification.NotificationService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class WebSockChatHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
     private final MessageService messageService; // Inject MessageService
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private final NotificationService notificationService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -59,6 +61,7 @@ public class WebSockChatHandler extends TextWebSocketHandler {
             String feedbackMsg = "{\"sender\":\"system\", \"msg\":\"User " + chatMessage.getRecipientId() + " is not online. Message saved.\"}";
             session.sendMessage(new TextMessage(feedbackMsg)); // Send system message to sender
         }
+        notificationService.sendChatNoti(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId());
     }
 
     @Override
