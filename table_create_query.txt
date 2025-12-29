@@ -1,4 +1,102 @@
+drop sequence MESSAGE_SEQ;
+drop sequence seq_accounts;
+drop sequence seq_reviews;
+drop sequence seq_favorite_products;
+drop sequence seq_products;
+drop sequence seq_categories;
+drop sequence seq_search;
+drop sequence SEQ_NOTIFICATIONS;
+
+create sequence SEQ_NOTIFICATIONS
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+create sequence seq_categories
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+create sequence seq_products
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+create sequence seq_favorite_products
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+create sequence seq_reviews
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+create sequence seq_accounts
+    INCREMENT BY 1 START WITH 1
+    MINVALUE 1 MAXVALUE 9999 NOCYCLE
+    NOCACHE NOORDER;
+
+CREATE SEQUENCE MESSAGE_SEQ START WITH 1 INCREMENT BY 1;
+
+CREATE SEQUENCE seq_search
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE;
+
+--drop table━
+drop table accounts;
+drop table reviews;
+drop table favorite_products;
+drop table payments;
+drop table products;
 drop table categories;
+drop table MESSAGES;
+drop table NOTIFICATIONS;
+drop table users;
+drop table search;
+
+--create table
+CREATE TABLE users (
+                       id varchar2(20) primary key,
+                       pw varchar2(255) not null,
+                       nickname varchar2(50) not NULL,
+                       profile_image varchar2(250) not NULL,
+                       email varchar2(50) not NULL,
+                       address	varchar2(200) NULL,
+                       phone varchar2(20) null,
+                       birth DATE null,
+                       role varchar2(20)
+);
+
+
+CREATE TABLE NOTIFICATIONS (
+                               NOTIFICATION_ID NUMBER primary key NOT NULL, -- 고유 ID (PK)
+                               RECEIVER_ID varchar2(20) NOT NULL, -- 수신자 유저 ID
+                               TYPE VARCHAR2(50) NOT NULL, -- 내부 로직 구분용 코드 (예: PRICE_DROP)
+                               TITLE VARCHAR2(50) NOT NULL, -- 알림 제목 (예: 찜한 상품 가격 변동)
+                               CONTENT VARCHAR2(200) NOT NULL, -- 알림 내용 (예: 강아지 인형 가격이...)
+                               ACTION_URL VARCHAR2(100), -- 클릭 시 이동할 경로
+                               IS_READ NUMBER(1) DEFAULT 0 NOT NULL, -- 읽음 상태 (0: 안읽음, 1: 읽음)
+                               CREATED_AT DATE DEFAULT CURRENT_TIMESTAMP NOT NULL, -- 생성일시
+                               foreign key (RECEIVER_ID) references users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE MESSAGES (
+                          ID NUMBER(19,0) NOT NULL PRIMARY KEY,
+                          SENDER_ID VARCHAR2(50) NOT NULL,
+                          RECIPIENT_ID VARCHAR2(50) NOT NULL,
+                          PRODUCT_ID NUMBER,
+                          CONTENT VARCHAR2(1000) NOT NULL,
+                          SENT_AT TIMESTAMP(6) NOT NULL,
+                          IS_READ NUMBER(1,0) DEFAULT 0 NOT NULL,
+                          foreign key (SENDER_ID)
+                              references users (id) ON DELETE CASCADE,
+                          foreign key (RECIPIENT_ID)
+                              references users (id) ON DELETE CASCADE,
+                          FOREIGN KEY (PRODUCT_ID)
+                              REFERENCES PRODUCTS (PRODUCT_ID) ON DELETE CASCADE
+);
 
 CREATE TABLE categories (
                             category_id	NUMBER primary key,
@@ -55,8 +153,97 @@ values (seq_categories.nextval, '잡화>기타');
 insert into categories (category_id, category)
 values (seq_categories.nextval, '기타>기타');
 
+CREATE TABLE products (
+                          product_id NUMBER primary key,
+                          seller_id varchar(20) NOT NULL,
+                          category_id	NUMBER NOT NULL,
+                          price NUMBER NOT NULL,
+                          title varchar2(100) NOT NULL,
+                          description	varchar2(1000) NOT NULL,
+                          product_image varchar2(250) NOT NULL,
+                          view_cnt NUMBER DEFAULT 0,
+                          created_at date NOT NULL,
+                          product_state NUMBER(1) DEFAULT 0, -- 0 : selling, 1 : selled
+                          foreign key (seller_id)
+                              references users (id) ON DELETE CASCADE,
+                          foreign key (category_id)
+                              references categories (category_id) ON DELETE CASCADE
+);
+
+create table payments (
+                          imp_uid varchar2(50) primary key,
+                          merchant_uid varchar2(50) not null,
+                          task_id NUMBER not null,
+                          amount NUMBER not null,
+                          created_at DATE not null,
+                          seller_id varchar2(50),
+                          buyer_id varchar2(50),
+                          foreign key (task_id)
+                              references products (product_id) ON DELETE CASCADE,
+                          foreign key (seller_id)
+                              references users (id) ON DELETE CASCADE,
+                          foreign key (buyer_id)
+                              references users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE favorite_products (
+                                   fp_id NUMBER primary key,
+                                   user_id	varchar(20) NOT NULL,
+                                   product_id NUMBER NOT NULL,
+                                   foreign key (user_id)
+                                       references users (id) ON DELETE CASCADE,
+                                   foreign key (product_id)
+                                       references products (product_id) ON DELETE CASCADE
+);
+
+create table reviews (
+                         review_id number primary key,
+                         product_id number not null, 
+                         seller_id varchar2(20) not null,
+                         reviewer_id varchar2(20) not null,
+                         score number not null,
+                         content varchar2(1000 CHAR) not null,
+                         created_at DATE not null,
+                         updated_at DATE not null,
+                         foreign key (product_id)
+                             references products (product_id) ON DELETE CASCADE,
+                         foreign key (reviewer_id)
+                             references users (id) ON DELETE CASCADE,
+                         foreign key (seller_id)
+                             references users (id) ON DELETE CASCADE
+);
+
+create table accounts(
+                         account_id number primary key,
+                         seller_id varchar2(20) not null,
+                         bank_code varchar2(50)       not null,
+                         account_number varchar(100),
+                         foreign key (seller_id)
+                             references users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE search (
+	search_id NUMBER(19) NOT NULL PRIMARY KEY,
+	keyword VARCHAR(255 CHAR) NOT NULL UNIQUE,
+	search_count NUMBER(19) DEFAULT 0 NOT NULL
+);
+
+
+--select table━
+select * from users;
+select * from NOTIFICATIONS;
 select * from categories;
+select * from products;
+select * from payments;
+select * from favorite_products;
+select * from reviews;
+select * from accounts;
+select * from MESSAGES;
+select * from search;
 
 select * from PRODUCTS where category_id between 7 and 15;
 
 select count(*) from PRODUCTS where category_id = 22;
+
+commit;
+

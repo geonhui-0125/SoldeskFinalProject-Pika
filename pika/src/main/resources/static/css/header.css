@@ -85,7 +85,7 @@ ul {
 #logo-link {
     font-size: 1.8em;
     font-weight: 900;
-    color: #ff4500;
+    color: #75b85b;
     white-space: nowrap;
 }
 
@@ -228,7 +228,7 @@ ul {
 /* 알림 숫자 스타일 */
 #notification-count {
     font-weight: bold;
-    color: #ff4500;
+    color: #75b85b;
 }
 
 #category-wrapper {
@@ -273,7 +273,7 @@ ul {
 #category-dropdown > p {
     font-weight: bold;
     border-bottom: 1px solid #eee;
-    color: #ff4500;
+    color: #75b85b;
     padding-left: 12px;
     padding-bottom: 10px;
 }
@@ -292,7 +292,7 @@ ul {
 /* 대분류 호버 시 배경색 */
 .category-item:hover > a {
     background-color: #f5f5f5;
-    color: #ff4500;
+    color: #75b85b;
 }
 
 /* [핵심] 대분류에 마우스 올리면 소분류 보여주기 */
@@ -315,7 +315,7 @@ ul {
 .submenu-title {
     font-weight: bold;
     padding: 9px 15px;
-    color: #ff4500;
+    color: #75b85b;
     border-bottom: 1px solid #eee;
 }
 
@@ -327,7 +327,7 @@ ul {
 /* 소분류 내부 메뉴 호버 */
 .submenu a:hover {
     background-color: #f5f5f5;
-    color: #ff4500;
+    color: #75b85b;
 }
 
 /*******************************
@@ -406,7 +406,7 @@ ul {
 
 #popular-searches-list li a:hover {
     background-color: #f5f5f5;
-    color: #ff4500;
+    color: #75b85b;
 }
 
 #popular-searches-list .no-results,
