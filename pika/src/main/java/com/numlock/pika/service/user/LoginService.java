@@ -55,9 +55,6 @@ public class LoginService {
         if (!passwordEncoder.matches(password, user.getPw())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
-        /*if (!password.equals(user.getPw())) { // 평문 비밀번호 직접 비교
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        }*/
         return user;
     }
 
@@ -70,10 +67,6 @@ public class LoginService {
         if(!passwordEncoder.matches(rawPassword, user.getPw())) {
             throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
         }
-        //비밀번호 확인 (평문 비교)
-        /*  if(!rawPassword.equals(user.getPw())) {
-            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
-        }*/
         userRepository.delete(user);
     }
 }

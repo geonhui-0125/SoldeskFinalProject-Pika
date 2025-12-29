@@ -6,16 +6,9 @@
 </head>
 <body>
 <header th:fragment="mainHeader" id="main-header">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <div class="header-auth">
         <div>
-    <!--<div sec:authorize="isAuthenticated()" th:if="${user}" class="header-auth">
-        <div>
-            <a href="/user/logout" id="logout" style="width: 100px; height: 50px">로그아웃</a>
-            <a href="/user/add-info" id="modify" style="width: 100px; height: 50px">정보수정</a>
-        </div>
-    </div>
-    <div sec:authorize="!isAuthenticated()" class="header-auth">
-        <div>-->
             <span sec:authorize="!isAuthenticated()">
                 <a href="/user/login" id="login">로그인</a>
                 <a href="/user/join" id="join">회원가입</a>
@@ -210,19 +203,20 @@
                 div.style.alignSelf = 'flex-end';
                 div.style.backgroundColor = '#FFD700'; // 노란색
                 div.style.color = '#333';
+                div.textContent = text;
             } else {
                 div.style.alignSelf = 'flex-start';
                 div.style.backgroundColor = '#fff';
                 div.style.border = '1px solid #eee';
                 div.style.color = '#333';
-                // 개행 문자 처리
-                div.innerHTML = text.replace(/\n/g, '<br>');
-            }
-
-            if (sender !== 'user') {
-                div.innerHTML = text.replace(/\n/g, '<br>');
-            } else {
-                div.textContent = text;
+                
+                // 마크다운 렌더링 적용
+                try {
+                    div.innerHTML = marked.parse(text);
+                } catch (e) {
+                    console.error('Markdown parsing error:', e);
+                    div.innerHTML = text.replace(/\n/g, '<br>');
+                }
             }
 
             messagesArea.appendChild(div);

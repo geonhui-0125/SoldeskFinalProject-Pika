@@ -6,7 +6,7 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
-        h1 { color: #333; text-align: center; margin-bottom: 25px; }
+        h1 { color: #ff4500; text-align: center; margin-bottom: 25px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; color: #555; font-weight: bold; }
         input[type="text"],
@@ -23,7 +23,7 @@
         button {
             width: 100%;
             padding: 12px;
-            background-color: #e74c3c;
+            background-color: #f5ae07;
             color: white;
             border: none;
             border-radius: 4px;
@@ -32,7 +32,7 @@
             transition: background-color 0.2s ease;
         }
         button:hover {
-            background-color: #e74c3c;
+            background-color: #de9e09;
         }
         .error-message {
             color: #dc3545;
@@ -64,41 +64,38 @@
     <div class="container">
         <h1>회원가입</h1>
         <!--/* 디버깅용: errorMessage 변수가 모델에 담겨오는지 확인 */-->
-        <p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>
+        <!--<p th:if="${errorMessage}" th:text="${errorMessage}" class="error-message"></p>-->
         <form th:action="@{/user/joinUser}" th:object="${user}" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="id">아이디:</label>
-                <input type="text" id="id" th:field="*{id}" required/>
+                <label for="id">아이디 </label>
+                <input type="text" id="id" th:field="*{id}" placeholder="로그인 아이디를 입력하세요." required />
                 <span th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="pw">비밀번호:</label>
-                <input type="password" id="pw" th:field="*{pw}" required/>
+                <label for="nickname">닉네임 </label>
+                <input type="text" id="nickname" th:field="*{nickname}" placeholder="닉네임은 변경이 불가능 합니다." required />
+                <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="field-error"></span>
+            </div>
+            <div class="form-group">
+                <label for="pw">비밀번호 </label>
+                <input type="password" id="pw" th:field="*{pw}" placeholder="4~20자리 비밀번호를 입력하세요." required/>
                 <span th:if="${#fields.hasErrors('pw')}" th:errors="*{pw}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="confirmPw">비밀번호 확인:</label>
-                <input type="password" id="confirmPw" th:field="*{confirmPw}" required/>
+                <label for="confirmPw">비밀번호 확인 </label>
+                <input type="password" id="confirmPw" th:field="*{confirmPw}" placeholder="4~20자리 비밀번호를 입력하세요." required/>
                 <span th:if="${#fields.hasErrors('confirmPw')}" th:errors="*{confirmPw}" class="field-error"></span>
             </div>
             <div class="form-group">
-                <label for="nickname">닉네임:</label>
-                <input type="text" id="nickname" th:field="*{nickname}" required/>
-                <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="field-error"></span>
-            </div>
-            <!--<div class="form-group">
-                <label for="profileImageFile">프로필 이미지:</label>
-                <input type="file" id="profileImageFile" name="profileImageFile"/>
-            </div>-->
-            <div class="form-group">
-                <label for="email">이메일:</label>
-                <input type="email" id="email" th:field="*{email}" required/>
+                <label for="email">이메일 </label>
+                <input type="email" id="email" th:field="*{email}" placeholder="비밀번호 찾기에 사용할 이메일을 입력하세요." required/>
                 <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></span>
             </div>
+            <br />
             <button type="submit">회원가입</button>
         </form>
         <div class="link-container">
-            <a href="/user/login">이미 계정이 있으신가요? 로그인</a>
+            <a href="/user/login">로그인 페이지로 돌아가기</a>
         </div>
     </div>
 
