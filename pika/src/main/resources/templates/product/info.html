@@ -18,6 +18,8 @@
     <input class="product-id" type="hidden" th:value="*{productId}">
     <input class="seller-id" type="hidden" th:value="*{seller.id}">
     <input class="wished" type="hidden" th:value="*{wished}">
+    <!-- 상품 상태를 JavaScript에서 사용하기 위한 hidden input 추가 -->
+    <input type="hidden" id="productStat" th:value="${productDetailDto.productStat}">
     <!-- breadcrumb -->
     <nav class="breadcrumb">
         <ul>
