@@ -152,11 +152,11 @@
                 <label>프로필 이미지</label>
 
                 <div style="display: flex; align-items: center">
-                    <img th:src="@{${user.profileImage}}" alt="프로필 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 20px;" />
+                    <img id="profileImagePreview" th:src="@{${user.profileImage}}" alt="프로필 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 20px;" />
                     <div style="display: flex; flex-direction: column; gap: 10px">
                         <div>
                             <label for="profileImageFile" class="image-upload-btn">새 프로필 이미지 선택</label>
-                            <input type="file" id="profileImageFile" name="profileImageFile" style="display: none" />
+                            <input type="file" id="profileImageFile" name="profileImageFile" style="display: none" accept="image/*" />
                         </div>
                         <div>
                             <button type="button" id="deleteImageBtn" class="delete-image-btn" th:if="${user.profileImage != '/profile/default-profile.png'}">이미지 삭제</button>
@@ -165,18 +165,6 @@
                     </div>
                 </div>
             </div>
-                <!--이미지 미리보기와 업로드 버튼 나란히 배치-->
-                <!--<div style="display: flex; align-items: center; margin-bottom: 10px;">
-                    <img th:src="@{${user.profileImage}}" alt="프로필 이미지" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-right: 15px;"/>
-                <label for="profileImageFile" class="image-upload-btn">새 프로필 이미지 선택</label>
-                    <input type="file" id="profileImageFile" name="profileImageFile" style="display: none;">
-                </div>
-                &lt;!&ndash;이미지 삭제/상태 버튼 아래에 배치&ndash;&gt;
-                <div style="margin-top: 10px">
-                    <button type="button" id="deleteImageBtn" class="delete-image-btn" th:if="${user.profileImage != '/profile/default-profile.png'}">이미지 삭제</button>
-                    <button type="button" class="disabled-image-btn" disabled th:if="${user.profileImage == '/profile/default-profile.png'}">기본 이미지 사용중</button>
-                </div>-->
-
 
             <!-- 주소 입력 필드 수정 -->
             <div class="form-group">
@@ -219,7 +207,7 @@
             <button type="submit">정보 업데이트</button>
         </form>
         <form th:action="@{/}" method="get" style="margin-top: 10px;">
-            <button type="submit" class="skip-button">건너뛰기</button>
+            <button type="submit" class="skip-button">메인으로</button>
         </form>
         <div style="margin-top: 10px;">
              <a th:href="@{/user/delete}" class="delete-button" onclick="return confirm('정말로 탈퇴하시겠습니까? 탈퇴 페이지로 이동합니다.');">회원탈퇴</a>
@@ -228,6 +216,22 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
+        //변경 프로필 이미지 미리보기
+        const profileImageFile = document.getElementById('profileImageFile');
+        if (profileImageFile){
+            profileImageFile.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if(file){
+                    const reader = new FileReader();
+                    reader.onload = function (e){
+                        const preview = document.getElementById('profileImagePreview');
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
         // 이미지 삭제 버튼 로직
         const deleteBtn = document.getElementById('deleteImageBtn');
         if (deleteBtn) {
