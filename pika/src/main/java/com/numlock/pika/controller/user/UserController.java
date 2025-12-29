@@ -84,13 +84,15 @@ public class UserController {
     }
 
     @PostMapping("/user/delete")
-    public String deleteUser(@RequestParam String rawPassword, Principal principal, HttpServletRequest request, Model model) {
+    public String deleteUser(@RequestParam String rawPassword, Principal principal, HttpServletRequest request,
+                             Model model, RedirectAttributes redirectAttributes) {
         if(principal == null) {
             return "redirect:/user/login"; //로그인 하지 않은 사용자 접근시
         }
         try {
             loginService.deleteUser(principal.getName(), rawPassword);
             request.logout();
+            redirectAttributes.addFlashAttribute("successMessage", "회원 탈퇴가 완료되었습니다.");
             return "redirect:/";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
