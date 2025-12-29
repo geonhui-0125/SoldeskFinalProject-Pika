@@ -1,5 +1,6 @@
 package com.numlock.pika.service.Notification;
 
+import com.numlock.pika.handler.NotificationWebSocketHandler; // NotificationWebSocketHandler import 추가
 import com.numlock.pika.domain.*;
 import com.numlock.pika.dto.NotificationDto;
 import com.numlock.pika.dto.ProductRegisterDto;
@@ -25,6 +26,7 @@ public class NotificationService {
     private final FavoriteProductRepository favoriteProductRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final NotificationWebSocketHandler notificationWebSocketHandler; // 핸들러 주입
 
     /**
      * 1. 찜한 상품 가격 변동 (다수 유저 대상)
@@ -95,7 +97,7 @@ public class NotificationService {
     }
 
     /**
-     * 다수 유저에게 알림 저장
+     * 다수 유저에게 알림 저장 및 실시간 전송
      */
     private void saveAll(List<Users> receivers, String type, String title, String content, String url) {
         List<Notifications> notiList = receivers.stream()
@@ -108,7 +110,13 @@ public class NotificationService {
                         .build())
                 .collect(Collectors.toList());
 
-        notificationRepository.saveAll(notiList);
+        List<Notifications> savedNotiList = notificationRepository.saveAll(notiList);
+
+        // 실시간 알림 전송
+        savedNotiList.forEach(noti -> {
+            NotificationDto notificationDto = NotificationDto.fromEntity(noti);
+            notificationWebSocketHandler.sendNotification(noti.getReceiver().getId(), notificationDto);
+        });
     }
 
     /**
@@ -289,7 +297,7 @@ public class NotificationService {
     }
 
     /**
-     * 소수 유저에게 알림 저장
+     * 소수 유저에게 알림 저장 및 실시간 전송
      */
     private void save(Users receiver, String type, String title, String content, String url) {
 
@@ -301,7 +309,11 @@ public class NotificationService {
                 .actionUrl(url)
                 .build();
 
-        notificationRepository.save(noti);
+        Notifications savedNoti = notificationRepository.save(noti);
+
+        // 실시간 알림 전송
+        NotificationDto notificationDto = NotificationDto.fromEntity(savedNoti);
+        notificationWebSocketHandler.sendNotification(savedNoti.getReceiver().getId(), notificationDto);
     }
 
     @Transactional(readOnly = true)

@@ -223,7 +223,9 @@
             messagesArea.scrollTop = messagesArea.scrollHeight;
         }
     </script>
-    <script th:src="@{/js/chat-websocket.js}" sec:authorize="isAuthenticated()"></script>
-</header>
-</body>
-</html>
+        <script th:src="@{/js/notification-websocket.js}" sec:authorize="isAuthenticated()"></script>
+        <script th:src="@{/js/chat-websocket.js}" sec:authorize="isAuthenticated()"></script>
+    </header>
+    
+    </body>
+    </html>
