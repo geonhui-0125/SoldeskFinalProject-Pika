@@ -19,13 +19,13 @@ public class MessageService {
     private final ProductRepository productRepository; // ProductRepository 주입
 
     @Transactional
-    public Message saveMessage(String senderId, String recipientId, String content, Integer productId) {
+    public Message saveMessage(String senderId, String recipientId, String content, Integer productId, boolean isRead) {
         Message.MessageBuilder messageBuilder = Message.builder()
                 .senderId(senderId)
                 .recipientId(recipientId)
                 .content(content)
                 .sentAt(LocalDateTime.now())
-                .isRead(false);
+                .isRead(isRead);
 
         if (productId != null) {
             Products product = productRepository.findById(productId)
@@ -35,11 +35,13 @@ public class MessageService {
 
         return messageRepository.save(messageBuilder.build());
     }
-
+    @Transactional
     public List<Message> getConversation(String user1Id, String user2Id, Integer productId) {
         if (productId != null) {
+        	messageRepository.markAsReadByRoomIdAndUserId(user1Id, user2Id, productId);
             return messageRepository.findConversationByProduct(user1Id, user2Id, productId);
         }
         return messageRepository.findConversationBetweenUsers(user1Id, user2Id);
     }
+    
 }
