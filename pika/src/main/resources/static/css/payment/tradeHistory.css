@@ -16,8 +16,8 @@
 }
 
 .tab-btn.active {
-    color: #ff4500;
-    border-bottom: 3px solid #ff4500;
+    color: #75b85b;
+    border-bottom: 3px solid #75b85b;
 }
 
 /* 내역 컨테이너 제어 */
@@ -67,7 +67,7 @@
 }
 
 .trade-info .price {
-    color: #ff4500;
+    color: #75b85b;
     font-weight: bold;
 }
 
@@ -87,8 +87,8 @@
 
 .status-0 { background: #e3f2fd; color: #1976d2; } /* 판매중 */
 .status-1 { background: #f5f5f5; color: #616161; } /* 판매완료 */
-.status-2 { background: #fff3e0; color: #fb8c00; } /* 거래중 */
-.status-3 { background: #fce4ec; color: #d81b60; } /* 승인대기 - 분홍/레드 */
+.status-2 { background: #fff3e0; color: #fb8c00; } /* 거래중 -> 이 부분도 녹색 톤으로 바꿀지 고민이지만, 상태값 색상은 유지 */
+.status-3 { background: #fce4ec; color: #d81b60; } /* 승인대기 */
 
 /* 승인대기 뱃지에 살짝 강조 효과 (선택사항) */
 .status-3 {
@@ -141,7 +141,7 @@
 .modal-close-btn {
     width: 100%;
     padding: 12px;
-    background: #333;
+    background: #75b85b;
     color: #fff;
     border: none;
     border-radius: 8px;

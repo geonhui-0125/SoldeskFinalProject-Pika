@@ -113,7 +113,7 @@ public class GeminiService {
             GenerateContentConfig config = GenerateContentConfig.builder()
                     .tools(Arrays.asList(googleSearchTool))
                     .temperature(0.2f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
-                    .maxOutputTokens(4000)
+                    .maxOutputTokens(2500)
                     .build();
 
             // 6. Gemini 호출
@@ -188,7 +188,12 @@ public class GeminiService {
             history.add(userContent);
 
             // Gemini API 호출 (전체 히스토리 전달)
-            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", history, null);
+            GenerateContentConfig chatConfig = GenerateContentConfig.builder()
+                    .maxOutputTokens(3000)
+                    .temperature(0.7f)
+                    .build();
+
+            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", history, chatConfig);
 
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
                 // 토큰 사용량 로그 출력
@@ -223,7 +228,12 @@ public class GeminiService {
     private String extractSearchKeyword(String userMessage) {
         try {
             String prompt = "다음 문장에서 검색할 상품명 키워드만 딱 하나 추출해줘. 조사나 불필요한 말은 빼고 명사 위주로. 없으면 NONE 이라고만 출력해.\n문장: " + userMessage;
-            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, null);
+            
+            GenerateContentConfig keywordConfig = GenerateContentConfig.builder()
+                    .maxOutputTokens(50)
+                    .build();
+
+            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, keywordConfig);
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
                 if (response.usageMetadata().isPresent()) {
                     var usage = response.usageMetadata().get();
@@ -260,7 +270,11 @@ public class GeminiService {
         
         try {
 
-            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, null);
+            GenerateContentConfig summaryConfig = GenerateContentConfig.builder()
+                    .maxOutputTokens(200)
+                    .build();
+
+            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, summaryConfig);
 
             // API 응답을 파싱하여 생성된 한줄평을 추출합니다.
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {

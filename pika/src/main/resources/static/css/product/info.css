@@ -84,14 +84,14 @@
 }
 
 .thumbnail.active {
-    border-color: #ff4500;
+    border-color: #bbf29d;
     opacity: 1;
 }
 
 
 .thumbnail:hover {
     opacity: 1;
-    border-color: #ff4500;
+    border-color: #bbf29d;
 }
 
 /* 메인 이미지 */
@@ -122,6 +122,7 @@
     font-size: 1.8em;
     font-weight: bold;
     margin-bottom: 15px;
+    color: #75b85b;
 }
 
 /* 찜 / 조회수 */
@@ -163,7 +164,7 @@
 
 .buy-btn {
     padding: 12px 30px;
-    background: #ff4500;
+    background: #75b85b;
     color: #fff;
     border: none;
     cursor: pointer;
