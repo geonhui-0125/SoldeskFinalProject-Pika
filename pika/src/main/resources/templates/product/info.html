@@ -18,6 +18,8 @@
     <input class="product-id" type="hidden" th:value="*{productId}">
     <input class="seller-id" type="hidden" th:value="*{seller.id}">
     <input class="wished" type="hidden" th:value="*{wished}">
+    <!-- 상품 상태를 JavaScript에서 사용하기 위한 hidden input 추가 -->
+    <input type="hidden" id="productStat" th:value="${productDetailDto.productStat}">
     <!-- breadcrumb -->
     <nav class="breadcrumb">
         <ul>
@@ -175,30 +177,32 @@
         <!-- 판매자 -->
         <section class="seller-info">
             <h3>판매자</h3>
-            <div class="seller-box"
-                 style="text-decoration: none; color: inherit; display: flex; align-items: center;">
+            <div class="seller-box">
                 <img th:src="@{${productDetailDto.seller.profileImage}}">
-                <div>
-                    <p th:text="*{seller.nickname}"></p>
-                    <p>
-                        <th:block th:if="${productDetailDto.star != 0}">
-                            별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span>
-                        </th:block>
+                <div class="seller-content-wrapper">
+                    <div class="seller-text-info">
+                        <p class="seller-nickname" th:text="*{seller.nickname}"></p>
+                        <p class="seller-rating">
+                            <th:block th:if="${productDetailDto.star != 0}">
+                                별점 <span th:text="${#numbers.formatDecimal(productDetailDto.star, 0, 1)}"></span>
+                            </th:block>
+                        </p>
+                    </div>
+
+                    <div class="seller-btn-group">
                         <button id="showReviewSummaryBtn" class="buy-btn">리뷰 보기</button>
 
-                        <!-- 리뷰 쓰러 가기 버튼 추가 -->
                         <th:block sec:authorize="isAuthenticated()">
                             <button th:if="${productDetailDto.buyerType == 'buy' and productDetailDto.productStat == 1 and !productDetailDto.hasReviewed}"
-                                    class="buy-btn"
-                                    th:onclick="|location.href='@{/reviews/new(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}'|"
-                                    style="margin-left: 10px;">
+                                    class="buy-btn review-write-btn"
+                                    th:onclick="|location.href='@{/reviews/new(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}'|">
                                 리뷰 쓰러 가기
                             </button>
                         </th:block>
-                    </p>
-                    <div id="reviewSummaryContent" class="review-summary-display"></div>
+                    </div>
                 </div>
             </div>
+            <div id="reviewSummaryContent" class="review-summary-display"></div>
         </section>
 
 
