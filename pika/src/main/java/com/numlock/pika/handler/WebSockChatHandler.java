@@ -43,7 +43,6 @@ public class WebSockChatHandler extends TextWebSocketHandler {
         log.info("Message received: {}", payload);
 
         // Save message to database
-        messageService.saveMessage(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId());
 
         // Always echo the original message back to the sender's session for display
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(chatMessage)));
@@ -52,16 +51,19 @@ public class WebSockChatHandler extends TextWebSocketHandler {
         WebSocketSession recipientSession = sessions.get(chatMessage.getRecipientId());
 
         if (recipientSession != null && recipientSession.isOpen()) {
+        	messageService.saveMessage(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId(),true);
             // 메시지 다시 직렬화하여 수신자에게 전송
             recipientSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(chatMessage)));
             log.info("Message sent to recipient {}.", chatMessage.getRecipientId());
         } else {
             // 수신자가 오프라인일 경우 보낸 사람에게 알림 (선택적)
+        	messageService.saveMessage(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId(),false);
             log.warn("Recipient {} is not online. Message saved.", chatMessage.getRecipientId());
             String feedbackMsg = "{\"sender\":\"system\", \"msg\":\"User " + chatMessage.getRecipientId() + " is not online. Message saved.\"}";
             session.sendMessage(new TextMessage(feedbackMsg)); // Send system message to sender
+            notificationService.sendChatNoti(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId());
         }
-        notificationService.sendChatNoti(chatMessage.getSender(), chatMessage.getRecipientId(), chatMessage.getMsg(), chatMessage.getProductId());
+        
     }
 
     @Override

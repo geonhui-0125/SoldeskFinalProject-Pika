@@ -103,78 +103,75 @@ async function onclickApprovePayment() {
     }
 }
 
-document.querySelector(".wish-btn").addEventListener('click', () => {
+// 1. 먼저 버튼을 변수에 담습니다.
+const wishBtn = document.querySelector(".wish-btn");
 
-    const likeButton = document.querySelector(".wish-btn");
-    const productId = document.querySelector('.product-id').value;
-    const wishedInput = document.querySelector('.wished'); // <input> 태그
+// 2. 버튼이 존재할 때만(판매중일 때만) 이벤트를 등록합니다. (중요!)
+if (wishBtn) {
+    wishBtn.addEventListener('click', () => {
+        const productId = document.querySelector('.product-id').value;
+        const wishedInput = document.querySelector('.wished');
 
-    // 현재 찜 상태 확인 (boolean 값으로 변환)
-    const isWished = wishedInput.value === 'true';
+        const isWished = wishedInput.value === 'true';
+        const httpMethod = isWished ? "DELETE" : "POST";
 
-    // 찜 상태에 따라 사용할 HTTP 메소드 결정
-    // isWished가 true (찜한 상태)이면 -> DELETE (취소)
-    // isWished가 false (찜 안 한 상태)이면 -> POST (찜하기)
-    const httpMethod = isWished ? "DELETE" : "POST";
+        fetch(`/api/product/${productId}/wish`, {method: httpMethod})
+            .then(resp => {
+                if (resp.ok) return resp.text();
+                throw new Error(`요청 실패: ${resp.status}`);
+            })
+            .then(data => {
+                const newWishCnt = parseInt(data);
+                const wishCntElement = document.querySelector('.wish-cnt span');
+                if (wishCntElement) {
+                    wishCntElement.textContent = newWishCnt;
+                }
 
-    fetch(`/api/product/${productId}/wish`,
-        {method: httpMethod})
-        .then(resp => {
-            if (resp.ok) {
-                return resp.text();
-            }
-            // 서버에서 오류가 발생하면 이 Error를 throw
-            throw new Error(`요청 실패: ${resp.status}`);
-        })
-        .then(data => {
-            const newWishCnt = parseInt(data);
-
-            console.log('변화된 wishCnt : ', newWishCnt);
-
-            // 찜 카운트 업데이트
-            const wishCntElement = document.querySelector('.wish-cnt span');
-            if (wishCntElement) {
-                wishCntElement.textContent = newWishCnt;
-            }
-
-            // 상태 반전 (찜 취소했으면 false로, 찜 했으면 true로)
-            const newIsWished = !isWished;
-
-            // 버튼 클래스 토글 (버튼 효과 적용/제거)
-            if (newIsWished) {
-                likeButton.classList.add('wished-active'); // 찜하기 완료 -> 활성화 클래스 추가
-            } else {
-                likeButton.classList.remove('wished-active'); // 찜 취소 완료 -> 활성화 클래스 제거
-            }
-
-            // 숨겨진 wished 필드 값 업데이트
-            wishedInput.value = newIsWished.toString();
-
-        })
-        .catch(error => {
-            console.error('찜 처리 중 오류 발생:', error);
-            alert(`찜 처리 중 오류가 발생했습니다. (${error.message})`);
-        });
-
-});
+                const newIsWished = !isWished;
+                if (newIsWished) {
+                    wishBtn.classList.add('wished-active');
+                } else {
+                    wishBtn.classList.remove('wished-active');
+                }
+                wishedInput.value = newIsWished.toString();
+            })
+            .catch(error => {
+                console.error('찜 처리 중 오류 발생:', error);
+                alert(`찜 처리 중 오류가 발생했습니다. (${error.message})`);
+            });
+    });
+}
 
 // 판매자 리뷰 요약 가져오기
 document.addEventListener('DOMContentLoaded', function () {
     const showReviewSummaryBtn = document.getElementById('showReviewSummaryBtn');
     const reviewSummaryContent = document.getElementById('reviewSummaryContent');
-    const sellerId = document.querySelector('.seller-id').value;
+    const productIdInput = document.querySelector('.product-id');
+    const sellerIdInput = document.querySelector('.seller-id');
+    const productStatInput = document.getElementById('productStat'); // 새로 추가된 input
 
-    if (showReviewSummaryBtn && reviewSummaryContent && sellerId) {
+    if (showReviewSummaryBtn && reviewSummaryContent && productIdInput && sellerIdInput && productStatInput) {
+        // 버튼이 항상 클릭 가능하도록 유지
+        showReviewSummaryBtn.style.pointerEvents = 'auto';
+
         showReviewSummaryBtn.addEventListener('click', async () => {
-            reviewSummaryContent.textContent = '요약 로딩 중...'; // Show loading state
+            console.log("리뷰 보기 버튼 클릭됨 (info.js)");
+            reviewSummaryContent.textContent = '요약 로딩 중...';
+
+            const productId = productIdInput.value;
+            const sellerId = sellerIdInput.value;
+            const productStat = productStatInput.value; // productStat 값 가져오기
+
             try {
-                const response = await fetch(`/reviews/summary/${sellerId}`);
+                // productId와 productStat을 쿼리 파라미터로 함께 전달
+                const response = await fetch(`/reviews/summary/${sellerId}?productId=${productId}&productStat=${productStat}`);
                 if (!response.ok) {
                     throw new Error('리뷰 요약을 가져오는 데 실패했습니다.');
                 }
                 const summary = await response.text();
                 reviewSummaryContent.textContent = summary;
-                showReviewSummaryBtn.style.display = 'none'; // Hide button after summary is loaded
+                // 로딩 후 버튼 숨김 처리 제거
+                // showReviewSummaryBtn.style.display = 'none';
             } catch (error) {
                 console.error('Error fetching review summary:', error);
                 reviewSummaryContent.textContent = '리뷰 요약 로딩 실패';

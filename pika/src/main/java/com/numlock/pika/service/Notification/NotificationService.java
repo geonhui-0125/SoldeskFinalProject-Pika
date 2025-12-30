@@ -134,7 +134,7 @@ public class NotificationService {
 
         String title = "채팅 알림";
         String content = String.format("%s님으로 부터 채팅이 왔습니다.", sender.getNickname());
-        String actionUrl = "/chat/dm?recipientId=" + recipientId + "&productId=" + productId ;
+        String actionUrl = "/chat/dm?recipientId=" + senderId + "&productId=" + productId ;
 
         save(receiver, "CHAT", title, content, actionUrl);
     }
