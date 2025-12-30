@@ -955,6 +955,11 @@ INSERT INTO PRODUCTS VALUES(seq_products.nextval,'tester1',22,25000,'(일본정�
 INSERT INTO PRODUCTS VALUES(seq_products.nextval,'tester1',5,22000,'(북미정품)북미한정 5주년 판다 시로쿠마 키링','5주년 기념 북미 한정판 시로쿠마 키링입니다. 앙증맞은 사이즈에 귀여운 판다 복장을 하고 있어요. 택도 그대로 달려있는 완전 새상품입니다. 문의 없으시면 바로 안전결제해주시면 됩니다!  ※미국판은 일본판과달리 고리가 플라스틱입니다 가품(짭)아닙니다.','/upload/a9d1a31f-944e-468f-8e7a-7a8f6b424527/',0,sysdate,0);
 INSERT INTO PRODUCTS VALUES(seq_products.nextval,'tester1',5,35000,'(일본정품)키디랜드한정 스밋코구라시 네코 시로쿠마 볼체인키링','2016년도 키디랜드한정판 스밋코구라시 네코 시로쿠마 볼체인키링 인형 팝니다. 택 달린 미사용 새상품입니다. 부드러운 촉감에 귀여운 디자인이 돋보입니다. 문의 없으시면 바로 안전결제해주시면 됩니다!','/upload/9088eaef-5f09-4ff6-8bcd-0930a8211e40/',0,sysdate,0);
 
+INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 20, 'tester1', 'tester2', 5, '포장이 아주 꼼꼼하고 배송이 빨라서 좋았습니다.', SYSDATE, SYSDATE); 
+INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 21, 'tester1', 'tester2', 4, '상품 상태가 설명과 같아서 만족스러워요.', SYSDATE, SYSDATE); 
+INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 22, 'tester1', 'tester2', 5, '친절하게 답변해주셔서 기분 좋은 거래였습니다.', SYSDATE, SYSDATE); 
+INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 23, 'tester1', 'tester2', 3, '작동은 잘 되는데 겉면에 미세한 기스가 조금 있네요.', SYSDATE, SYSDATE); 
+INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 24, 'tester1', 'tester2', 5, '좋은 가격에 좋은 상품 구해서 너무 만족합니다!', SYSDATE, SYSDATE);
 
 
 SET DEFINE ON;
