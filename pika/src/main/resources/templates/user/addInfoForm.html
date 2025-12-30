@@ -129,6 +129,9 @@
         .address-search-btn:hover {
             background-color: #0056b3;
         }
+        .profile-group{
+            margin-top: 20px;
+        }
     </style>
     <!-- 카카오 주소 API 스크립트 -->
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -136,19 +139,21 @@
 <body>
     <div class="container">
         <h1>상세 정보 입력</h1>
-        
+        <form id="addInfoForm" th:action="@{/user/add-info}" th:object="${userAddInfo}" method="post" enctype="multipart/form-data">
+        <!--<div th:if="${#fields.hasGlobalErrors()}" class="error-message">
+            <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+        </div>
         <div th:if="${successMessage}" class="success-message">
             <p th:text="${successMessage}"></p>
         </div>
         <div th:if="${errorMessage}" class="error-message">
             <p th:text="${errorMessage}"></p>
-        </div>
+        </div>-->
 
-        <form id="addInfoForm" th:action="@{/user/add-info}" th:object="${userAddInfo}" method="post" enctype="multipart/form-data">
             <!-- 이미지 액션을 위한 숨겨진 필드 -->
             <input type="hidden" id="profileImageAction" name="profileImage" value="">
 
-            <div class="form-group" th:if="${user != null}">
+            <div class="form-group profile-group" th:if="${user != null}">
                 <label>프로필 이미지</label>
 
                 <div style="display: flex; align-items: center">
@@ -181,6 +186,7 @@
             <div class="form-group">
                 <label for="detailAddress">상세주소</label>
                 <input type="text" id="detailAddress" placeholder="상세주소를 입력하세요">
+                <span th:if="${#fields.hasErrors('detailAddress')}" th:errors="*{detailAddress}" class="field-error"></span>
                  <!-- 최종 주소값을 서버로 보내기 위한 숨겨진 필드 -->
                 <input type="hidden" id="fullAddress" th:field="*{address}" />
                 <input type="hidden" id="hiddenDetailAddress" th:field="*{detailAddress}" />

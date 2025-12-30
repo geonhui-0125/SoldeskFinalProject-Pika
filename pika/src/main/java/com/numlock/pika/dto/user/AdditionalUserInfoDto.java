@@ -16,8 +16,9 @@ public class AdditionalUserInfoDto {
     private String profileImage;
     private String address;
     private String detailAddress;
-    private String phone;
 
+
+    private String phone;
 
     @Pattern(regexp = "^$|^(19|20)\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01])$",
             message = "올바른 생년월일을 입력하세요.")
