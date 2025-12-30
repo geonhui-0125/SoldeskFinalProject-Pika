@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #95ff6e;
+            --primary-color: #6ecf4a;
             --border-color: #eee;
             --background-color: #f8f9fa;
             --text-color: #333;
@@ -26,7 +26,7 @@
             background-color: var(--background-color);
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 130px);
+            height: calc(100vh);
         }
 
         .chat-container {
@@ -230,7 +230,7 @@
 	<div class="chat-container">
         <div class="chat-header">
             <span>To: <th:block th:text="${recipientId}"></th:block></span>
-            <a th:href="@{/chat/userList}">Back to List</a>
+            <a th:href="@{/chat/list}">Back to List</a>
         </div>
 
         <!-- Product Info Bar -->
