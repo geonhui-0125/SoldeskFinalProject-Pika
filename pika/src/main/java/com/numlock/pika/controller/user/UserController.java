@@ -60,10 +60,10 @@ public class UserController {
             return "redirect:/";
         }
         //상세주소 조건부 유효성 검사
-        if (dto.getAddress() != null && !dto.getAddress().isBlank()
+        /*if (dto.getAddress() != null && !dto.getAddress().isBlank()
                 && (dto.getDetailAddress() == null || dto.getDetailAddress().isBlank())){
             result.rejectValue("detailAddress", "blankDetailAddress", "상세주소를 입력하세요.");
-        }
+        }*/
 
         //유효성 검사
         if(result.hasErrors()){
