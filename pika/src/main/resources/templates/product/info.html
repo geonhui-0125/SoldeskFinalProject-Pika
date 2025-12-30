@@ -118,7 +118,7 @@
                                 <button th:case="'buy'" class="buy-btn"
                                         th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제
                                 </button>
-                                <button th:case="'sell'" class="buy-btn" th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">상품관리</button>
+                                <button th:case="'sell'" class="update-btn" th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">상품관리</button>
                                 <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">
                                     상품결제
                                 </button>
