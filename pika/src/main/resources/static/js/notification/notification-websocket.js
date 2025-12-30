@@ -1,3 +1,5 @@
+import { handleNotificationClick } from './noti.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     // 현재 페이지의 프로토콜, 호스트, 포트를 사용하여 WebSocket URL을 구성
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -32,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.dispatchEvent(notificationsUpdatedEvent);
 
         // 3. (선택 사항) 토스트 알림 표시
-        showNotificationToast(notification.title, notification.content, notification.actionUrl);
+        showNotificationToast(notification.title, notification.content, notification.notificationId, notification.actionUrl);
     };
 
     notificationSocket.onclose = function(event) {
@@ -48,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * 간단한 토스트 알림을 표시하는 헬퍼 함수
      * 이 함수를 위한 기본 CSS 스타일링이 필요할 수 있습니다.
      */
-    function showNotificationToast(title, content, url) {
+    function showNotificationToast(title, content, noti_id, url) {
         let toastContainer = document.getElementById('notification-toast-container');
         if (!toastContainer) {
             // 토스트 컨테이너가 없으면 생성
@@ -84,6 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (url) {
             toast.addEventListener('click', () => {
+
+                handleNotificationClick(noti_id, url);
                 window.location.href = url;
                 toast.remove(); // 클릭 후 토스트 제거
             });

@@ -1,9 +1,8 @@
 $(document).ready(function () {
-
     /** * 메인 카테고리 드롭다운:
      * #category-wrapper 내부의 #hamburger-icon 클릭 시 드롭다운 표시/숨김 (Toggle)
      */
-    $("#hamburger-icon").click(function(event) {
+    $("#hamburger-icon").click(function (event) {
         // 클릭 이벤트가 버블링되어 body나 document에 영향을 주는 것을 방지
         event.stopPropagation();
 
@@ -14,7 +13,7 @@ $(document).ready(function () {
     });
 
     // 드롭다운이 열려있는 상태에서 드롭다운 외부를 클릭하면 닫히도록 설정
-    $(document).click(function(event) {
+    $(document).click(function (event) {
         // 클릭된 요소가 #category-wrapper 내부에 포함되어 있지 않다면
         if (!$(event.target).closest('#category-wrapper').length) {
             // 드롭다운 숨김
@@ -28,9 +27,9 @@ $(document).ready(function () {
     /** * 서브 카테고리 (Submenu):
      * .category-item 클릭 시 서브메뉴 표시/숨김 (Toggle)
      */
-    $(".category-item").click(function(event) {
+    $(".category-item").click(function (event) {
         // 부모 요소의 클릭 이벤트(메인 드롭다운 닫기)가 실행되지 않도록 방지
-        if($(event.target).is('a')){
+        if ($(event.target).is('a')) {
             return;
         }
         event.stopPropagation();
@@ -45,11 +44,11 @@ $(document).ready(function () {
         $submenu.stop(true, true).slideToggle(120);
     });
 
-    $("#favorite-link").click(function() {
+    $("#favorite-link").click(function () {
         location.href = "/user/mypage";
     })
 
-    $("#top-link").click(function() {
+    $("#top-link").click(function () {
         // HTML과 BODY에 0 (상단)
         $('html, body').scrollTop(0)
     });
@@ -65,7 +64,7 @@ $(document).ready(function () {
         $.ajax({
             url: "/notifications",
             type: "GET",
-            data: { page: page, size: 2 },
+            data: {page: page, size: 2},
             success: function (response) {
                 const notificationItems = $("#notification-items");
                 notificationItems.empty();
@@ -113,7 +112,7 @@ $(document).ready(function () {
             }
         });
     }
-    
+
     // 페이지 로드 시 안읽은 알림 개수 업데이트
     updateNotificationCount();
 
@@ -126,24 +125,23 @@ $(document).ready(function () {
             fetchNotifications(0);
         }
     });
-    
-    $("#prev-notification-page").click(function() {
-        if(currentPage > 0) {
+
+    $("#prev-notification-page").click(function () {
+        if (currentPage > 0) {
             fetchNotifications(currentPage - 1);
         }
     });
 
-    $("#next-notification-page").click(function() {
-        if(currentPage < totalPages - 1) {
+    $("#next-notification-page").click(function () {
+        if (currentPage < totalPages - 1) {
             fetchNotifications(currentPage + 1);
         }
     });
 
     const notificationItemsEl = document.getElementById('notification-items');
     if (notificationItemsEl) {
-        notificationItemsEl.addEventListener('click', function(e) {
+        notificationItemsEl.addEventListener('click', function (e) {
             let target = e.target;
-            // 클릭된 요소가 .notification-item-link 클래스를 가질 때까지 부모로 이동
             while (target && !target.classList.contains('notification-item-link')) {
                 target = target.parentElement;
             }
@@ -157,18 +155,18 @@ $(document).ready(function () {
                 fetch('/notifications/read/' + notificationId, {
                     method: 'PUT'
                 })
-                .then(resp => {
-                    if (!resp.ok) {
-                        console.error('Failed to mark notification as read. Status: ' + resp.status);
-                    }
-                    // 성공하든 실패하든 링크로 이동
-                    window.location.href = href;
-                })
-                .catch(error => {
-                    console.error('Error in fetch call:', error);
-                    // 에러 발생 시에도 링크로 이동
-                    window.location.href = href;
-                });
+                    .then(resp => {
+                        if (!resp.ok) {
+                            console.error('Failed to mark notification as read. Status: ' + resp.status);
+                        }
+                        // 성공하든 실패하든 링크로 이동
+                        window.location.href = href;
+                    })
+                    .catch(error => {
+                        console.error('Error in fetch call:', error);
+                        // 에러 발생 시에도 링크로 이동
+                        window.location.href = href;
+                    });
             }
         });
     }
@@ -184,7 +182,7 @@ $(document).ready(function () {
     });
 
     /*******************************
-         인기 검색어 소트 기능
+     인기 검색어 소트 기능
      *******************************/
 
     const $searchBarInput = $('#search-bar input[name="keyword"]');
@@ -255,7 +253,7 @@ $(document).ready(function () {
     /*******************************
      Global Chat Message Listener
      *******************************/
-    document.addEventListener('chat:message', function(event) {
+    document.addEventListener('chat:message', function (event) {
         console.log("Global listener received 'chat:message' event. Updating notification count.");
         // A new message has arrived anywhere in the app.
         // Let's update the notification count to give a real-time feel.
@@ -264,7 +262,7 @@ $(document).ready(function () {
     });
 
     // mypage.html 등 다른 페이지에서 알림 상태가 변경되었을 때 헤더 카운트를 업데이트하기 위한 리스너
-    document.addEventListener('notifications-updated', function() {
+    document.addEventListener('notifications-updated', function () {
         console.log("Global listener received 'notifications-updated' event. Updating notification count.");
         updateNotificationCount();
     });
