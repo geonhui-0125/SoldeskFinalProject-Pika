@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,15 +35,24 @@ public class UserController {
         if(principal != null){
             userRepository.findById(principal.getName()).ifPresent(user -> {
                 model.addAttribute("user", user);
+                AdditionalUserInfoDto dto = new AdditionalUserInfoDto();
+                dto.setPhone(user.getPhone()); //휴대폰 정보 불러오기
+                if(user.getBirth() != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
+                    dto.setBirth(sdf.format(user.getBirth()));
+                }//생년월일 정보 불러오기
+                dto.setAddress(user.getAddress()); //주소정보 불러오기
+                model.addAttribute("userAddInfo", dto);
             });
+        }else {
+            model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         }
-        model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         return "user/addInfoForm";
     }
 
     @PostMapping("/user/add-info")
-    public String addInfo(@Valid AdditionalUserInfoDto dto, BindingResult result,
-                          Principal principal, Model model,
+    public String addInfo(@Valid @ModelAttribute("userAddInfo") AdditionalUserInfoDto dto,
+                          BindingResult result, Principal principal, Model model,
                           @RequestParam(value="profileImageFile", required = false)
                           MultipartFile profileImageFile, RedirectAttributes redirectAttributes) {
         if(principal == null) {
@@ -52,29 +62,42 @@ public class UserController {
         //상세주소 조건부 유효성 검사
         if (dto.getAddress() != null && !dto.getAddress().isBlank()
                 && (dto.getDetailAddress() == null || dto.getDetailAddress().isBlank())){
-            redirectAttributes.addFlashAttribute("errorMessage", "상세 주소를 입력하세요.");
-            redirectAttributes.addFlashAttribute("userAddInfo", dto);
-            return "redirect:/user/add-info";
+            result.rejectValue("detailAddress", "blankDetailAddress", "상세주소를 입력하세요.");
         }
 
         //유효성 검사
         if(result.hasErrors()){
-            log.error("--Additional User Info Validation Failed--");
-            //addInfoForm.html에서 별도의 오류 검사 필요
-            model.addAttribute("errorMessage", "생년월일이 올바르지 않습니다.");
+            log.error("--Additional User Info Validation Failed-- {}", result);
+            userRepository.findById(principal.getName()).ifPresent(user -> model.addAttribute("user", user));
             model.addAttribute("userAddInfo", dto);
             return "user/addInfoForm";
         }
         try {
             userService.updateAddlInfo(principal.getName(), dto, profileImageFile);
             redirectAttributes.addFlashAttribute("successMessage", "수정완료되었습니다.");
-        }catch (Exception e){
+            return "redirect:/";
+        }catch (IllegalArgumentException e){
             log.error("추가 정보 업데이트 중 오류 발생: {}", e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage());
+            if("전화번호 형식이 올바르지 않습니다.".equals(e.getMessage())){
+                result.rejectValue("phone", "invalid.phone", e.getMessage());
+            }else if("생년월일 형식이 올바르지 않습니다.".equals(e.getMessage())){
+                result.rejectValue("birth", "invalid.birth", e.getMessage());
+            }else {
+                result.reject("globalError", e.getMessage());
+            }
+
+            model.addAttribute("errorMessage", "입력 내용을 다시 확인해주세요.");
+            userRepository.findById(principal.getName()).ifPresent(user -> model.addAttribute("user", user));
+            model.addAttribute("userAddInfo", dto);
+            return "user/addInfoForm";
+        }catch (Exception e){
+            log.error("추가 정보 업데이트 중 예상치 못한 오류 발생: {}", e.getMessage());
+            result.reject("globalError", "알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
+            model.addAttribute("errorMessage", "알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
+            userRepository.findById(principal.getName()).ifPresent(user -> model.addAttribute("user", user));
             model.addAttribute("userAddInfo", dto);
             return "user/addInfoForm";
         }
-        return "redirect:/";
     }
 
     //회원 탈퇴 처리(Delete)
