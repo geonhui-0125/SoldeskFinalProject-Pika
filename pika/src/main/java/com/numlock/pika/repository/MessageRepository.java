@@ -3,6 +3,7 @@ package com.numlock.pika.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,10 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     long countByProductProductIdAndRecipientIdAndSenderIdAndIsRead(Integer productId, String recipientId, String senderId, boolean isRead);
 
-
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Message m SET m.isRead = true WHERE m.product.productId = :productId AND ((m.senderId = :user1 AND m.recipientId = :user2) OR (m.senderId = :user2 AND m.recipientId = :user1)) "+
+           "AND m.isRead = false")
+    void markAsReadByRoomIdAndUserId(@Param("user1") String user1Id, @Param("user2") String user2Id, @Param("productId") Integer productId);
     // 특정 사용자에게 온 메시지 중 읽지 않은 메시지 수
     long countByRecipientIdAndIsReadFalse(String recipientId);
 }

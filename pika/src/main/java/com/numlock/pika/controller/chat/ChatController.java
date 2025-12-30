@@ -3,6 +3,7 @@ package com.numlock.pika.controller.chat;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.numlock.pika.domain.Message;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.MessageDto;
+import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.MessageService;
 import com.numlock.pika.dto.ChatRoomDto;
 import com.numlock.pika.service.chat.ChatRoomService;
@@ -34,6 +36,8 @@ public class ChatController {
     private final UserService userService;
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
+    private final CategoryService categoryService;
+
 
     @GetMapping("/list")
     public String chatList(Model model, Principal principal) {
@@ -43,6 +47,8 @@ public class ChatController {
         String userId = principal.getName();
         List<ChatRoomDto> chatRooms = chatRoomService.getChatRoomList(userId);
         model.addAttribute("chatRooms", chatRooms);
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
         return "chat/chatList";
     }
 
@@ -66,7 +72,8 @@ public class ChatController {
         }
         System.out.println("**************debug code******************");
         model.addAttribute("messages", messageDtos);
-
+        Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
+        model.addAttribute("categoriesMap", categoriesMap);
         return "chat/dm";
     }
 }

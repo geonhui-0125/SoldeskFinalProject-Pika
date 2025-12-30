@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>DM with <th:block th:text="${recipientId}"></th:block></title>
     <link rel="stylesheet" th:href="@{/css/header.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #ff4500;
+            --primary-color: #95ff6e;
             --border-color: #eee;
             --background-color: #f8f9fa;
             --text-color: #333;
@@ -30,7 +32,7 @@
         .chat-container {
             max-width: 800px;
             width: 100%;
-            margin: 0 auto;
+            margin: 70px auto;
             display: flex;
             flex-direction: column;
             flex-grow: 1;
@@ -180,8 +182,9 @@
 </head>
 <body>
     <header th:replace="~{header :: mainHeader}"></header>
-
-    <div class="chat-container">
+	<script th:src="@{/js/chat-websocket.js}"
+		sec:authorize="isAuthenticated()"></script>
+	<div class="chat-container">
         <div class="chat-header">
             <span>To: <th:block th:text="${recipientId}"></th:block></span>
             <a th:href="@{/chat/userList}">Back to List</a>
@@ -404,5 +407,6 @@
     });
 
 </script>
+<script th:src="@{/js/header.js}"></script>
 </body>
 </html>
