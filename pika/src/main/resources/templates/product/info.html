@@ -190,11 +190,13 @@
                     </div>
 
                     <div class="seller-btn-group">
-                        <button id="showReviewSummaryBtn" class="buy-btn">리뷰 보기</button>
+                        <button id="showReviewSummaryBtn" class="buy-btn active-style-btn">
+                            리뷰 보기
+                        </button>
 
                         <th:block sec:authorize="isAuthenticated()">
                             <button th:if="${productDetailDto.buyerType == 'buy' and productDetailDto.productStat == 1 and !productDetailDto.hasReviewed}"
-                                    class="buy-btn review-write-btn"
+                                    class="buy-btn review-write-btn active-style-btn"
                                     th:onclick="|location.href='@{/reviews/new(productId=${productDetailDto.productId}, sellerId=${productDetailDto.seller.id}, sellerNickname=${productDetailDto.seller.nickname})}'|">
                                 리뷰 쓰러 가기
                             </button>
