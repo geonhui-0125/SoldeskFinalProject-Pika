@@ -33,12 +33,6 @@
                 <span th:text="*{categoryTwo}"></span>
             </li>
         </ul>
-        <th:block th:if="*{productStat == 0 && buyerType == 'sell'}">
-            <div id="product-update"
-                 th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">
-                수정
-            </div>
-        </th:block>
     </nav>
 
     <!-- 상단 영역 -->
@@ -71,7 +65,7 @@
 
             <div class="product-actions" th:object="${productDetailDto}">
                 <!-- AI 시세 분석 버튼 추가 -->
-                <button th:if="${productDetailDto.productStat != 1}" type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
+                <button th:if="${productDetailDto.productStat != 1 && !(productDetailDto.buyerType == 'sell')}" type="button" class="like-btn" onclick="analyzePrice()" style="color: #673ab7; border-color: #673ab7; font-weight: bold;">
                     💰 시세 분석
                 </button>
 
@@ -81,7 +75,7 @@
                 <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '찜' button logic -->
                     <th:block th:switch="${type}">
-                        <button th:case="'sell'" class="like-btn wish-btn" disabled>찜</button>
+                        <!--<button th:case="'sell'" class="like-btn wish-btn disabled-cursor" disabled>찜</button>-->
                         <button th:case="'visit'" class="like-btn" th:onclick="|location.href='@{/user/login}'|">찜
                         </button>
                         <!-- Explicit cases for 'view' and 'buy' -->
@@ -97,7 +91,7 @@
                 <th:block th:if="${productDetailDto.productStat != 1}">
                     <!-- '채팅하기' button logic -->
                     <th:block th:switch="${type}">
-                        <button th:case="'sell'" class="chat-btn" disabled>채팅하기</button>
+                        <!--<button th:case="'sell'" class="chat-btn disabled-cursor" disabled>채팅하기</button>-->
                         <button th:case="'visit'" class="chat-btn" th:onclick="|location.href='@{/user/login}'|">채팅하기
                         </button>
                         <button th:case="'view'" class="chat-btn"
@@ -124,7 +118,7 @@
                                 <button th:case="'buy'" class="buy-btn"
                                         th:onclick="|location.href='@{/payments/preview(productId=${productId})}'|">상품결제
                                 </button>
-                                <button th:case="'sell'" class="buy-btn" disabled>상품결제</button>
+                                <button th:case="'sell'" class="buy-btn" th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">상품관리</button>
                                 <button th:case="'visit'" class="buy-btn" th:onclick="|location.href='@{/user/login}'|">
                                     상품결제
                                 </button>
@@ -137,13 +131,13 @@
                                 <input type="hidden" id="impUid" th:value="*{impUid}"/>
                                 <button class="buy-btn" onclick="onclickConfirmPayment()">구매확정</button>
                             </th:block>
-                            <button th:unless="${type == 'buy'}" class="buy-btn" disabled>상품거래중</button>
+                            <button th:unless="${type == 'buy'}" class="buy-btn disabled-cursor" disabled>상품거래중</button>
                         </th:block>
 
                         <th:block th:case="3">
                             <th:block th:switch="${type}">
                                 <input type="hidden" id="impUid" th:value="*{impUid}"/>
-                                <button th:case="'view'" class="buy-btn" disabled>상품예약중
+                                <button th:case="'view'" class="buy-btn disabled-cursor" disabled>상품예약중
                                 </button>
                                 <button th:case="'buy'" class="buy-btn"
                                         onclick="onclickCancelPayment()">결제취소/환불
@@ -158,7 +152,7 @@
 
                         <!-- 판매완료일 경우 -->
                         <th:block th:case="1">
-                            <button class="buy-btn" disabled>판매완료</button>
+                            <button class="buy-btn disabled-cursor" disabled>판매완료</button>
                         </th:block>
                     </th:block>
                 </th:block>
