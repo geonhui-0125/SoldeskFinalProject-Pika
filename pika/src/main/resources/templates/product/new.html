@@ -22,16 +22,21 @@
             <h1 class="product-block-title">상품정보</h1>
             <ul class="product-form-list">
                 <li class="product-form-item">
-                    <div class="form-label">상품이미지</div>
+                    <div class="form-label">
+                        상품이미지
+                        <div class="image-counter">(0/10)</div>
+                    </div>
                     <div class="form-content" id="image-form-content">
-                        <!-- 대표 이미지를 위한 업로드/미리보기 박스 -->
-                        <label class="image-upload-box" id="main-image-box">
-                            <input class="image-input" type="file" name="images" accept="image/jpeg, image/png" multiple>
-                            <div class="placeholder-text">이미지 등록</div>
-                            <img class="main-preview-image" style="display:none;"/>
-                        </label>
-                        <!-- 추가 이미지 목록을 위한 컨테이너 -->
-                        <div id="additional-image-list"></div>
+                        <!-- 이미지 미리보기와 추가 버튼이 표시될 컨테이너 -->
+                        <div class="image-preview-container">
+                            <!-- + 버튼 역할을 할 초기 업로드 박스 -->
+                            <label class="image-upload-box" for="file-input">
+                                <div class="plus-icon">+</div>
+                                <div class="placeholder-text">이미지 등록</div>
+                            </label>
+                        </div>
+                        <!-- 실제 파일 입력을 처리하지만 숨겨둠 -->
+                        <input id="file-input" class="image-input" type="file" name="images" accept="image/jpeg, image/png" multiple style="display: none;">
                     </div>
                 </li>
 
