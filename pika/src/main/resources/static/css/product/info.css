@@ -171,6 +171,16 @@
     font-weight: bold;
 }
 
+.update-btn{
+    padding: 12px 30px;
+    width: 100%;
+    background: #fd7800;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 /*******************************
  하단 영역
 ********************************/
@@ -248,7 +258,7 @@
 .chat-btn {
 	background-color: #FFD700 !important; /* 항상 노란색 유지 */
 	color: #ffffff !important;
-	cursor: pointer !important;
+	cursor: pointer;
 	opacity: 1 !important;
 	/* 기존 결제 버튼의 여백이나 폰트 스타일 상속 */
 	padding: 10px 20px;
@@ -272,4 +282,8 @@
 /* 2. 리뷰 버튼에 마우스를 올렸을 때의 피드백 (상단 버튼과 무관) */
 .seller-btn-group .buy-btn:hover {
     background-color: #62a349 !important; /* 살짝 어두운 초록 */
+}
+
+.disabled-cursor{
+    cursor : not-allowed;
 }
