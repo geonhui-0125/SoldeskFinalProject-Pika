@@ -62,11 +62,110 @@
 .form-label {
     width: 140px;
     font-weight: 600;
+    padding-top: 10px; /* 카운터와 정렬 맞춤 */
+}
+
+.image-counter {
+    font-size: 0.8em;
+    color: #888;
+    font-weight: normal;
+    margin-top: 6px;
 }
 
 .form-content {
     flex: 1;
 }
+
+/* 이미지 폼 콘텐츠 전체를 감싸는 컨테이너 */
+#image-form-content {
+    display: flex;
+    flex-direction: column; /* 컨테이너 방향 변경 */
+    gap: 15px;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap; /* 여러 줄로 감싸기 */
+    gap: 15px;
+    flex: 1;
+}
+
+/* 업로드 박스와 미리보기 아이템 공통 스타일 */
+.image-upload-box,
+.image-preview-item {
+    width: 140px;
+    height: 140px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0; /* flex 아이템이 줄어들지 않도록 설정 */
+}
+
+.preview-image{
+    width: 140px;
+    height: 140px;
+}
+
+/* 초기 업로드 박스 스타일 */
+.image-upload-box {
+    border: 2px dashed #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    transition: border-color 0.2s;
+}
+
+.plus-icon {
+    font-size: 40px;
+    color: #aaa;
+    line-height: 1;
+}
+
+.placeholder-text {
+    color: #999;
+    font-size: 1em;
+    margin-top: 8px;
+}
+
+/* 이미지 미리보기 아이템 스타일 */
+.image-preview-item {
+    border: 1px solid #ddd;
+}
+
+
+/* 이미지 삭제 버튼 */
+.remove-image-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0; /* 평소에는 숨김 */
+    transition: opacity 0.2s;
+}
+
+.image-preview-item:hover .remove-image-btn {
+    opacity: 1; /* 호버 시 보임 */
+}
+
+.remove-image-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
 
 .text-input{
     width: 500px;
@@ -84,94 +183,18 @@
     outline: none;
 }
 
-/* 이미지 폼 콘텐츠 전체를 감싸는 컨테이너 */
-#image-form-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-/* 대표 이미지 업로드 박스 */
-.image-upload-box {
-    width: 160px;
-    height: 160px;
-    min-width: 160px; /* 크기 고정 */
-    border: 1px dashed #ccc;
+/* 가격 */
+.price-content {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    border-radius: 6px;
-    padding: 0;
-    overflow: hidden; /* 내부 이미지가 밖으로 나가지 않도록 */
-}
-
-.image-input {
-    display: none;
-}
-
-.placeholder-text {
-    color: #999;
-    font-size: 1em;
-    text-align: center;
-}
-
-/* 대표 이미지 미리보기 */
-.main-preview-image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* 추가 이미지 목록 컨테이너 */
-#additional-image-list {
-    display: flex;
-    flex-wrap: wrap;
     gap: 10px;
-    flex: 1; /* 남는 공간을 모두 차지 */
-}
-
-/* 추가 이미지 미리보기 아이템 */
-.additional-image-item {
-    position: relative;
-    width: 80px;
-    height: 80px;
+    width: 550px;
     border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #f9f9f9;
+    border-radius: 4px;
 }
 
-.additional-image-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* 이미지 삭제 버튼 (공통 사용) */
-.remove-image-btn {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8em;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 10;
-}
-
-.remove-image-btn:hover {
-    background: rgba(0, 0, 0, 0.8);
+.price-unit {
+    font-weight: 600;
 }
 
 /* 카테고리 선택 박스 */
