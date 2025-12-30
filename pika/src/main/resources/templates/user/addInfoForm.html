@@ -272,12 +272,12 @@
                 const fullAddressHidden = document.getElementById('fullAddress');
                 const hiddenDetailAddressHidden = document.getElementById('hiddenDetailAddress');
 
-                if(addressInput.value.trim() !== '' && detailAddressInput.value.trim() === ''){
+                /*if(addressInput.value.trim() !== '' && detailAddressInput.value.trim() === ''){
                     alert('상세 주소를 입력하세요.');
                     detailAddressInput.focus();
                     event.preventDefault();
                     return;
-                }
+                }*/
 
                 fullAddressHidden.value = addressInput.value.trim();
                 hiddenDetailAddressHidden.value = detailAddressInput.value.trim()
