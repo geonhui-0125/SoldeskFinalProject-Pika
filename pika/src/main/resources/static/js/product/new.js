@@ -41,39 +41,86 @@ $(function () {
     });
 
 
-    $(".image-input").on("change", function (e) {
+    // 파일 리스트를 관리하는 전역 변수
+    let imageFiles = [];
 
-        $(".image-upload-box").removeClass("invalid");
+    // 파일 변경 시 미리보기를 업데이트하는 함수
+    function updateImagePreviews() {
+        const $mainImageBox = $("#main-image-box");
+        const $mainPreview = $mainImageBox.find(".main-preview-image");
+        const $placeholder = $mainImageBox.find(".placeholder-text");
+        const $additionalList = $("#additional-image-list");
 
-        const file = e.target.files[0];
-        if (!file) return;
+        // 모든 미리보기 초기화
+        $additionalList.empty();
+        // 대표 이미지 삭제 버튼도 함께 제거
+        $mainImageBox.find(".remove-image-btn").remove(); 
+        $mainPreview.hide().attr("src", "");
+        $placeholder.show();
+        $mainImageBox.removeClass("invalid");
 
-        const reader = new FileReader();
+        if (imageFiles.length > 0) {
+            // 대표 이미지 설정
+            $placeholder.hide();
+            const mainImageReader = new FileReader();
+            mainImageReader.onload = function(e) {
+                $mainPreview.attr("src", e.target.result).show();
+            };
+            mainImageReader.readAsDataURL(imageFiles[0]);
 
-        reader.onload = function (event) {
-            $(".preview-image")
-                .attr("src", event.target.result)
-                .show();
+            // 대표 이미지에 삭제 버튼 추가
+            const $mainRemoveBtn = $(`<button type="button" class="remove-image-btn" data-index="0">&times;</button>`);
+            $mainImageBox.append($mainRemoveBtn);
 
-            $(".image-upload-box")
-                .css("border", "1px solid #ccc")
+            // 추가 이미지 목록 설정
+            imageFiles.slice(1).forEach((file, index) => {
+                const additionalImageReader = new FileReader();
+                additionalImageReader.onload = function(e) {
+                    const $additionalItem = $(`
+                        <div class="additional-image-item">
+                            <img src="${e.target.result}" alt="추가 이미지">
+                            <button type="button" class="remove-image-btn" data-index="${index + 1}">&times;</button>
+                        </div>
+                    `);
+                    $additionalList.append($additionalItem);
+                };
+                additionalImageReader.readAsDataURL(file);
+            });
+        }
 
+        // 파일 입력(input) 엘리먼트의 files 속성 업데이트
+        const dataTransfer = new DataTransfer();
+        imageFiles.forEach(file => dataTransfer.items.add(file));
+        $(".image-input")[0].files = dataTransfer.files;
+    }
 
-            $(".image-placeholder").hide();
-        };
-
-        reader.readAsDataURL(file);
+    // 파일 입력(input) 변경 이벤트
+    $(".image-input").on("change", function(e) {
+        imageFiles = Array.from(e.target.files); // 직접 imageFiles 업데이트
+        updateImagePreviews();
     });
 
+    // 이미지 삭제 버튼 클릭 이벤트
+    $(document).on("click", ".remove-image-btn", function() {
+        const indexToRemove = $(this).data("index");
+        
+        // 버튼이 속한 컨테이너에서 버튼 제거
+        $(this).remove(); 
+        
+        imageFiles.splice(indexToRemove, 1);
+        updateImagePreviews();
+    });
+
+    // 폼 제출 시 유효성 검사 로직 (imageFiles 배열을 확인하도록 변경)
     $("#productForm").on("submit", function (e) {
         // 1. 이전 에러 표시 초기화
         $(".invalid").removeClass("invalid");
 
         // 2. 이미지 체크
-        if ($(".image-input")[0].files.length === 0) {
-            alert("이미지를 등록해주세요.");
-            $(".image-upload-box").addClass("invalid");
-            e.preventDefault(); // 전송 중단
+        if (imageFiles.length === 0) {
+            alert("이미지를 1개 이상 등록해주세요.");
+            $("#main-image-box").addClass("invalid"); // 클래스명 변경
+            e.preventDefault();
             return false;
         }
 
@@ -103,13 +150,14 @@ $(function () {
             return false;
         }
 
-        // 6. 가격 체크
+        // 6. 가격 체크 (priceWrap.addClass("invalid") 부분 수정)
         const priceWrap = $(".price-content");
         const price = $("input[name='price']");
 
         if (price.val().trim() === "") {
             alert("가격을 입력해주세요.");
-            priceWrap.addClass("invalid").focus();
+            price.addClass("invalid"); // price 입력창 자체에 invalid 클래스 적용
+            priceWrap.addClass("invalid"); // price-content 래퍼에도 invalid 클래스 적용
             e.preventDefault();
             return false;
         }
