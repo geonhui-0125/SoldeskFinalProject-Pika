@@ -27,6 +27,7 @@ public class NotificationDto {
     public static NotificationDto fromEntity(Notifications notification) {
         return NotificationDto.builder()
                 .notificationId(notification.getNotificationId())
+                .receiverId(notification.getReceiver().getId()) // receiverId 추가
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .actionUrl(notification.getActionUrl())
