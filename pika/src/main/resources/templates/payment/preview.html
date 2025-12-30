@@ -123,7 +123,8 @@
         </div>
         <div class="info-row">
             <span class="info-label">주소</span>
-            <span class="info-value" th:text="${paymentRequestDto.buyerAddr}"></span>
+            <span class="info-value"
+                  th:text="${#strings.isEmpty(paymentRequestDto.buyerAddr)} ? '미등록' : ${paymentRequestDto.buyerAddr}">
         </div>
         <div class="info-row">
             <span class="info-label">이메일</span>
@@ -131,7 +132,8 @@
         </div>
         <div class="info-row">
             <span class="info-label">전화번호</span>
-            <span class="info-value" th:text="${paymentRequestDto.buyerTel}"></span>
+            <span class="info-value"
+                  th:text="${#strings.isEmpty(paymentRequestDto.buyerTel)} ? '미등록' : ${paymentRequestDto.buyerTel}">
         </div>
     </div>
 
