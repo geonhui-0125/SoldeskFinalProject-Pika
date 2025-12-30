@@ -35,9 +35,18 @@ public class UserController {
         if(principal != null){
             userRepository.findById(principal.getName()).ifPresent(user -> {
                 model.addAttribute("user", user);
+                AdditionalUserInfoDto dto = new AdditionalUserInfoDto();
+                dto.setPhone(user.getPhone()); //휴대폰 정보 불러오기
+                if(user.getBirth() != null) {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
+                    dto.setBirth(sdf.format(user.getBirth()));
+                }//생년월일 정보 불러오기
+                dto.setAddress(user.getAddress()); //주소정보 불러오기
+                model.addAttribute("userAddInfo", dto);
             });
+        }else {
+            model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         }
-        model.addAttribute("userAddInfo", new AdditionalUserInfoDto());
         return "user/addInfoForm";
     }
 
