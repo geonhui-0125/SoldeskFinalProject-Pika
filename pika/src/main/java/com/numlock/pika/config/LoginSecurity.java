@@ -30,10 +30,11 @@ public class LoginSecurity {
                 .csrf(csrf -> csrf.disable())
                 /*.authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/icon/**", "/upload/**", "/profile/**").permitAll()
-                        .requestMatchers("/", "/user/login", "/user/join", "/search/**", "/products/info/**").permitAll()
+                        .requestMatchers("/", "/main", "/user/login", "user/login-proc", "/user/join", "/search/**", "user/password/**").permitAll()
                         //마이페이지, 상품등록 가입사 용자 모두 접근 가능(USER/GUEST 권환 분리 논의 필요)
-                        .requestMatchers("/user/mypage/**", "/products/new").hasAnyRole("USER", "GUEST", "ADMIN")
-                        .anyRequest().authenticated() //나머지는 인증 필요
+                        .requestMatchers("/search/**", "products/search", "products/info/**", "/products/bySeller/**").permitAll()
+                        .requestMatchers("/user/mypage/**", "/products/new", "/chat/**").authenticated()
+                        .anyRequest().authenticated() //나머지는 인증 불필요
                 )*/
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
                 // 모든 경로에 대한 접근 허용 (개발용) 개발 완료후 삭제 필요
@@ -50,9 +51,7 @@ public class LoginSecurity {
                         .invalidateHttpSession(true) //세션 무효화
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        // 인증된 사용자가 권한 없는 페이지 접근 시 처리
-                        // 현재는 메인 페이지로 리다이렉트하지만,
-                        // 추후 '권한이 없습니다' 메시지를 보여주는 커스텀 페이지(예: /access-denied)로 변경 가능
+                        // 인증된 사용자가 권한 없는 페이지 접근 시 메인 페이지로 리다이렉트
                         .accessDeniedPage("/")
                 );
 
