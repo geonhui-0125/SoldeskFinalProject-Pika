@@ -171,6 +171,16 @@
     font-weight: bold;
 }
 
+.update-btn{
+    padding: 12px 30px;
+    width: 100%;
+    background: #fd7800;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 /*******************************
  하단 영역
 ********************************/
