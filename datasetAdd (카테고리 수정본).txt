@@ -961,6 +961,10 @@ INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, conte
 INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 23, 'tester1', 'tester2', 3, '작동은 잘 되는데 겉면에 미세한 기스가 조금 있네요.', SYSDATE, SYSDATE); 
 INSERT INTO reviews (review_id, product_id, seller_id, reviewer_id, score, content, created_at, updated_at) VALUES (seq_reviews.nextval, 24, 'tester1', 'tester2', 5, '좋은 가격에 좋은 상품 구해서 너무 만족합니다!', SYSDATE, SYSDATE);
 
+UPDATE products 
+SET product_state = 1 
+WHERE product_id BETWEEN 20 AND 24;
+
 
 SET DEFINE ON;
 SET SCAN ON;
