@@ -23,12 +23,15 @@
             <ul class="product-form-list">
                 <li class="product-form-item">
                     <div class="form-label">상품이미지</div>
-                    <div class="form-content">
-                        <label class="image-upload-box" id="imageBox">
+                    <div class="form-content" id="image-form-content">
+                        <!-- 대표 이미지를 위한 업로드/미리보기 박스 -->
+                        <label class="image-upload-box" id="main-image-box">
                             <input class="image-input" type="file" name="images" accept="image/jpeg, image/png" multiple>
-                            <span class="image-placeholder">이미지 등록</span>
-                            <img class="preview-image" style="display:none;"/>
+                            <div class="placeholder-text">이미지 등록</div>
+                            <img class="main-preview-image" style="display:none;"/>
                         </label>
+                        <!-- 추가 이미지 목록을 위한 컨테이너 -->
+                        <div id="additional-image-list"></div>
                     </div>
                 </li>
 

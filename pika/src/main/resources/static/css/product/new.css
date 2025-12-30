@@ -72,6 +72,7 @@
     width: 500px;
     padding: 12px;
     font-size: 15px;
+    border: 1px solid #ddd;
     outline: none;
 }
 
@@ -83,32 +84,94 @@
     outline: none;
 }
 
-/* 이미지 업로드 */
+/* 이미지 폼 콘텐츠 전체를 감싸는 컨테이너 */
+#image-form-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+/* 대표 이미지 업로드 박스 */
 .image-upload-box {
     width: 160px;
     height: 160px;
+    min-width: 160px; /* 크기 고정 */
     border: 1px dashed #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
+    border-radius: 6px;
+    padding: 0;
+    overflow: hidden; /* 내부 이미지가 밖으로 나가지 않도록 */
 }
 
 .image-input {
     display: none;
 }
 
-.image-placeholder {
+.placeholder-text {
     color: #999;
+    font-size: 1em;
+    text-align: center;
 }
 
-.preview-image {
+/* 대표 이미지 미리보기 */
+.main-preview-image {
     position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: none;
+}
+
+/* 추가 이미지 목록 컨테이너 */
+#additional-image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: 1; /* 남는 공간을 모두 차지 */
+}
+
+/* 추가 이미지 미리보기 아이템 */
+.additional-image-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+.additional-image-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 이미지 삭제 버튼 (공통 사용) */
+.remove-image-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.remove-image-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
 }
 
 /* 카테고리 선택 박스 */
