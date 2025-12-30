@@ -33,7 +33,7 @@
                 <span th:text="*{categoryTwo}"></span>
             </li>
         </ul>
-        <th:block th:if="*{buyerType == 'sell'}">
+        <th:block th:if="*{productStat == 0 && buyerType == 'sell'}">
             <div id="product-update"
                  th:onclick="|location.href='@{/products/edit/{id}(id=*{productId})}'|">
                 수정
@@ -142,6 +142,7 @@
 
                         <th:block th:case="3">
                             <th:block th:switch="${type}">
+                                <input type="hidden" id="impUid" th:value="*{impUid}"/>
                                 <button th:case="'view'" class="buy-btn" disabled>상품예약중
                                 </button>
                                 <button th:case="'buy'" class="buy-btn"
