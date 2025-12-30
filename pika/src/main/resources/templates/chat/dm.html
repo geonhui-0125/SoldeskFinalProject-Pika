@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <meta charset="UTF-8">
@@ -178,6 +178,49 @@
             margin: 5px 0;
         }
 
+        .product-info-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #fafafa;<img class="product-image"
+                     th:src="${product.productImage != null ? product.productImage : '/images/no-image.png'}"
+                     alt="상품 이미지">
+        }
+        .product-info-bar .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .product-details {
+            flex-grow: 1;
+        }
+        .product-title {
+            font-weight: bold;
+            font-size: 1em;
+            color: #333;
+        }
+        .product-price {
+            color: #555;
+            font-size: 0.9em;
+        }
+        .view-product-btn {
+            padding: 8px 12px;
+            background-color: #75b85b;
+            color: #eee;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            border: 1px solid #ddd;
+            transition: background-color 0.2s;
+        }
+        .view-product-btn:hover {
+            background-color: #62a349;
+        }
+
     </style>
 </head>
 <body>
@@ -189,6 +232,17 @@
             <span>To: <th:block th:text="${recipientId}"></th:block></span>
             <a th:href="@{/chat/userList}">Back to List</a>
         </div>
+
+        <!-- Product Info Bar -->
+        <div class="product-info-bar" th:if="${product != null}">
+        <img th:src="${product.productImage != null ? product.productImage : '/images/no-image.png'}" alt="상품 이미지" class="product-img"/>
+            <div class="product-details">
+                <div class="product-title" th:text="${product.title}">상품 제목</div>
+                <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + '원'}">가격</div>
+            </div>
+            <a th:href="@{/products/info/{id}(id=${product.productId})}" class="view-product-btn">상품보기</a>
+        </div>
+        
         <div class="msgArea">
             <!-- Messages will be loaded here by JavaScript -->
         </div>

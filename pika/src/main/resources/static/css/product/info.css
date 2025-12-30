@@ -245,6 +245,17 @@
     gap: 10px;
     flex-shrink: 0;
 }
+.chat-btn {
+	background-color: #FFD700 !important; /* 항상 노란색 유지 */
+	color: #ffffff !important;
+	cursor: pointer !important;
+	opacity: 1 !important;
+	/* 기존 결제 버튼의 여백이나 폰트 스타일 상속 */
+	padding: 10px 20px;
+	font-weight: bold;
+	border: none;
+}
+
 .seller-btn-group .buy-btn {
     /* 디자인 정보만 '활성화된 결제 버튼'에서 참조 */
     background-color: #75b85b !important; /* 항상 초록색 유지 */

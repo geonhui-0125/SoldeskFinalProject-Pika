@@ -16,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.numlock.pika.domain.Message;
 import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.MessageDto;
+import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.service.CategoryService;
 import com.numlock.pika.service.MessageService;
 import com.numlock.pika.dto.ChatRoomDto;
 import com.numlock.pika.service.chat.ChatRoomService;
+import com.numlock.pika.service.product.ProductServiceImpl;
 import com.numlock.pika.service.user.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,7 @@ public class ChatController {
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
     private final CategoryService categoryService;
+    private final ProductServiceImpl productServiceImpl;
 
 
     @GetMapping("/list")
@@ -74,6 +77,24 @@ public class ChatController {
         model.addAttribute("messages", messageDtos);
         Map<String, List<String>> categoriesMap = categoryService.getAllCategoriestoMap();
         model.addAttribute("categoriesMap", categoriesMap);
+        ProductDto product = productServiceImpl.getProductById(productId.intValue());
+        String folderUrl = product.getProductImage();
+        if (folderUrl != null && !folderUrl.isEmpty()) {
+            List<String> imageUrls = productServiceImpl.getImageUrls(folderUrl);
+
+            if (!imageUrls.isEmpty()) {
+                product.setProductImage(imageUrls.get(0));
+            } else {
+                // 이미지가 없는 경우, 디폴트 이미지
+            	product.setProductImage(null);
+            }
+        } else {
+            // 폴더 URL 자체가 없는 경우 디폴트 이미지
+        	product.setProductImage(null);
+        }
+        System.out.println("product : "+product.getProductImage());
+        model.addAttribute("product", product);
+
         return "chat/dm";
     }
 }
