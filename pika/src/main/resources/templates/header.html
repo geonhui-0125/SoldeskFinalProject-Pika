@@ -101,6 +101,21 @@
             <p>찜한 상품</p>
             <img th:src="@{/icon/heart.png}">
         </div>
+
+        <div class="slider_fp_wrap" sec:authorize="isAuthenticated()">
+            <div class="slider_fp_img">
+                <div class="slider_fp_inner">
+                    <!-- 찜한 상품 목록이 여기에 동적으로 추가됩니다. -->
+                </div>
+            </div>
+            <div class="slider_fp_btn">
+                <button class="prev_fp"><span>&lt;</span></button>
+                <button class="next_fp"><span>&gt;</span></button>
+            </div>
+            <div class="slider__dot">
+            </div>
+        </div>
+
         <div id="top-link">TOP</div>
     </div>
 
@@ -224,6 +239,7 @@
         }
     </script>
         <script type="module" th:src="@{/js/notification/notification-websocket.js}" sec:authorize="isAuthenticated()"></script>
+        <script th:src="@{/js/product/favorite-slider.js}" sec:authorize="isAuthenticated()"></script>
     </header>
 
     </body>
