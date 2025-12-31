@@ -261,6 +261,10 @@ public class ProductServiceImpl implements ProductService {
             throw new SecurityException("Not authorized to update this product");
         }
 
+        if (product.getProductState() != 0) {
+            throw new IllegalStateException("판매 중인 상품만 수정할 수 있습니다.");
+        }
+
         product.setTitle(dto.getTitle());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
@@ -288,6 +292,9 @@ public class ProductServiceImpl implements ProductService {
 
         // ADMIN 역할이거나 해당 상품의 판매자인 경우에만 삭제 허용
         if ("ADMIN".equals(currentUser.getRole()) || product.getSeller().getId().equals(currentUser.getId())) {
+            if (!"ADMIN".equals(currentUser.getRole()) && product.getProductState() != 0) {
+                throw new IllegalStateException("판매 중인 상품만 삭제할 수 있습니다.");
+            }
             productRepository.delete(product);
         } else {
             throw new SecurityException("Not authorized to delete this product");

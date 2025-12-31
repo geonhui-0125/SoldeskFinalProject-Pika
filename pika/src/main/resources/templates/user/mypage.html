@@ -279,16 +279,20 @@
                         <span th:if="${p.productState == 3}" style="color: #9b59b6; font-weight: bold;">승인대기</span>
                     </td>
                     <td>
-                        <button class="btn-action"
-                                th:onclick="'location.href=\'/products/info/' + ${p.productId} + '\''">상세
-                        </button>
-                        <button class="btn-action"
-                                th:onclick="'location.href=\'/products/edit/' + ${p.productId} + '\''">수정
-                        </button>
-                        <form th:action="@{/products/delete/{id}(id=${p.productId})}" method="post"
-                              style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                        <!-- 판매중일 때만 수정/삭제 버튼 노출 -->
+                        <th:block th:if="${p.productState == 0}">
+                            <button class="btn-action"
+                                    th:onclick="'location.href=\'/products/edit/' + ${p.productId} + '\''">수정
+                            </button>
+                                        <form th:if="${p.productState == 0}" th:action="@{/products/delete/{id}(id=${p.productId})}" method="post"
+                              style="display:inline;"
+                              th:onsubmit="|return confirm(${p.hasChat} ? '채팅이 진행중인 상품입니다. 그래도 삭제를 진행하시겠습니까?' : '정말 삭제하시겠습니까?');|">
+                            <input type="hidden" name="_method" value="delete"/>
                             <button type="submit" class="btn-action btn-danger">삭제</button>
                         </form>
+                        </th:block>
+                        <!-- 판매중이 아닐 때는 별도 관리 버튼 없음 -->
+                        <span th:unless="${p.productState == 0}" style="color: #ccc;">-</span>
                     </td>
                 </tr>
                 </tbody>
