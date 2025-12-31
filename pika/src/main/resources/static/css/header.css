@@ -425,6 +425,9 @@ ul {
 }
 
 .slider_fp_wrap {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 10px;
     overflow: hidden;
     transition: height 0.25s ease;
 }
@@ -483,4 +486,18 @@ ul {
     height: 28px;
     font-weight: 7;
     cursor: pointer;
+}
+
+.slider_fp_btn button:hover {
+    background-color: #f8f8f8;
+    border-color: #bbb;
+    color: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.slider_fp_btn button:active {
+    background-color: #eee;
+    transform: translateY(0);
+    box-shadow: none;
 }
