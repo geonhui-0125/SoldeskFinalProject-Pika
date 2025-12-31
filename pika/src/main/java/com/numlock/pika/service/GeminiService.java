@@ -274,7 +274,7 @@ public class GeminiService {
         try {
             // 5. 응답 속도를 위해 설정을 간소화하여 호출
             GenerateContentConfig summaryConfig = GenerateContentConfig.builder()
-                    .maxOutputTokens(300) // 한줄평이므로 출력 토큰을 낮춰 비용 절감
+                    .maxOutputTokens(400) // 한줄평이므로 출력 토큰을 낮춰 비용 절감
                     .temperature(0.5f)    // 적당한 일관성 유지
                     .build();
 
