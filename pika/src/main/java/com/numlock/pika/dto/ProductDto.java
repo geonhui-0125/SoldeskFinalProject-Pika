@@ -23,6 +23,7 @@ public class ProductDto {
     private int viewCnt;
     private LocalDateTime createdAt;
     private int productState;
+    private boolean hasChat;
 
     // Entity -> DTO
     public static ProductDto fromEntity(Products product) {

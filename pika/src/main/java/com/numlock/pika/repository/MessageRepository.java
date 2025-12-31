@@ -32,4 +32,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     void markAsReadByRoomIdAndUserId(@Param("user1") String user1Id, @Param("user2") String user2Id, @Param("productId") Integer productId);
     // 특정 사용자에게 온 메시지 중 읽지 않은 메시지 수
     long countByRecipientIdAndIsReadFalse(String recipientId);
+
+    // 해당 상품에 대한 채팅 메시지가 존재하는지 확인
+    boolean existsByProduct_ProductId(int productId);
 }
