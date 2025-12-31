@@ -15,7 +15,7 @@ public class FavoriteProducts {
 
     @SequenceGenerator(
             name = "favorite_product_seq_generator", // JPA 내부에서 참조할 별칭 (자유롭게 지정 가능)
-            sequenceName = "SEQ_FAVORITE_PRODUCTS",  // 🌟 데이터베이스의 실제 시퀀스 이름 입력
+            sequenceName = "SEQ_FAVORITE_PRODUCTS",  // 데이터베이스의 실제 시퀀스 이름 입력
             allocationSize = 1 // DB 시퀀스 정의에 따라 설정 (기본값 1 또는 50 사용)
     )
 

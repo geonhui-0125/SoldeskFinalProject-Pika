@@ -3,6 +3,8 @@ package com.numlock.pika.service.user;
 import com.numlock.pika.domain.FavoriteProducts;
 import com.numlock.pika.domain.Products;
 import com.numlock.pika.domain.Users;
+import com.numlock.pika.dto.FpApiDto;
+import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.repository.FavoriteProductRepository;
 import com.numlock.pika.repository.ProductRepository;
 import com.numlock.pika.repository.UserRepository;
@@ -22,8 +24,9 @@ public class WishApiService {
     private final UserRepository userRepository;
     private final FavoriteProductRepository favoriteProductRepository;
     private final NotificationService notificationService;
+    private final ProductServiceImpl productServiceImpl;
 
-    public int upWishCount(int productId, Principal principal) {
+    public FpApiDto upWishCount(int productId, Principal principal) {
 
         Products products = productRepository.findById(productId)
                         .orElseThrow(() -> new IllegalArgumentException("해당 상품 정보를 찾지 못했습니다."));
@@ -40,10 +43,14 @@ public class WishApiService {
 
         favoriteProductRepository.save(favoriteProducts);
 
-        return favoriteProductRepository.countByProduct(products);
+        return FpApiDto.builder()
+                .productId(favoriteProducts.getProduct().getProductId())
+                .productImage(productServiceImpl.getImageUrls(favoriteProducts.getProduct().getProductImage()).get(0))
+                .fpCnt(favoriteProductRepository.countByProduct(products))
+                .build();
     }
 
-    public int downWishCount(int productId, Principal principal) {
+    public FpApiDto downWishCount(int productId, Principal principal) {
 
         Products products = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품 정보를 찾지 못했습니다."));
@@ -65,7 +72,9 @@ public class WishApiService {
                     .ifPresent(favoriteProductRepository::delete);
         }
 
-        return favoriteProductRepository.countByProduct(products);
+        return FpApiDto.builder()
+                .productId(favoriteProducts.getProduct().getProductId())
+                .build();
     }
 
 }

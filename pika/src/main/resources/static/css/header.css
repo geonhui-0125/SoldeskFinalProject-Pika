@@ -23,7 +23,7 @@ ul {
 /*******************************
  HEADER
 ********************************/
-.header-auth{
+.header-auth {
     border-bottom: 1px solid #6c757d;
 }
 
@@ -175,7 +175,7 @@ ul {
     width: 300px;
     background: white;
     border: 1px solid #ddd;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 2000;
     display: none; /* 기본적으로 숨김, JS로 제어 */
 }
@@ -307,7 +307,7 @@ ul {
     width: 200px;
     background: white;
     border: 1px solid #ddd;
-    box-shadow: 2px 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.1);
     display: none; /* 기본 숨김 */
     z-index: 10001; /* 메뉴가 위로 올라오도록 설정 */
 }
@@ -358,6 +358,7 @@ ul {
     margin-top: 5px;
 }
 
+
 #top-link {
     font-weight: bold;
     border-top: 1px solid #eee;
@@ -365,6 +366,7 @@ ul {
     text-align: center;
     cursor: pointer;
 }
+
 
 /*******************************
  인기 검색어
@@ -379,7 +381,7 @@ ul {
     margin: 3px;
     /*border-top: none;*/
     border-radius: 10px 10px 10px 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     padding: 10px 0;
 }
@@ -414,4 +416,71 @@ ul {
     padding: 8px 15px;
     color: #999;
     font-style: italic;
+}
+
+.slider_fp_img {
+    width: 80px;          /* 이미지 폭 기준 */
+    overflow: hidden;
+    position: relative;
+}
+
+.slider_fp_wrap {
+    overflow: hidden;
+    transition: height 0.25s ease;
+}
+
+.slider_fp_inner {
+    display: flex;
+    transition: transform 0.35s ease;
+}
+
+.slider_fp_inner a {
+    display: flex;
+    justify-content: center;
+}
+
+.slider_fp_page {
+    width: 80px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.slider_fp_page.single {
+    margin-left: 10px;
+    width: 60px;
+}
+
+.slider_fp_page.single a {
+    margin: 0 auto;
+}
+
+.slider_fp_page a {
+    width: 60px;
+    height: 60px;
+}
+
+.slider_fp_page img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.slider_fp_btn {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.slider_fp_btn button {
+    border: 1px solid #ddd;
+    background: #fff;
+    width: 28px;
+    height: 28px;
+    font-weight: 7;
+    cursor: pointer;
 }

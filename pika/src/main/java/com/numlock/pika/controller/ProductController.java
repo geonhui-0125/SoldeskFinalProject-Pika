@@ -4,6 +4,7 @@ import com.numlock.pika.dto.ProductDetailDto;
 import com.numlock.pika.dto.ProductDto;
 import com.numlock.pika.dto.ProductRegisterDto;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.service.FavoriteProductService;
 import com.numlock.pika.service.Notification.NotificationService;
 import com.numlock.pika.service.product.ProductService;
 import com.numlock.pika.service.CategoryService;
@@ -34,6 +35,7 @@ public class ProductController {
     private final CategoryService categoryService;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+	private final FavoriteProductService favoriteProductService;
 
     /**
      * [추가] 상품 검색 및 카테고리 필터링
@@ -284,5 +286,17 @@ public class ProductController {
         List<ProductDto> products = productService.getProductsBySeller(sellerId);
         model.addAttribute("products", products);
         return "product/list";
+    }
+
+    /**
+     * 현재 로그인한 유저의 찜 목록을 반환하는 API
+     */
+    @GetMapping("/api/favorites")
+    @ResponseBody
+    @PreAuthorize("isAuthenticated()")
+    public List<ProductDto> getFavoriteProducts(Principal principal) {
+        return userRepository.findById(principal.getName())
+                .map(favoriteProductService::findFavoriteByUser)
+                .orElse(new ArrayList<>());
     }
 }
