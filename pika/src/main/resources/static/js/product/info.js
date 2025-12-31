@@ -115,18 +115,16 @@ if (wishBtn) {
 
         fetch(`/api/product/${productId}/wish`, {method: httpMethod})
             .then(resp => {
-                if (resp.ok) {
-
-                    if(httpMethod === 'POST'){
-                        addFavoriteItem(resp.json());
-                    }else{
-                        removeFavoriteItem(productId);
-                    }
-                    return resp.json();
-                }
-                throw new Error(`요청 실패: ${resp.status}`);
+                if (!resp.ok) throw new Error(`요청 실패: ${resp.status}`);
+                return resp.json();
             })
             .then(data => {
+                if (httpMethod === 'POST') {
+                    addFavoriteItem(data);
+                } else {
+                    removeFavoriteItem(productId);
+                }
+
                 const newWishCnt = parseInt(data.fpCnt);
                 const wishCntElement = document.querySelector('.wish-cnt span');
                 if (wishCntElement) {
