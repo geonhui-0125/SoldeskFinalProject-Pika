@@ -47,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     private final FavoriteProductRepository  favoriteProductRepository;
     private final ReviewRepository reviewRepository;
     private final PaymentRepository paymentRepository;
+    private final MessageRepository messageRepository; // MessageRepository 주입
     private final com.numlock.pika.service.ReviewService reviewService; // ReviewService 주입
 
     @Override
@@ -246,6 +247,10 @@ public class ProductServiceImpl implements ProductService {
                         // 폴더 URL 자체가 없는 경우 디폴트 이미지
                         dto.setProductImage(null);
                     }
+
+                    // 채팅 존재 여부 설정
+                    boolean hasChat = messageRepository.existsByProduct_ProductId(product.getProductId());
+                    dto.setHasChat(hasChat);
 
                     return dto;
                 })
