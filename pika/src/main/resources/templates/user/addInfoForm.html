@@ -196,7 +196,8 @@
             </div>
             <div class="form-group">
                 <label for="birth">생년월일 (8자리)</label>
-                <input type="text" id="birth" th:field="*{birth}" placeholder="YYYYMMDD"/>
+                <input type="text" id="birth" th:field="*{birth}" placeholder="YYYYMMDD" maxlength="8" oninput="this.value = this.value.replace(/[^0-9]/g, '');"/>
+                <span id="birth-error" class="field-error"></span>
                 <span th:if="${#fields.hasErrors('birth')}" th:errors="*{birth}" class="field-error"></span>
             </div>
             
@@ -288,6 +289,37 @@
                     document.getElementById('phone').value = combinedPhone;
                 } else {
                     document.getElementById('phone').value = '';
+                }
+                //생년월일 유효성 검사
+                const birthInput = document.getElementById('birth');
+                const birthValue = birthInput.value;
+                const birthErrorSpan = document.getElementById('birth-error');
+                birthErrorSpan.textContent = '';
+
+                if(birthValue && birthValue.length === 8) {
+                    const year = parseInt(birthValue.substring(0, 4));
+                    const month = parseInt(birthValue.substring(4, 6)) - 1;
+                    const day = parseInt(birthValue.substring(6, 8));
+
+                    const inputDate = new Date(year, month, day);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); //시간정보 초기화로 날짜만 비교
+
+                    if (isNaN(inputDate.getTime()) || inputDate.getFullYear() !== year
+                        || inputDate.getMonth() !== month || inputDate.getDate() !== day) {
+                        birthErrorSpan.textContent = '생년월일이 잘 못 입력되었습니다.';
+                        birthInput.focus();
+                        event.preventDefault();
+                        return;
+                    }
+
+                    if (inputDate > today) {
+                        birthErrorSpan.textContent = '생년월일이 잘 못 입력되었습니다.'
+                        birthInput.value = '';
+                        birthInput.focus();
+                        event.preventDefault();
+                        return;
+                    }
                 }
             });
         }
