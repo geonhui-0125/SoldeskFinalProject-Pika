@@ -373,7 +373,7 @@
 
     <!-- 4. 상점 후기 (Reviews) -->
     <div class="product-block">
-        <h1 class="product-block-title">받은 상점 후기 <span th:text="'(' + ${#lists.size(myReviews)} + ')'"
+        <h1 class="product-block-title">내가 받은 리뷰 <span th:text="'(' + ${#lists.size(myReviews)} + ')'"
                                                        style="font-size:0.7em; color:#888;"></span></h1>
 
         <div class="scroll-container" th:if="${!#lists.isEmpty(myReviews)}">

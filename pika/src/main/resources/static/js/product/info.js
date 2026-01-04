@@ -46,7 +46,7 @@ async function onclickCancelPayment() {
             headers: {
                 "Content-Type": "application/json" // JSON 전송 명시
             },
-            body: JSON.stringify({ impUid: impUid }) // 데이터를 JSON 문자열로 변환
+            body: JSON.stringify({impUid: impUid}) // 데이터를 JSON 문자열로 변환
         });
 
         if (resp.ok) {
@@ -85,7 +85,7 @@ async function onclickApprovePayment() {
             headers: {
                 "Content-Type": "application/json" // JSON 전송 명시
             },
-            body: JSON.stringify({ taskId: productId }) // 데이터를 JSON 문자열로 변환
+            body: JSON.stringify({taskId: productId}) // 데이터를 JSON 문자열로 변환
         });
 
         if (resp.ok) {
@@ -103,10 +103,8 @@ async function onclickApprovePayment() {
     }
 }
 
-// 1. 먼저 버튼을 변수에 담습니다.
 const wishBtn = document.querySelector(".wish-btn");
 
-// 2. 버튼이 존재할 때만(판매중일 때만) 이벤트를 등록합니다. (중요!)
 if (wishBtn) {
     wishBtn.addEventListener('click', () => {
         const productId = document.querySelector('.product-id').value;
@@ -117,11 +115,17 @@ if (wishBtn) {
 
         fetch(`/api/product/${productId}/wish`, {method: httpMethod})
             .then(resp => {
-                if (resp.ok) return resp.text();
-                throw new Error(`요청 실패: ${resp.status}`);
+                if (!resp.ok) throw new Error(`요청 실패: ${resp.status}`);
+                return resp.json();
             })
             .then(data => {
-                const newWishCnt = parseInt(data);
+                if (httpMethod === 'POST') {
+                    addFavoriteItem(data);
+                } else {
+                    removeFavoriteItem(productId);
+                }
+
+                const newWishCnt = parseInt(data.fpCnt);
                 const wishCntElement = document.querySelector('.wish-cnt span');
                 if (wishCntElement) {
                     wishCntElement.textContent = newWishCnt;
@@ -186,7 +190,7 @@ async function analyzePrice() {
 
     // 1. 채팅창 열기 (header.html에 있는 요소 및 함수 활용)
     const chatWindow = document.getElementById('ai-chat-window');
-    if(chatWindow) {
+    if (chatWindow) {
         chatWindow.style.display = 'flex';
     }
 
