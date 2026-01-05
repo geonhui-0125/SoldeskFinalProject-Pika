@@ -126,9 +126,26 @@ public class UserService {
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(email);
+            message.setSubject("[PIKA] 비밀번호 재설정을 위한 안내 메일입니다.");
+
+            StringBuilder mailContent = new StringBuilder();
+            mailContent.append("안녕하세요, PIKA 서비스 운영팀입니다.\n\n");
+            mailContent.append("귀하의 계정에 대한 비밀번호 재설정 요청이 접수되었습니다.\n");
+            mailContent.append("비밀번호 변경을 원하실 경우, 아래의 링크를 클릭하여 절차를 진행해 주시기 바랍니다.\n\n");
+            mailContent.append("[비밀번호 재설정 링크]\n");
+            mailContent.append(resetLink).append("\n\n");
+            mailContent.append("※ 해당 링크는 보안을 위해 요청 후 약 ");
+            mailContent.append(jwtUtil.getExpirationMs() / 60000);
+            mailContent.append("분 동안만 유효합니다.\n");
+            mailContent.append("만약 본인이 요청한 것이 아니라면, 본 메일을 무시하시거나 고객센터로 문의해 주세요.\n\n");
+            mailContent.append("감사합니다.\nPIKA 운영팀 드림");
+
+            message.setText(mailContent.toString());
+            /*SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
             message.setSubject("[PIKA] 비밀번호 재설정 인증 메일입니다.");
             message.setText("pika 비밀번호 재설정 안내 메일입니다. \n\n 유효시간 내에 아래 링크로 접속해주세요. \n\n"+
-                    resetLink + "\n\n이 링크는 "+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );
+                    resetLink + "\n\n이 링크는 "+ (jwtUtil.getExpirationMs() / 60000) +"분 동안 유효합니다." );*/
             mailSender.send(message);
             return true;
         }
