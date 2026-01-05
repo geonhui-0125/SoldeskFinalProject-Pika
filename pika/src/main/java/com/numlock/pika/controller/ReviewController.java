@@ -1,8 +1,10 @@
 package com.numlock.pika.controller;
 
+import com.numlock.pika.domain.Users;
 import com.numlock.pika.dto.ReviewRequestDto;
 import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.dto.SellerStatsDto;
+import com.numlock.pika.repository.UserRepository;
 import com.numlock.pika.service.ReviewService;
 import com.numlock.pika.service.GeminiService; // GeminiService import 추가
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.numlock.pika.service.DuplicateReviewException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors; // Collectors 임포트 추가
 
 @Controller
@@ -24,6 +27,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     private final GeminiService geminiService; // GeminiService 주입
+    private final UserRepository userRepository;
 
     // 새 리뷰를 생성하기 위한 양식을 표시합니다.
     @GetMapping("/new") // 특정 판매자에 대한 리뷰 생성 링크
@@ -90,7 +94,13 @@ public class ReviewController {
                 throw new AccessDeniedException("이 리뷰를 수정할 권한이 없습니다.");
             }
 
+            // 판매자 닉네임 조회
+            String sellerNickname = userRepository.findById(review.getSellerId())
+                    .map(Users::getNickname)
+                    .orElse("알 수 없는 판매자"); // 판매자를 찾지 못한 경우 기본값
+
             model.addAttribute("review", review);
+            model.addAttribute("sellerNickname", sellerNickname); // 모델에 판매자 닉네임 추가
             // Assuming review/form.html can be reused for editing
             return "review/form";
         } catch (IllegalArgumentException e) {
