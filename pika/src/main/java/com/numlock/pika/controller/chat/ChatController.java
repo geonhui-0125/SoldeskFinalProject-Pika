@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatController {
 
-    private final UserService userService;
     private final MessageService messageService;
     private final ChatRoomService chatRoomService;
     private final CategoryService categoryService;
