@@ -6,8 +6,9 @@ import com.google.genai.types.GoogleSearch;
 import com.google.genai.types.Tool;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentResponse;
-import com.google.genai.types.HttpOptions; // HttpOptions 임포트 추가
+import com.google.genai.types.HttpOptions;
 import com.google.genai.types.Part;
+import com.google.genai.types.ThinkingConfig;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -113,8 +114,9 @@ public class GeminiService {
 
             GenerateContentConfig config = GenerateContentConfig.builder()
                     .tools(Arrays.asList(googleSearchTool))
-                    .temperature(0.2f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
+                    .temperature(0.7f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
                     .maxOutputTokens(2500)
+                    .thinkingConfig(ThinkingConfig.builder().includeThoughts(true).build())
                     .build();
 
             // 6. Gemini 호출
@@ -125,7 +127,11 @@ public class GeminiService {
             );
 
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                return response.text();
+                // [DEBUG] 추론 과정 확인을 위한 로그
+                System.out.println("=== [Analyze Price] Full Response: " + response);
+                
+                String resultText = response.text();
+                return (resultText != null) ? resultText : "시세 정보를 가져오지 못했습니다.";
             }
 
         } catch (Exception e) {
@@ -150,31 +156,38 @@ public class GeminiService {
             List<Content> history = chatHistories.computeIfAbsent(sessionId, k -> new ArrayList<>());
 
             String context = "";
-            // 가격 관련 키워드가 있는지 확인
-            if (userMessage.contains("얼마") || userMessage.contains("가격") || userMessage.contains("시세") || userMessage.contains("적정가")) {
-                String keyword = extractSearchKeyword(userMessage);
-                if (!"NONE".equals(keyword)) {
-                    // DB에서 상품 검색 (최신순 5개)
-                    org.springframework.data.domain.Page<com.numlock.pika.domain.Products> products =
-                            productRepository.searchByFilters(keyword, null, org.springframework.data.domain.PageRequest.of(0, 5));
+            // 가격 관련 키워드가 있는지 확인하는 하드코딩 조건 제거
+            String keyword = extractSearchKeyword(userMessage);
+            
+            if (!"NONE".equals(keyword)) {
+                // DB에서 상품 검색 (최신순 5개)
+                org.springframework.data.domain.Page<com.numlock.pika.domain.Products> products =
+                        productRepository.searchByFilters(keyword, null, org.springframework.data.domain.PageRequest.of(0, 5));
 
-                    if (products.hasContent()) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("현재 마켓에 올라온 '").append(keyword).append("' 관련 상품 정보입니다:\n");
-                        for (com.numlock.pika.domain.Products p : products.getContent()) {
-                            sb.append("- ").append(p.getTitle()).append(": ").append(p.getPrice()).append("원\n");
-                        }
-                        context = sb.toString();
-                    } else {
-                        context = "마켓에 '" + keyword + "' 관련 상품이 현재 없습니다.";
+                if (products.hasContent()) {
+                    long totalElements = products.getTotalElements(); // 전체 검색 결과 수 확보
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("현재 마켓 DB에 '").append(keyword).append("' 검색 결과 총 ")
+                      .append(totalElements).append("개의 상품이 등록되어 있습니다.\n");
+                    sb.append("그 중 가장 최근 등록된 5개의 정보는 다음과 같습니다:\n");
+                    
+                    for (com.numlock.pika.domain.Products p : products.getContent()) {
+                        sb.append("- ").append(p.getTitle()).append(": ").append(p.getPrice()).append("원\n");
                     }
+                    context = sb.toString();
+                } else {
+                    context = "현재 마켓에 '" + keyword + "' 관련 상품은 등록되어 있지 않습니다.";
                 }
             }
 
             // 시스템 프롬프트 성격의 지시문과 컨텍스트, 사용자 질문을 조합
             String finalPromptText = "";
             if (history.isEmpty()) {
-                finalPromptText += "당신은 중고거래 마켓 'Pika'의 친절한 AI 어시스턴트입니다. 사용자의 질문에 답변해주세요.\n";
+                finalPromptText += "당신은 중고거래 마켓 'Pika'의 AI 어시스턴트입니다. 다음 원칙을 엄격히 지켜주세요:\n" +
+                        "1. **핵심만 간결하게**: 답변은 최대 3~4문장으로 짧게 작성하세요.\n" +
+                        "2. **불필요한 조언 금지**: 사용자가 구체적인 방법을 묻지 않았다면, '사진 잘 찍는 법', '상세 설명 쓰는 법' 같은 일반적인 조언은 생략하세요.\n" +
+                        "3. **행동 유도**: 사용자가 판매 의사를 보이면, 해당 상품의 '시세'를 분석해줄지 묻거나, 상단의 '판매하기' 메뉴를 이용하라고 안내하세요.\n" +
+                        "4. **톤앤매너**: 친절하지만 군더더기 없는 말투를 사용하세요.\n";
             }
             if (!context.isEmpty()) {
                 finalPromptText += "참고할 마켓 데이터:\n" + context + "\n";
@@ -192,11 +205,15 @@ public class GeminiService {
             GenerateContentConfig chatConfig = GenerateContentConfig.builder()
                     .maxOutputTokens(3000)
                     .temperature(0.7f)
+                    .thinkingConfig(ThinkingConfig.builder().includeThoughts(true).build())
                     .build();
 
             GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", history, chatConfig);
 
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
+                // [DEBUG] 추론 과정 확인을 위한 로그
+                System.out.println("=== [Chat Response] Full Response: " + response);
+
                 // 토큰 사용량 로그 출력
                 if (response.usageMetadata().isPresent()) {
                     var usage = response.usageMetadata().get();
@@ -208,6 +225,9 @@ public class GeminiService {
                 }
 
                 String responseText = response.text();
+                if (responseText == null) {
+                    responseText = "죄송합니다. 답변을 생성하는 중에 문제가 발생했습니다.";
+                }
 
                 // 모델의 응답을 Content 객체로 생성하여 History에 추가
                 Content modelContent = Content.builder()
@@ -228,10 +248,17 @@ public class GeminiService {
 
     private String extractSearchKeyword(String userMessage) {
         try {
-            String prompt = "다음 문장에서 검색할 상품명 키워드만 딱 하나 추출해줘. 조사나 불필요한 말은 빼고 명사 위주로. 없으면 NONE 이라고만 출력해.\n문장: " + userMessage;
+            // 검색 의도 분석을 포함한 개선된 프롬프트 (정확도를 위해 영문 지시문 혼용)
+            String prompt = "Analyze the user message and extract a search keyword for the product database.\n" +
+                    "Rules:\n" +
+                    "1. If the user is looking for product info, price, or stock, output ONLY the **full product name** or core keyword.\n" +
+                    "2. **NEVER truncate proper nouns.** (e.g., '체인소맨' -> '체인소맨', NOT '체')\n" +
+                    "3. If it's a general greeting or small talk, output 'NONE'.\n" +
+                    "User message: " + userMessage;
 
             GenerateContentConfig keywordConfig = GenerateContentConfig.builder()
                     .maxOutputTokens(50)
+                    .temperature(0.1f) // 일관된 판단을 위해 낮은 온도 설정
                     .build();
 
             GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, keywordConfig);
@@ -240,7 +267,9 @@ public class GeminiService {
                     var usage = response.usageMetadata().get();
                     System.out.println("[Keyword] Tokens - In: " + usage.promptTokenCount() + ", Out: " + usage.candidatesTokenCount());
                 }
-                return response.text().trim();
+                
+                String resultText = response.text();
+                return (resultText != null) ? resultText.trim() : "NONE";
             }
         } catch (Exception e) {
             System.err.println("키워드 추출 오류: " + e.getMessage());
@@ -282,7 +311,8 @@ public class GeminiService {
 
             // 6. 결과 추출 및 반환
             if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                return response.text().trim();
+                String resultText = response.text();
+                return (resultText != null) ? resultText.trim() : "리뷰 내용을 요약할 수 없습니다.";
             }
         } catch (Exception e) {
             // 7. 에러 발생 시 원인을 구체적으로 로그에 남김
