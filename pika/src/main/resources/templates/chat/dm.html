@@ -90,7 +90,13 @@
             max-width: 70%;
             padding: 10px 15px;
             border-radius: 18px;
-            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 4px; /* 버블 아래에 위치하므로 상단 여백 추가 */
         }
 
         .my-message .message-bubble {
@@ -229,8 +235,8 @@
 		sec:authorize="isAuthenticated()"></script>
 	<div class="chat-container">
         <div class="chat-header">
-            <span>To: <th:block th:text="${recipientId}"></th:block></span>
-            <a th:href="@{/chat/list}">Back to List</a>
+            <span>상대방 : <th:block th:text="${recipientId}"></th:block></span>
+            <a th:href="@{/chat/list}">목록 보기</a>
         </div>
 
         <!-- Product Info Bar -->
@@ -251,7 +257,7 @@
                 <i class="material-icons">attach_file</i>
             </label>
             <input type="file" id="mediaFile" accept="image/*,video/*">
-            <input type="text" placeholder="Send a message" class="content">
+            <input type="text" placeholder="메세지를 입력하세요." class="content">
             <button id="send-btn" type="button" onclick="sendMsg()">
                 <i class="material-icons">send</i>
             </button>
@@ -296,9 +302,6 @@
         const wrapper = document.createElement('div');
         wrapper.classList.add('message-wrapper');
 
-        const bubble = document.createElement('div');
-        bubble.classList.add('message-bubble');
-
         const isMyMsg = messageSender === senderId;
         wrapper.classList.add(isMyMsg ? 'my-message' : 'other-message');
 
@@ -308,6 +311,9 @@
             senderName.innerText = messageSender;
             wrapper.appendChild(senderName);
         }
+
+        const bubble = document.createElement('div');
+        bubble.classList.add('message-bubble');
 
         let messageElement;
         if (messageType === 'IMAGE') {
@@ -323,7 +329,15 @@
         }
 
         bubble.appendChild(messageElement);
-        wrapper.appendChild(bubble);
+        wrapper.appendChild(bubble); // wrapper에 bubble을 직접 추가
+
+        // 시간 표시 로직
+        if (msgObj.sentAtFormatted) {
+            const timeSpan = document.createElement('span');
+            timeSpan.classList.add('message-time');
+            timeSpan.innerText = msgObj.sentAtFormatted;
+            wrapper.appendChild(timeSpan); // wrapper에 timeSpan을 직접 추가
+        }
 
         console.log("[displayMessage] Appending to msgArea:", wrapper);
         msgArea.append(wrapper);
@@ -350,7 +364,8 @@
             const adaptedMsg = {
                 senderId: msg.senderId,
                 content: msg.content,
-                type: getMessageTypeFromContent(msg.content)
+                type: getMessageTypeFromContent(msg.content),
+                sentAtFormatted: msg.sentAtFormatted // 포맷된 시간 전달
             };
             window.displayMessage(adaptedMsg);
         }
@@ -366,6 +381,8 @@
 
             if ((isMyMessage || isTheirMessage) && isSameProduct) {
                 console.log("Message is for this room. Displaying...");
+                 // 실시간 메시지 시간 포맷팅 (임시)
+                msg.sentAtFormatted = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
                 window.displayMessage(msg);
             } else {
                 console.log("Message is for another room. Ignoring display.");
