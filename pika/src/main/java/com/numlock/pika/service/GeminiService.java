@@ -9,6 +9,11 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.HttpOptions;
 import com.google.genai.types.Part;
 import com.google.genai.types.ThinkingConfig;
+import com.google.genai.types.FunctionCall;
+import com.google.genai.types.FunctionDeclaration;
+import com.google.genai.types.FunctionResponse;
+import com.google.genai.types.Schema;
+import com.google.genai.types.Type;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -51,94 +56,199 @@ public class GeminiService {
     }
 
     /**
-     * 상품 시세 분석 (RAG + Google Search Grounding)
+     * 상품 시세 분석 (MCP/Function Calling + Google Search Grounding)
+     * AI가 스스로 DB 조회 도구를 사용해 정보를 얻고, 구글 검색을 병행하여 분석합니다.
      *
      * @param productId 분석할 상품 ID
      * @return 분석 결과 텍스트
      */
     public String analyzeProductPrice(int productId) {
-        // 1. 상품 정보 조회
-        com.numlock.pika.domain.Products product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+        // 대화 기록 (이 분석 요청만을 위한 임시 히스토리)
+        List<Content> history = new ArrayList<>();
 
-        // 2. 상품명에서 핵심 키워드 추출 (AI)
-        String refinedKeyword = extractSearchKeyword(product.getTitle());
-        if ("NONE".equals(refinedKeyword)) {
-            refinedKeyword = product.getTitle(); // 추출 실패 시 원본 제목 사용
-        }
+        // 1. 도구 정의 (분리)
+        Tool dbTool = Tool.builder()
+                .functionDeclarations(Collections.singletonList(
+                        FunctionDeclaration.builder()
+                                .name("get_product_detail")
+                                .description("상품 ID를 입력받아 상품의 상세 정보(제목, 가격, 카테고리)와 Pika 마켓 내 동일 카테고리/키워드 평균 거래가를 조회합니다.")
+                                .parameters(
+                                        Schema.builder()
+                                                .type(Type.Known.OBJECT)
+                                                .properties(Map.of(
+                                                        "productId", Schema.builder()
+                                                                .type(Type.Known.STRING)
+                                                                .description("분석할 상품의 ID (숫자)")
+                                                                .build()
+                                                ))
+                                                .required(Collections.singletonList("productId"))
+                                                .build()
+                                )
+                                .build()
+                ))
+                .build();
 
-        // 3. 내부 평균 시세 조회 (정제된 키워드 + 카테고리 기준)
-        Double internalAvg = productRepository.findAveragePriceByTitleAndCategory(
-                refinedKeyword,
-                product.getCategory().getCategoryId()
-        );
+        Tool googleSearchTool = Tool.builder()
+                .googleSearch(GoogleSearch.builder().build())
+                .build();
 
-        String internalInfo = (internalAvg != null)
-                ? String.format("%,.0f원", internalAvg)
-                : "정보 없음";
-
-        // 4. 프롬프트 구성
+        // 2. 프롬프트 구성 (명확한 지시)
         String prompt = String.format(
-                "다음 상품에 대한 시세 분석을 수행하고, 결과를 아래의 **출력 형식**에 맞춰서 간결하고 가독성 있게 작성해줘.\n" +
-                        "불필요한 서론이나 인사는 생략해.\n\n" +
-                        "[상품 정보]\n" +
-                        "1. 게시글 제목: %s\n" +
-                        "2. 핵심 상품명: %s\n" +
-                        "3. 마켓(Pika) 내 평균 거래가: %s\n\n" +
-                        "[지시사항]\n" +
-                        "- 구글 검색 도구를 사용하여 '%s'의 '정가(신품가)'와 '현재 온라인 중고 시세'를 찾아줘.\n\n" +
-                        "[출력 형식]\n" +
-                        "### 🏷️ [%s] 분석 결과\n\n" +
-                        "**💰 가격 정보**\n" +
-                        "- **판매 희망가:** (판매 희망가)원\n" +
-                        "- **정가(신품가):** (검색된 정가, 모르면 '정보 없음')\n" +
-                        "- **중고 시세:** (검색된 중고 시세 범위)\n" +
-                        "- **Pika 내 평균:** (마켓 내 평균 거래가)\n\n" +
-                        "**📊 분석 및 코멘트**\n" +
-                        "- **상품 요약:** (상품에 대한 1줄 설명)\n" +
-                        "- **가격 분석:** (판매 희망가가 시세 대비 어떤지, 구매/판매 추천 여부를 2~3문장으로 핵심만 요약)",
-                product.getTitle(),
-                refinedKeyword,
-                product.getPrice(),
-                internalInfo,
-                refinedKeyword,
-                refinedKeyword
+                "상품 ID '%d'번에 대한 시세 분석을 시작해. 먼저 `get_product_detail` 도구를 사용해 DB에서 상품 정보를 가져와줘.",
+                productId
         );
+
+        history.add(Content.builder().role("user").parts(Collections.singletonList(Part.builder().text(prompt).build())).build());
 
         try {
-            // 5. Google Search 도구 설정
-            Tool googleSearchTool = Tool.builder()
-                    .googleSearch(GoogleSearch.builder().build())
+            // [1단계] DB 조회 도구만 활성화
+            GenerateContentConfig dbConfig = GenerateContentConfig.builder()
+                    .tools(Collections.singletonList(dbTool))
+                    .temperature(0.1f) // 함수 호출의 정확도를 위해 낮음
                     .build();
 
-            GenerateContentConfig config = GenerateContentConfig.builder()
-                    .tools(Arrays.asList(googleSearchTool))
-                    .temperature(0.7f) // 사실 기반 분석을 위해 온도를 낮게 설정 (창의성 억제)
-                    .maxOutputTokens(2500)
-                    .thinkingConfig(ThinkingConfig.builder().includeThoughts(true).build())
-                    .build();
+            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", history, dbConfig);
 
-            // 6. Gemini 호출
-            GenerateContentResponse response = geminiClient.models.generateContent(
-                    "models/gemini-2.5-flash",
-                    Content.builder().parts(Collections.singletonList(Part.builder().text(prompt).build())).build(),
-                    config
-            );
+            // 함수 호출 처리 루프
+            if (response != null && response.candidates().isPresent() && !response.candidates().get().isEmpty()) {
+                com.google.genai.types.Candidate candidate = response.candidates().get().get(0);
 
-            if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                // [DEBUG] 추론 과정 확인을 위한 로그
-                System.out.println("=== [Analyze Price] Full Response: " + response);
-                
-                String resultText = response.text();
-                return (resultText != null) ? resultText : "시세 정보를 가져오지 못했습니다.";
+                if (candidate.content().isPresent()) {
+                    history.add(candidate.content().get());
+                }
+
+                List<Part> parts = Collections.emptyList();
+                if (candidate.content().isPresent() && candidate.content().get().parts().isPresent()) {
+                    parts = candidate.content().get().parts().get();
+                }
+
+                boolean functionCalled = false;
+                List<Part> functionResponseParts = new ArrayList<>();
+
+                for (Part part : parts) {
+                    if (part.functionCall().isPresent()) {
+                        FunctionCall call = part.functionCall().get();
+
+                        if (call.name().isPresent() && "get_product_detail".equals(call.name().get())) {
+                            functionCalled = true;
+                            Map<String, Object> args = call.args().orElse(Collections.emptyMap());
+                            String idStr = (String) args.get("productId");
+
+                            System.out.println("=== [Analyze Tool] Gemini requests function: get_product_detail(" + idStr + ") ===");
+
+                            String dbResult = executeProductDetailSearch(idStr);
+
+                            functionResponseParts.add(Part.builder()
+                                    .functionResponse(FunctionResponse.builder()
+                                            .name(call.name().get())
+                                            .response(Map.of("result", dbResult))
+                                            .build())
+                                    .build());
+                        }
+                    }
+                }
+
+                if (functionCalled) {
+                    // 함수 결과를 모델에게 전달
+                    Content functionResponseContent = Content.builder()
+                            .role("function")
+                            .parts(functionResponseParts)
+                            .build();
+                    history.add(functionResponseContent);
+
+                    // [2단계] 구글 검색 도구로 교체하여 최종 분석 요청
+                    // 모델에게 이제 검색하고 분석하라는 추가 지시를 내림 (Context 유지)
+                    String finalPrompt = "DB에서 확인된 상품명(키워드)을 바탕으로 구글 검색을 수행하여 '정가'와 '중고 시세'를 찾고, " +
+                            "수집한 정보를 종합하여 아래 **출력 형식**에 맞춰 분석 보고서를 작성해줘.\n\n" +
+                            "[출력 형식]\n" +
+                            "### 🏷️ [상품명] 분석 결과\n\n" +
+                            "**💰 가격 정보**\n" +
+                            "- **판매 희망가:** (판매 희망가)원\n" +
+                            "- **정가(신품가):** (검색된 정가, 모르면 '정보 없음')\n" +
+                            "- **중고 시세:** (검색된 중고 시세 범위)\n" +
+                            "- **Pika 내 평균:** (DB에서 조회한 평균가)\n\n" +
+                            "**📊 분석 및 코멘트**\n" +
+                            "- **상품 요약:** (상품 특징 1줄 요약)\n" +
+                            "- **가격 분석:** (판매가가 시세 대비 어떤지, 구매/판매 추천 여부를 2~3문장으로 핵심만 요약)";
+                    
+                    history.add(Content.builder().role("user").parts(Collections.singletonList(Part.builder().text(finalPrompt).build())).build());
+
+                    GenerateContentConfig searchConfig = GenerateContentConfig.builder()
+                            .tools(Collections.singletonList(googleSearchTool)) // 구글 검색 도구만 활성화
+                            .temperature(0.5f)
+                            .maxOutputTokens(2500)
+                            .build();
+
+                    GenerateContentResponse finalResponse = geminiClient.models.generateContent("models/gemini-2.5-flash", history, searchConfig);
+
+                    if (finalResponse != null && finalResponse.candidates().isPresent() && !finalResponse.candidates().get().isEmpty()) {
+                        String finalText = finalResponse.text();
+                        System.out.println("=== [Analyze Tool] Final Answer: " + finalText);
+                        return finalText != null ? finalText : "분석 결과를 생성하지 못했습니다.";
+                    }
+                } else {
+                    String text = response.text();
+                    System.out.println("=== [Analyze Tool] Failed to call DB function: " + text);
+                    return "AI가 상품 정보를 조회하지 못했습니다.";
+                }
             }
 
         } catch (Exception e) {
             System.err.println("Gemini Analysis 오류: " + e.getMessage());
-            return "죄송합니다. 시세 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+            e.printStackTrace();
+            return "죄송합니다. 시세 분석 중 오류가 발생했습니다: " + e.getMessage();
         }
 
         return "시세 정보를 가져오지 못했습니다.";
+    }
+
+    /**
+     * 시세 분석용 상품 상세 정보 조회 (Tool Execution)
+     */
+    private String executeProductDetailSearch(String productIdStr) {
+        try {
+            int productId = Integer.parseInt(productIdStr);
+            com.numlock.pika.domain.Products product = productRepository.findById(productId)
+                    .orElse(null);
+
+            if (product == null) {
+                return "Error: 해당 ID(" + productId + ")의 상품을 찾을 수 없습니다.";
+            }
+
+            // 검색 키워드 추출 (기존 extractSearchKeyword 로직 대신 제목을 그대로 사용하거나 간단히 처리)
+            // 여기서는 제목을 그대로 제공하고 모델이 판단하게 함
+            String keyword = product.getTitle();
+
+            // 내부 평균 시세 조회
+            Double internalAvg = productRepository.findAveragePriceByTitleAndCategory(
+                    keyword,
+                    product.getCategory().getCategoryId()
+            );
+            String avgPriceStr = (internalAvg != null) ? String.format("%,.0f원", internalAvg) : "데이터 부족으로 산출 불가";
+
+            // JSON 형태 또는 명확한 텍스트로 반환
+            return String.format(
+                    "{" +
+                    "\"productId\": %d, " +
+                    "\"title\": \"%s\", " +
+                    "\"price\": %s, " +
+                    "\"category\": \"%s\", " +
+                    "\"internalAveragePrice\": \"%s\", " +
+                    "\"description\": \"%s\"" +
+                    "}",
+                    product.getProductId(),
+                    product.getTitle(),
+                    product.getPrice(),
+                    product.getCategory().getCategory(),
+                    avgPriceStr,
+                    product.getDescription().replaceAll("[\"\\n]", " ") // 간단한 이스케이프 처리
+            );
+
+        } catch (NumberFormatException e) {
+            return "Error: 유효하지 않은 상품 ID 형식입니다.";
+        } catch (Exception e) {
+            return "Error: DB 조회 중 오류 발생 - " + e.getMessage();
+        }
     }
 
     /**
@@ -154,126 +264,167 @@ public class GeminiService {
             // 해당 세션의 대화 기록 가져오기 (없으면 생성)
             List<Content> history = chatHistories.computeIfAbsent(sessionId, k -> new ArrayList<>());
 
-            String context = "";
-            // 가격 관련 키워드가 있는지 확인하는 하드코딩 조건 제거
-            String keyword = extractSearchKeyword(userMessage);
-            
-            if (!"NONE".equals(keyword)) {
-                // DB에서 상품 검색 (최신순 5개)
-                org.springframework.data.domain.Page<com.numlock.pika.domain.Products> products =
-                        productRepository.searchByFilters(keyword, null, org.springframework.data.domain.PageRequest.of(0, 5));
+            // 1. 도구(Function) 정의
+            Tool searchTool = Tool.builder()
+                    .functionDeclarations(Collections.singletonList(
+                            FunctionDeclaration.builder()
+                                    .name("search_market_products")
+                                    .description("사용자가 특정 상품의 시세, 재고, 구매 가능 여부, 상품 목록 등을 물어볼 때 DB에서 상품을 검색합니다. 사용자가 구체적인 상품명을 언급하지 않아도 문맥상 상품 검색이 필요하면 사용하세요.")
+                                    .parameters(
+                                            Schema.builder()
+                                                    .type(Type.Known.OBJECT)
+                                                    .properties(Map.of(
+                                                            "keyword", Schema.builder()
+                                                                    .type(Type.Known.STRING)
+                                                                    .description("검색할 상품명 (예: 원피스, 아이폰, 자전거)")
+                                                                    .build()
+                                                    ))
+                                                    .required(Collections.singletonList("keyword"))
+                                                    .build()
+                                    )
+                                    .build()
+                    ))
+                    .build();
 
-                if (products.hasContent()) {
-                    long totalElements = products.getTotalElements(); // 전체 검색 결과 수 확보
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("현재 마켓 DB에 '").append(keyword).append("' 검색 결과 총 ")
-                      .append(totalElements).append("개의 상품이 등록되어 있습니다.\n");
-                    sb.append("그 중 가장 최근 등록된 5개의 정보는 다음과 같습니다:\n");
-                    
-                    for (com.numlock.pika.domain.Products p : products.getContent()) {
-                        sb.append("- ").append(p.getTitle()).append(": ").append(p.getPrice()).append("원\n");
-                    }
-                    context = sb.toString();
-                } else {
-                    context = "현재 마켓에 '" + keyword + "' 관련 상품은 등록되어 있지 않습니다.";
-                }
-            }
-
-            // 시스템 프롬프트 성격의 지시문과 컨텍스트, 사용자 질문을 조합
-            String finalPromptText = "";
+            // 2. 시스템 프롬프트 설정 (히스토리가 비었을 때만)
             if (history.isEmpty()) {
-                finalPromptText += "당신은 중고거래 마켓 'Pika'의 AI 어시스턴트입니다. 다음 원칙을 엄격히 지켜주세요:\n" +
-                        "1. **핵심만 간결하게**: 답변은 최대 3~4문장으로 짧게 작성하세요.\n" +
-                        "2. **불필요한 조언 금지**: 사용자가 구체적인 방법을 묻지 않았다면, '사진 잘 찍는 법', '상세 설명 쓰는 법' 같은 일반적인 조언은 생략하세요.\n" +
-                        "3. **행동 유도**: 사용자가 판매 의사를 보이면, 해당 상품의 '시세'를 분석해줄지 묻거나, 상단의 '판매하기' 메뉴를 이용하라고 안내하세요.\n" +
-                        "4. **톤앤매너**: 친절하지만 군더더기 없는 말투를 사용하세요.\n";
+                String systemInstruction = "당신은 중고거래 마켓 'Pika'의 AI 어시스턴트입니다.\n" +
+                        "- 사용자가 상품 정보를 물으면 `search_market_products` 도구를 사용하여 실제 DB 데이터를 확인한 후 답변하세요.\n" +
+                        "- 도구 실행 결과가 없으면 '현재 판매 중인 해당 상품이 없습니다'라고 정직하게 말하세요.\n" +
+                        "- 답변은 친절하고 간결하게(3~4문장) 작성하세요.";
+                
+                Content systemContent = Content.builder()
+                        .role("user")
+                        .parts(Collections.singletonList(Part.builder().text(systemInstruction).build()))
+                        .build();
+                history.add(systemContent);
+                
+                // 턴을 맞추기 위한 모델의 더미 응답
+                history.add(Content.builder().role("model").parts(Collections.singletonList(Part.builder().text("네, 알겠습니다.").build())).build());
             }
-            if (!context.isEmpty()) {
-                finalPromptText += "참고할 마켓 데이터:\n" + context + "\n";
-            }
-            finalPromptText += userMessage;
 
-            // 사용자 메시지를 Content 객체로 생성하여 History에 추가
+            // 3. 사용자 메시지 추가
             Content userContent = Content.builder()
                     .role("user")
-                    .parts(Collections.singletonList(Part.builder().text(finalPromptText).build()))
+                    .parts(Collections.singletonList(Part.builder().text(userMessage).build()))
                     .build();
             history.add(userContent);
 
-            // Gemini API 호출 (전체 히스토리 전달)
+            // 4. 1차 호출 (Tools 포함)
             GenerateContentConfig chatConfig = GenerateContentConfig.builder()
+                    .tools(Collections.singletonList(searchTool))
                     .maxOutputTokens(3000)
                     .temperature(0.7f)
-                    .thinkingConfig(ThinkingConfig.builder().includeThoughts(true).build())
                     .build();
 
             GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", history, chatConfig);
 
-            if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                // [DEBUG] 추론 과정 확인을 위한 로그
-                System.out.println("=== [Chat Response] Full Response: " + response);
-
-                // 토큰 사용량 로그 출력
-                if (response.usageMetadata().isPresent()) {
-                    var usage = response.usageMetadata().get();
-                    System.out.println("=== [Chat] Token Usage ===");
-                    System.out.println("Input Tokens : " + usage.promptTokenCount());
-                    System.out.println("Output Tokens: " + usage.candidatesTokenCount());
-                    System.out.println("Total Tokens : " + usage.totalTokenCount());
-                    System.out.println("==========================");
+            // 5. 응답 처리 (함수 호출 vs 텍스트 답변)
+            if (response != null && response.candidates().isPresent() && !response.candidates().get().isEmpty()) {
+                com.google.genai.types.Candidate candidate = response.candidates().get().get(0);
+                
+                // 모델의 1차 응답(함수 호출 요청 포함 가능)을 히스토리에 저장
+                if (candidate.content().isPresent()) {
+                    history.add(candidate.content().get());
                 }
 
-                String responseText = response.text();
-                if (responseText == null) {
-                    responseText = "죄송합니다. 답변을 생성하는 중에 문제가 발생했습니다.";
+                List<Part> parts = Collections.emptyList();
+                if (candidate.content().isPresent() && candidate.content().get().parts().isPresent()) {
+                    parts = candidate.content().get().parts().get();
                 }
 
-                // 모델의 응답을 Content 객체로 생성하여 History에 추가
-                Content modelContent = Content.builder()
-                        .role("model")
-                        .parts(Collections.singletonList(Part.builder().text(responseText).build()))
-                        .build();
-                history.add(modelContent);
+                boolean functionCalled = false;
+                List<Part> functionResponseParts = new ArrayList<>();
 
-                return responseText;
+                for (Part part : parts) {
+                    // FunctionCall 확인 (Optional 처리)
+                    if (part.functionCall().isPresent()) {
+                        FunctionCall call = part.functionCall().get();
+                        
+                        if (call.name().isPresent() && "search_market_products".equals(call.name().get())) {
+                            functionCalled = true;
+                            Map<String, Object> args = call.args().orElse(Collections.emptyMap());
+                            String keyword = (String) args.get("keyword");
+                            
+                            System.out.println("=== [Tool Use] Gemini requests function: search_market_products(" + keyword + ") ===");
+
+                            // DB 조회 실행
+                            String searchResult = executeProductSearch(keyword);
+
+                            // 결과 생성 (FunctionResponse)
+                            functionResponseParts.add(Part.builder()
+                                    .functionResponse(FunctionResponse.builder()
+                                            .name(call.name().get())
+                                            .response(Map.of("result", searchResult))
+                                            .build())
+                                    .build());
+                        }
+                    }
+                }
+
+                if (functionCalled) {
+                    // 6. 함수 실행 결과를 모델에게 전달 (2차 호출)
+                    Content functionResponseContent = Content.builder()
+                            .role("function") // 중요: 역할은 function
+                            .parts(functionResponseParts)
+                            .build();
+                    history.add(functionResponseContent);
+
+                    // 도구 결과를 포함하여 다시 모델 호출 (최종 답변 생성)
+                    GenerateContentResponse finalResponse = geminiClient.models.generateContent("models/gemini-2.5-flash", history, chatConfig);
+                    
+                    if (finalResponse != null && finalResponse.candidates().isPresent() && !finalResponse.candidates().get().isEmpty()) {
+                         String finalText = finalResponse.text();
+                         System.out.println("=== [Tool Use] Final Answer: " + finalText);
+                         
+                         // 최종 답변 히스토리 저장
+                         if (finalResponse.candidates().get().get(0).content().isPresent()) {
+                             history.add(finalResponse.candidates().get().get(0).content().get());
+                         }
+                         return finalText;
+                    }
+                } else {
+                    // 함수 호출 없이 바로 답변이 온 경우
+                    String text = response.text();
+                    System.out.println("=== [Chat] Normal Response: " + text);
+                    return text;
+                }
             }
         } catch (Exception e) {
             System.err.println("Gemini Chat 오류: " + e.getMessage());
-            // 오류 발생 시, 방금 추가한 사용자 메시지는 제거하는 것이 좋을 수 있음 (선택 사항)
-            return "죄송합니다. 현재 답변을 생성할 수 없습니다.";
+            e.printStackTrace();
+            return "죄송합니다. 서비스 연결 중 오류가 발생했습니다.";
         }
         return "죄송합니다. 이해하지 못했습니다.";
     }
 
-    private String extractSearchKeyword(String userMessage) {
+    private String executeProductSearch(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return "검색어가 유효하지 않습니다.";
+        }
+
         try {
-            // 검색 의도 분석을 포함한 개선된 프롬프트 (정확도를 위해 영문 지시문 혼용)
-            String prompt = "Analyze the user message and extract a search keyword for the product database.\n" +
-                    "Rules:\n" +
-                    "1. If the user is looking for product info, price, or stock, output ONLY the **full product name** or core keyword.\n" +
-                    "2. **NEVER truncate proper nouns.** (e.g., '체인소맨' -> '체인소맨', NOT '체')\n" +
-                    "3. If it's a general greeting or small talk, output 'NONE'.\n" +
-                    "User message: " + userMessage;
+            // DB에서 상품 검색 (최신순 5개)
+            org.springframework.data.domain.Page<com.numlock.pika.domain.Products> products =
+                    productRepository.searchByFilters(keyword, null, org.springframework.data.domain.PageRequest.of(0, 5));
 
-            GenerateContentConfig keywordConfig = GenerateContentConfig.builder()
-                    .maxOutputTokens(50)
-                    .temperature(0.1f) // 일관된 판단을 위해 낮은 온도 설정
-                    .build();
+            if (products.hasContent()) {
+                long totalElements = products.getTotalElements();
+                StringBuilder sb = new StringBuilder();
+                sb.append("DB 검색 결과 ('").append(keyword).append("'): 총 ").append(totalElements).append("건 발견.\n")
+                        .append("최신 등록 상품 5건:\n");
 
-            GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, keywordConfig);
-            if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
-                if (response.usageMetadata().isPresent()) {
-                    var usage = response.usageMetadata().get();
-                    System.out.println("[Keyword] Tokens - In: " + usage.promptTokenCount() + ", Out: " + usage.candidatesTokenCount());
+                for (com.numlock.pika.domain.Products p : products.getContent()) {
+                    sb.append("- [").append(p.getProductState() == 0 ? "판매중" : "판매완료").append("] ")
+                            .append(p.getTitle()).append(" / 가격: ").append(p.getPrice()).append("원\n");
                 }
-                
-                String resultText = response.text();
-                return (resultText != null) ? resultText.trim() : "NONE";
+                return sb.toString();
+            } else {
+                return "검색 결과: '" + keyword + "' 관련 상품이 마켓에 없습니다.";
             }
         } catch (Exception e) {
-            System.err.println("키워드 추출 오류: " + e.getMessage());
+            return "상품 검색 중 시스템 오류가 발생했습니다: " + e.getMessage();
         }
-        return "NONE";
     }
 
     /**
