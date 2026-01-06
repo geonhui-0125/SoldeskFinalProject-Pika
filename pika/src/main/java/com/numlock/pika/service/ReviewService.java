@@ -16,6 +16,7 @@ public interface ReviewService {
     ReviewResponseDto updateReview(Long reviewId, ReviewRequestDto reviewRequestDto, String currentUserId);
     void deleteReview(Long reviewId, String currentUserId);
     boolean hasUserReviewedProduct(String userId, int productId);
+    boolean hasUserPurchasedProduct(String userId, int productId); // 추가
     SellerStatsDto getSellerStats(String sellerId);
 
 

@@ -13,6 +13,7 @@ import com.numlock.pika.dto.ReviewResponseDto;
 import com.numlock.pika.dto.SellerStatsDto;
 import com.numlock.pika.repository.ReviewRepository;
 import com.numlock.pika.repository.UserRepository;
+import com.numlock.pika.repository.PaymentRepository; // PaymentRepository import 추가
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository; // ProductRepository 주입
+    private final PaymentRepository paymentRepository; // PaymentRepository 주입 추가
     private final EntityManager entityManager;
 
     @Override
@@ -48,7 +50,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 판매자가 자신에게 리뷰를 작성하는 것을 방지
         if (seller.getId().equals(reviewer.getId())) {
-            throw new IllegalArgumentException("Seller cannot review themselves.");
+            throw new IllegalArgumentException("자기 자신에게 리뷰를 작성할 수 없습니다");
+        }
+
+        // 구매 여부 확인
+        boolean hasPurchased = paymentRepository.findByBuyerAndTask(reviewer, product).isPresent();
+        if (!hasPurchased) {
+            throw new IllegalArgumentException("상품을 구매한 사용자만 리뷰를 작성할 수 있습니다.");
         }
 
         // 특정 상품에 대해 동일한 사용자가 이미 리뷰를 작성했는지 확인
@@ -153,6 +161,15 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public boolean hasUserReviewedProduct(String userId, int productId) {
         return reviewRepository.existsByReviewer_IdAndProduct_ProductId(userId, productId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasUserPurchasedProduct(String userId, int productId) {
+        Users user = userRepository.findById(userId).orElse(null);
+        Products product = productRepository.findById(productId).orElse(null);
+        if (user == null || product == null) return false;
+        return paymentRepository.findByBuyerAndTask(user, product).isPresent();
     }
 
 
