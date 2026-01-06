@@ -211,7 +211,9 @@
                 <span id="birth-error" class="field-error"></span>
                 <span th:if="${#fields.hasErrors('birth')}" th:errors="*{birth}" class="field-error"></span>
             </div>-->
-
+            <div style="margin-top: 10px">
+                <button type="submit">정보 업데이트</button>
+            </div>
         </form>
 
         <form th:action="@{/user/password/find}" method="get" style="margin-top: 10px;">
@@ -219,9 +221,6 @@
         </form>
         <form th:action="@{/}" method="get" style="margin-top: 10px;">
             <button type="submit" class="skip-button">메인으로</button>
-        </form>
-        <form th:action="@{/}" method="get" style="margin-top: 10px;">
-            <button type="submit">정보 업데이트</button>
         </form>
         <div style="margin-top: 10px;">
             <a th:href="@{/user/delete}" class="delete-button" onclick="return confirm('정말로 탈퇴하시겠습니까? 탈퇴 페이지로 이동합니다.');">회원탈퇴</a>
