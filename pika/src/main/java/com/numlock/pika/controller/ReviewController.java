@@ -35,10 +35,19 @@ public class ReviewController {
                                    @RequestParam("sellerId") String sellerId,
                                    @RequestParam("sellerNickname") String sellerNickname,
                                    Principal principal,
-                                   Model model) {
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         if (principal == null) {
             model.addAttribute("errorMessage", "로그인이 필요합니다.");
             return "redirect:/user/login";
+        }
+
+        String userId = principal.getName();
+        
+        // 구매 여부 확인 (구매하지 않았으면 폼 접근 차단)
+        if (!reviewService.hasUserPurchasedProduct(userId, productId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "상품을 구매한 분들만 리뷰를 남길 수 있습니다.");
+            return "redirect:/products/info/" + productId;
         }
 
         ReviewRequestDto reviewRequestDto = new ReviewRequestDto();
