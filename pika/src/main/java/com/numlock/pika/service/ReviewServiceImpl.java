@@ -48,7 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         // 판매자가 자신에게 리뷰를 작성하는 것을 방지
         if (seller.getId().equals(reviewer.getId())) {
-            throw new IllegalArgumentException("Seller cannot review themselves.");
+            throw new IllegalArgumentException("자기 자신에게 리뷰를 작성할 수 없습니다");
         }
 
         // 특정 상품에 대해 동일한 사용자가 이미 리뷰를 작성했는지 확인

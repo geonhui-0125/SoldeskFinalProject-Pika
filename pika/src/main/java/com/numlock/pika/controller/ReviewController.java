@@ -68,7 +68,7 @@ public class ReviewController {
         try {
             reviewService.createReview(reviewRequestDto);
             return "redirect:/products/info/" + reviewRequestDto.getProductId(); // 상품 정보 페이지로 리다이렉트
-        } catch (DuplicateReviewException e) {
+        } catch (DuplicateReviewException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/"; // 메인 페이지로 리다이렉트
         } catch (Exception e) {
