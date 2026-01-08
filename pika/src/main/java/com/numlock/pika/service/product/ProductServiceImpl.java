@@ -29,7 +29,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import static com.numlock.pika.dto.ProductDetailDto.calculateTimeAgo;
 
@@ -53,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getAllProducts() {
-        return productRepository.findAll().stream()
+        return productRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
                 .map(ProductDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -61,8 +63,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDto> getProductList(Pageable pageable) {
+        // createdAt을 기준으로 내림차순 정렬을 추가하여 Pageable 객체를 생성
+        Pageable sortedPageable = PageRequest.of(
+            pageable.getPageNumber(),
+            pageable.getPageSize(),
+            pageable.getSort().and(Sort.by(Sort.Direction.DESC, "createdAt"))
+        );
 
-        return productRepository.findAll(pageable).map(product -> {
+        return productRepository.findAll(sortedPageable).map(product -> {
             ProductDto dto = ProductDto.fromEntity(product);
 
             String folderUrl = dto.getProductImage();
