@@ -348,14 +348,15 @@ public class GeminiService {
         if (reviewContents == null || reviewContents.isEmpty()) return "아직 등록된 리뷰가 없습니다.";
         List<String> limitedReviews = reviewContents.stream().limit(10).collect(Collectors.toList());
         String combinedReviews = String.join("\n", limitedReviews);
-        String prompt = "다음 판매자 리뷰를 50자 이내 한줄평으로 요약해줘:\n" + combinedReviews;
+        String prompt = "다음 판매자 리뷰를 50자 이내 한줄평으로 요약해줘. (글자 수는 표기하지 말고, 주어진 토큰 한도 내에서 문장을 완결해줘.):\n" + combinedReviews;
 
         try {
-            GenerateContentConfig summaryConfig = GenerateContentConfig.builder().maxOutputTokens(400).temperature(0.5f).build();
+            GenerateContentConfig summaryConfig = GenerateContentConfig.builder().maxOutputTokens(3000).temperature(0.5f).build();
             GenerateContentResponse response = geminiClient.models.generateContent("models/gemini-2.5-flash", prompt, summaryConfig);
-            return (response != null) ? response.text().trim() : "요약 불가";
+            return (response != null && response.text() != null) ? response.text().trim() : "요약 불가";
         } catch (Exception e) {
-            return "리뷰 분석 중...";
+            e.printStackTrace();
+            return "요약 정보를 불러오지 못했습니다.";
         }
     }
     // Google Search 전용 독립 호출 메서드
