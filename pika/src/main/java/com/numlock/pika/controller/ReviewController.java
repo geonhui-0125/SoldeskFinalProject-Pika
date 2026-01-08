@@ -18,6 +18,8 @@ import com.numlock.pika.service.DuplicateReviewException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors; // Collectors 임포트 추가
 
 @Controller
@@ -210,6 +212,14 @@ public class ReviewController {
 
         // 3. GeminiService를 호출하여 리뷰 내용으로부터 한줄평을 생성합니다.
         String summary = geminiService.generateReviewSummary(reviewContents);
+
+        String regex = "[@#$%^&*]"; // !@#$%^&*이 포함되어있는지 체크하는 정규식
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(summary);
+        if (matcher.find()) {
+            summary = summary.replaceAll(regex, "");
+        }
 
         // 4. 생성된 한줄평을 반환합니다.
         return summary;
