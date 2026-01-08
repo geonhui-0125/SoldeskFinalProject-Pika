@@ -266,8 +266,8 @@ public class ProductController {
     /**
      * 상품 삭제 처리
      */
+    //@PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     public String deleteProduct(@PathVariable("id") int id,
                                 @RequestParam(value = "redirect", required = false) String redirect,
                                 Principal principal) {
