@@ -7,7 +7,7 @@ PIKA는 **서브컬처 굿즈를 사고파는 사용자의 정보 탐색 부담�
 - **팀**: Numlock
 - **구현 형태**: Spring Boot · Thymeleaf 기반 서버 렌더링 웹 애플리케이션
 - **주요 구현 영역**: 상품 검색·관리, 회원·마이페이지, 채팅·알림, 결제 연동, AI 시세 분석·리뷰 요약
-- **기획 및 역할 분담 자료**: [프로젝트 기획서](../../docs/기획서(2차_기획서_NUMLOCK).txt) · [발표 자료](../../docs/Numlock%202차%20프로젝트%20PPT.odp)
+- **기획 및 역할 분담 자료**: [프로젝트 기획서](docs/기획서(2차_기획서_NUMLOCK).txt) · [발표 자료](docs/Numlock%202차%20프로젝트%20PPT.odp)
 
 이 README의 구현 설명은 현재 소스 코드를 기준으로 합니다. 팀 전체의 구현 범위를 다루며, 개인별 담당 범위는 기획서의 역할 분담 자료에서 확인할 수 있습니다.
 
@@ -27,12 +27,12 @@ AI 분석은 구매·판매 판단을 돕는 참고 정보이며, 실제 적정�
 
 | 영역 | 구현 내용 | 대표 코드 |
 | --- | --- | --- |
-| 회원 | 회원가입, 폼 로그인, BCrypt 비밀번호 암호화, 계정 관리, 이메일 비밀번호 재설정 | [LoginSecurity](src/main/java/com/numlock/pika/config/LoginSecurity.java), [회원 컨트롤러](src/main/java/com/numlock/pika/controller/user/UserController.java) |
-| 상품·탐색 | 상품 등록·수정·조회, 다중 이미지, 키워드·카테고리 검색, 목록 페이징, 인기 검색어 | [상품 서비스](src/main/java/com/numlock/pika/service/product/ProductServiceImpl.java), [검색 조건](src/main/java/com/numlock/pika/service/product/ProductSpecification.java) |
-| 마이페이지 | 사용자 정보, 찜 목록, 구매·판매 내역, 리뷰·알림 관리 | [계정 컨트롤러](src/main/java/com/numlock/pika/controller/user/AccountController.java), [거래 내역](src/main/java/com/numlock/pika/controller/payment/TradeHistoryController.java) |
-| 실시간 소통 | WebSocket 1:1 채팅, 메시지 저장, 이미지 첨부, 알림 | [채팅 핸들러](src/main/java/com/numlock/pika/handler/WebSockChatHandler.java), [알림 서비스](src/main/java/com/numlock/pika/service/Notification/NotificationService.java) |
-| 거래·리뷰 | PortOne 결제 정보 조회, 결제 내역 저장·상품 상태 변경, 구매 이력 기반 리뷰 작성, 중복 리뷰 방지 | [결제 서비스](src/main/java/com/numlock/pika/service/payment/PaymentApiService.java), [리뷰 서비스](src/main/java/com/numlock/pika/service/ReviewServiceImpl.java) |
-| AI | 상품 시세 분석, 내부 상품 검색과 외부 웹 검색을 연결하는 챗봇, 판매자 리뷰 요약 | [GeminiService](src/main/java/com/numlock/pika/service/GeminiService.java) |
+| 회원 | 회원가입, 폼 로그인, BCrypt 비밀번호 암호화, 계정 관리, 이메일 비밀번호 재설정 | [LoginSecurity](pika/src/main/java/com/numlock/pika/config/LoginSecurity.java), [회원 컨트롤러](pika/src/main/java/com/numlock/pika/controller/user/UserController.java) |
+| 상품·탐색 | 상품 등록·수정·조회, 다중 이미지, 키워드·카테고리 검색, 목록 페이징, 인기 검색어 | [상품 서비스](pika/src/main/java/com/numlock/pika/service/product/ProductServiceImpl.java), [검색 조건](pika/src/main/java/com/numlock/pika/service/product/ProductSpecification.java) |
+| 마이페이지 | 사용자 정보, 찜 목록, 구매·판매 내역, 리뷰·알림 관리 | [계정 컨트롤러](pika/src/main/java/com/numlock/pika/controller/user/AccountController.java), [거래 내역](pika/src/main/java/com/numlock/pika/controller/payment/TradeHistoryController.java) |
+| 실시간 소통 | WebSocket 1:1 채팅, 메시지 저장, 이미지 첨부, 알림 | [채팅 핸들러](pika/src/main/java/com/numlock/pika/handler/WebSockChatHandler.java), [알림 서비스](pika/src/main/java/com/numlock/pika/service/Notification/NotificationService.java) |
+| 거래·리뷰 | PortOne 결제 정보 조회, 결제 내역 저장·상품 상태 변경, 구매 이력 기반 리뷰 작성, 중복 리뷰 방지 | [결제 서비스](pika/src/main/java/com/numlock/pika/service/payment/PaymentApiService.java), [리뷰 서비스](pika/src/main/java/com/numlock/pika/service/ReviewServiceImpl.java) |
+| AI | 상품 시세 분석, 내부 상품 검색과 외부 웹 검색을 연결하는 챗봇, 판매자 리뷰 요약 | [GeminiService](pika/src/main/java/com/numlock/pika/service/GeminiService.java) |
 
 ## 3. 구현 포인트
 
@@ -50,7 +50,7 @@ AI 분석은 구매·판매 판단을 돕는 참고 정보이며, 실제 적정�
 
 ### 조건 조합과 연관 데이터 조회
 
-상품 검색은 JPA `Specification`으로 키워드와 카테고리 조건을 조합하고, 목록은 페이지 단위로 조회합니다. 찜 목록은 [Fetch Join 쿼리](src/main/java/com/numlock/pika/repository/FavoriteProductRepository.java)를 사용해 찜 항목과 상품을 함께 가져옵니다. 조회 시 필요한 연관 데이터를 명시적으로 선택한 사례이며, 성능 개선율을 측정한 결과는 없습니다.
+상품 검색은 JPA `Specification`으로 키워드와 카테고리 조건을 조합하고, 목록은 페이지 단위로 조회합니다. 찜 목록은 [Fetch Join 쿼리](pika/src/main/java/com/numlock/pika/repository/FavoriteProductRepository.java)를 사용해 찜 항목과 상품을 함께 가져옵니다. 조회 시 필요한 연관 데이터를 명시적으로 선택한 사례이며, 성능 개선율을 측정한 결과는 없습니다.
 
 ### 거래 이력을 기준으로 리뷰 작성 제한
 
@@ -110,9 +110,9 @@ Gradle은 별도로 설치할 필요가 없습니다. 최초 실행에는 의존
 
 | 자료 | 용도 |
 | --- | --- |
-| [table_create_query.txt](../table_create_query.txt) | 테이블·시퀀스와 기본 카테고리 정의 |
-| [datasetAdd (카테고리 수정본).txt](../datasetAdd%20(카테고리%20수정본).txt) | 카테고리가 반영된 상품·리뷰 예시 데이터 |
-| [mock.zip](../mock.zip) | 예시 상품 이미지와 데이터 SQL |
+| [table_create_query.txt](table_create_query.txt) | 테이블·시퀀스와 기본 카테고리 정의 |
+| [datasetAdd (카테고리 수정본).txt](datasetAdd%20(카테고리%20수정본).txt) | 카테고리가 반영된 상품·리뷰 예시 데이터 |
+| [mock.zip](mock.zip) | 예시 상품 이미지와 데이터 SQL |
 
 초기 SQL은 그대로 실행하기 전에 다음 사항을 확인해야 합니다.
 
@@ -126,7 +126,7 @@ Gradle은 별도로 설치할 필요가 없습니다. 최초 실행에는 의존
 
 ### 애플리케이션 설정
 
-기본 설정은 [application.properties](src/main/resources/application.properties)에서 읽습니다. 실제 비밀번호와 API 키는 커밋하지 않고 로컬 설정 또는 환경 변수로 제공합니다.
+기본 설정은 [application.properties](pika/src/main/resources/application.properties)에서 읽습니다. 실제 비밀번호와 API 키는 커밋하지 않고 로컬 설정 또는 환경 변수로 제공합니다.
 
 | 속성 | 설정 내용 |
 | --- | --- |
